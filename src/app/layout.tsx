@@ -51,7 +51,7 @@ export default function RootLayout({
                 ))}
               </ul>
             </nav>
-            <main className="flex-grow container mx-auto p-4">{children}</main>
+            <main className="flex-grow mx-auto p-4 px-6 w-full max-w-screen-2xl">{children}</main>
           </div>
           <Toaster />
         </HydrationBoundary>

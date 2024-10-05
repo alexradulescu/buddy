@@ -1,14 +1,15 @@
 'use client'
 
-import React, { useState } from 'react'
+import { parseAsInteger, useQueryState } from 'nuqs'
+import React from 'react'
 
 import { ExpenseForm } from '@/components/expense-form'
 import { ExpenseList } from '@/components/expense-list'
 
 export default function ExpensesPage() {
   const currentDate = new Date()
-  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear())
-  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth())
+  const [selectedYear, setSelectedYear] = useQueryState('year', parseAsInteger.withDefault(currentDate.getFullYear()))
+  const [selectedMonth, setSelectedMonth] = useQueryState('month', parseAsInteger.withDefault(currentDate.getMonth()))
 
   return (
     <>

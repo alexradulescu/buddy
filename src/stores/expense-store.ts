@@ -24,7 +24,7 @@ export const useExpenseStore = create<ExpenseStore>()(
       isHydrated: false,
       addExpense: (expense) =>
         set((state) => ({
-          expenses: [...state.expenses, { ...expense, id: Date.now().toString() }]
+          expenses: [...state.expenses, { ...expense, id: crypto.randomUUID() }]
         })),
       removeExpense: (id) =>
         set((state) => ({

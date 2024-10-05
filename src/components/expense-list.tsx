@@ -21,7 +21,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
 
   const currentYear = new Date().getFullYear()
 
-  const years = Array.from(new Set(expenses.map((expense) => new Date(expense.date).getFullYear())))
+  const years = [currentYear, currentYear - 1, currentYear - 2]
   const months = [
     'January',
     'February',
@@ -41,12 +41,6 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
     const expenseDate = new Date(expense.date)
     return expenseDate.getFullYear() === selectedYear && expenseDate.getMonth() === selectedMonth
   })
-
-  useEffect(() => {
-    if (!years.includes(selectedYear)) {
-      onYearChange(currentYear)
-    }
-  }, [expenses])
 
   return (
     <div className="space-y-4">
