@@ -1,6 +1,9 @@
+'use client'
+
 import { TrashIcon } from 'lucide-react'
 import React, { useState } from 'react'
 
+import { ExpenseAiConverter } from '@/components/expense-ai-converter'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
@@ -9,9 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
 import { useCategoryStore } from '@/stores/category-store'
-import { useExpenseStore } from '@/stores/expense-store'
-
-import { ExpenseAiConverter } from './expense-ai-converter'
+import { Expense, useExpenseStore } from '@/stores/expense-store'
 
 interface ExpenseFormProps {
   selectedYear: number
@@ -170,6 +171,10 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
     setTableExpenses(updatedExpenses)
   }
 
+  const handleAddAiConvertedExpenses = (expenses: Omit<Expense, 'id'>[]) => {
+    expenses.forEach((expense) => addExpense(expense))
+  }
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">
@@ -180,83 +185,85 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
         <TabsList>
           <TabsTrigger value="table-form">Table Entry</TabsTrigger>
           <TabsTrigger value="textarea-form">Bulk Entry</TabsTrigger>
-          <TabsTrigger value="ai-converter">AI converter</TabsTrigger>
+          <TabsTrigger value="ai-converter">AI Converter</TabsTrigger>
         </TabsList>
         <TabsContent value="table-form">
           <div className="space-y-4">
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-200">
-                <thead>
-                  <tr>
-                    <th className="border border-gray-200 p-2 w-[110px]">Amount</th>
-                    <th className="border border-gray-200 p-2 w-[130px]">Category</th>
-                    <th className="border border-gray-200 p-2 w-[130px]">Date</th>
-                    <th className="border border-gray-200 p-2 w-[150px]">Description</th>
-                    <th className="border border-gray-200 p-2 w-[50px]"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableExpenses.map((expense, index) => (
-                    <tr key={index}>
-                      <td className="border border-gray-200 p-1">
-                        <Input
-                          type="number"
-                          value={expense.amount}
-                          onChange={(e) => handleTableInputChange(index, 'amount', e.target.value)}
-                          onKeyDown={(e) => handleTableKeyDown(e, index)}
-                          step="0.01"
-                          min="0"
-                          required
-                          className="w-full h-full rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none py-2"
-                        />
-                      </td>
-                      <td className="border border-gray-200 p-1">
-                        <Select
-                          value={expense.category}
-                          onValueChange={(value) => handleTableInputChange(index, 'category', value)}
-                        >
-                          <SelectTrigger className="w-full h-full rounded-none">
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {expenseCategories.map((category) => (
-                              <SelectItem key={category.name} value={category.name}>
-                                {category.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </td>
-                      <td className="border border-gray-200 p-1">
-                        <DatePicker
-                          date={expense.date}
-                          onDateChange={(date) => handleTableInputChange(index, 'date', date!)}
-                          className="w-full h-full rounded-none"
-                        />
-                      </td>
-                      <td className="border border-gray-200 p-1">
-                        <Input
-                          type="text"
-                          value={expense.description}
-                          onChange={(e) => handleTableInputChange(index, 'description', e.target.value)}
-                          onKeyDown={(e) => handleTableKeyDown(e, index)}
-                          className="w-full h-full rounded-none py-2"
-                        />
-                      </td>
-                      <td className="border border-gray-200 p-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteRow(index)}
-                          className="w-full h-full rounded-none"
-                        >
-                          <TrashIcon className="h-7 w-4" />
-                        </Button>
-                      </td>
+              <div className="max-h-[50vh] overflow-y-auto">
+                <table className="w-full border-collapse border border-gray-200">
+                  <thead className="sticky top-0 bg-background">
+                    <tr>
+                      <th className="border border-gray-200 p-2 w-[110px]">Amount</th>
+                      <th className="border border-gray-200 p-2 w-[130px]">Category</th>
+                      <th className="border border-gray-200 p-2 w-[130px]">Date</th>
+                      <th className="border border-gray-200 p-2 w-[150px]">Description</th>
+                      <th className="border border-gray-200 p-2 w-[50px]"></th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {tableExpenses.map((expense, index) => (
+                      <tr key={index}>
+                        <td className="border border-gray-200 p-1">
+                          <Input
+                            type="number"
+                            value={expense.amount}
+                            onChange={(e) => handleTableInputChange(index, 'amount', e.target.value)}
+                            onKeyDown={(e) => handleTableKeyDown(e, index)}
+                            step="0.01"
+                            min="0"
+                            required
+                            className="w-full h-full rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none py-2"
+                          />
+                        </td>
+                        <td className="border border-gray-200 p-1">
+                          <Select
+                            value={expense.category}
+                            onValueChange={(value) => handleTableInputChange(index, 'category', value)}
+                          >
+                            <SelectTrigger className="w-full h-full rounded-none">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {expenseCategories.map((category) => (
+                                <SelectItem key={category.name} value={category.name}>
+                                  {category.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </td>
+                        <td className="border border-gray-200 p-1">
+                          <DatePicker
+                            date={expense.date}
+                            onDateChange={(date) => handleTableInputChange(index, 'date', date!)}
+                            className="w-full h-full rounded-none"
+                          />
+                        </td>
+                        <td className="border border-gray-200 p-1">
+                          <Input
+                            type="text"
+                            value={expense.description}
+                            onChange={(e) => handleTableInputChange(index, 'description', e.target.value)}
+                            onKeyDown={(e) => handleTableKeyDown(e, index)}
+                            className="w-full h-full rounded-none py-2"
+                          />
+                        </td>
+                        <td className="border border-gray-200 p-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteRow(index)}
+                            className="w-full h-full rounded-none"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
             <div className="flex items-center space-x-2">
               <Input

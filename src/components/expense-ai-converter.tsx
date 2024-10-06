@@ -62,7 +62,7 @@ export const ExpenseAiConverter = ({ handleTextareaAddExpenses, setTextareaConte
               onChange={(e) => setTextareaContent(e.target.value)}
               placeholder="Enter expenses (amount,category,date,description)"
               rows={10}
-              className="font-mono"
+              className="font-mono max-h-[50dvh] overflow-y-scroll"
             />
             <Button onClick={handleTextareaAddExpenses}>Add Expenses</Button>
           </div>

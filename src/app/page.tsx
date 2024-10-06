@@ -36,16 +36,26 @@ export default function HomePage() {
   const calculateCategoryAmount = (
     items: typeof expenses | typeof incomes,
     categoryName: string,
-    isAnnual: boolean = false
+    isAnnual: boolean = false,
+    isYearToDate: boolean = false
   ) => {
     return items
       .filter((item) => {
         const itemDate = new Date(item.date)
+        if (isAnnual) {
+          return itemDate.getFullYear() === selectedYear && item.category === categoryName
+        }
+        if (isYearToDate) {
+          return (
+            itemDate.getFullYear() === selectedYear &&
+            itemDate.getMonth() <= selectedMonth &&
+            item.category === categoryName
+          )
+        }
         return (
-          item.category === categoryName &&
-          (isAnnual
-            ? itemDate.getFullYear() === selectedYear
-            : itemDate.getFullYear() === selectedYear && itemDate.getMonth() === selectedMonth)
+          itemDate.getFullYear() === selectedYear &&
+          itemDate.getMonth() === selectedMonth &&
+          item.category === categoryName
         )
       })
       .reduce((total, item) => total + item.amount, 0)
@@ -74,6 +84,17 @@ export default function HomePage() {
       return incomeDate.getFullYear() === selectedYear && incomeDate.getMonth() === selectedMonth
     })
     .reduce((total, income) => total + income.amount, 0)
+
+  const calculateAnnualBudget = (maxBudget: number | undefined, maxAnnualBudget: number | undefined) => {
+    if (maxAnnualBudget !== undefined) return maxAnnualBudget
+    if (maxBudget !== undefined) return maxBudget * 12
+    return undefined
+  }
+
+  const calculateYearToDateBudget = (maxBudget: number | undefined) => {
+    if (maxBudget === undefined) return undefined
+    return maxBudget * (selectedMonth + 1)
+  }
 
   return (
     <div className="space-y-8">
@@ -146,6 +167,8 @@ export default function HomePage() {
               <TableHead className="text-right">Current Expense</TableHead>
               <TableHead className="text-right">Monthly Budget</TableHead>
               <TableHead className="text-right">Annual Budget</TableHead>
+              <TableHead className="text-right">Year-to-Date Budget</TableHead>
+              <TableHead className="text-right">Year-to-Date Expense</TableHead>
               <TableHead>Overview</TableHead>
             </TableRow>
           </TableHeader>
@@ -153,10 +176,14 @@ export default function HomePage() {
             {expenseCategories.map((category) => {
               const currentMonthlyExpense = calculateCategoryAmount(expenses, category.name)
               const currentAnnualExpense = calculateCategoryAmount(expenses, category.name, true)
+              const currentYearToDateExpense = calculateCategoryAmount(expenses, category.name, false, true)
+              const annualBudget = calculateAnnualBudget(category.maxBudget, category.maxAnnualBudget)
+              const yearToDateBudget = calculateYearToDateBudget(category.maxBudget)
               const monthlyDifference =
                 category.maxBudget !== undefined ? category.maxBudget - currentMonthlyExpense : undefined
-              const annualDifference =
-                category.maxAnnualBudget !== undefined ? category.maxAnnualBudget - currentAnnualExpense : undefined
+              const annualDifference = annualBudget !== undefined ? annualBudget - currentAnnualExpense : undefined
+              const yearToDateDifference =
+                yearToDateBudget !== undefined ? yearToDateBudget - currentYearToDateExpense : undefined
               const rowColor = getRowBackgroundColor(currentMonthlyExpense, category.maxBudget)
 
               return (
@@ -167,8 +194,12 @@ export default function HomePage() {
                     {category.maxBudget !== undefined ? `$${category.maxBudget.toFixed(2)}` : 'N/A'}
                   </TableCell>
                   <TableCell className="text-right">
-                    {category.maxAnnualBudget !== undefined ? `$${category.maxAnnualBudget.toFixed(2)}` : 'N/A'}
+                    {annualBudget !== undefined ? `$${annualBudget.toFixed(2)}` : 'N/A'}
                   </TableCell>
+                  <TableCell className="text-right">
+                    {yearToDateBudget !== undefined ? `$${yearToDateBudget.toFixed(2)}` : 'N/A'}
+                  </TableCell>
+                  <TableCell className="text-right">${currentYearToDateExpense.toFixed(2)}</TableCell>
                   <TableCell>
                     {monthlyDifference !== undefined && (
                       <span className={monthlyDifference >= 0 ? 'text-green-600' : 'text-red-600'}>
@@ -180,6 +211,12 @@ export default function HomePage() {
                       <span className={`block ${annualDifference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         Annual: {annualDifference >= 0 ? 'Under by: ' : 'Over by: '}$
                         {Math.abs(annualDifference).toFixed(2)}
+                      </span>
+                    )}
+                    {yearToDateDifference !== undefined && (
+                      <span className={`block ${yearToDateDifference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        YTD: {yearToDateDifference >= 0 ? 'Under by: ' : 'Over by: '}$
+                        {Math.abs(yearToDateDifference).toFixed(2)}
                       </span>
                     )}
                   </TableCell>
@@ -198,12 +235,14 @@ export default function HomePage() {
               <TableHead>Category</TableHead>
               <TableHead className="text-right">Current Income</TableHead>
               <TableHead className="text-right">Target Amount</TableHead>
+              <TableHead className="text-right">Year-to-Date Income</TableHead>
               <TableHead>Overview</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {incomeCategories.map((category) => {
               const currentMonthlyIncome = calculateCategoryAmount(incomes, category.title)
+              const currentYearToDateIncome = calculateCategoryAmount(incomes, category.title, false, true)
               const difference =
                 category.targetAmount !== undefined ? category.targetAmount - currentMonthlyIncome : undefined
               const rowColor = getRowBackgroundColor(currentMonthlyIncome, category.targetAmount)
@@ -215,6 +254,7 @@ export default function HomePage() {
                   <TableCell className="text-right">
                     {category.targetAmount !== undefined ? `$${category.targetAmount.toFixed(2)}` : 'N/A'}
                   </TableCell>
+                  <TableCell className="text-right">${currentYearToDateIncome.toFixed(2)}</TableCell>
                   <TableCell>
                     {difference !== undefined && (
                       <span className={difference >= 0 ? 'text-red-600' : 'text-green-600'}>
