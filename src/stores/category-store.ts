@@ -1,38 +1,63 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-export interface Category {
+export interface ExpenseCategory {
   name: string
-  maxBudget: number
+  maxBudget?: number
+  maxAnnualBudget?: number
+}
+
+export interface IncomeCategory {
+  title: string
+  targetAmount?: number
 }
 
 interface CategoryStore {
-  categories: Category[]
+  expenseCategories: ExpenseCategory[]
+  incomeCategories: IncomeCategory[]
   isHydrated: boolean
-  setCategories: (categories: Category[]) => void
-  addCategory: (category: Category) => void
-  removeCategory: (name: string) => void
-  updateCategory: (name: string, updatedCategory: Category) => void
+  setExpenseCategories: (categories: ExpenseCategory[]) => void
+  setIncomeCategories: (categories: IncomeCategory[]) => void
+  addExpenseCategory: (category: ExpenseCategory) => void
+  addIncomeCategory: (category: IncomeCategory) => void
+  removeExpenseCategory: (name: string) => void
+  removeIncomeCategory: (title: string) => void
+  updateExpenseCategory: (name: string, updatedCategory: ExpenseCategory) => void
+  updateIncomeCategory: (title: string, updatedCategory: IncomeCategory) => void
   setHydrated: () => void
 }
 
 export const useCategoryStore = create<CategoryStore>()(
   persist(
     (set) => ({
-      categories: [],
+      expenseCategories: [],
+      incomeCategories: [],
       isHydrated: false,
-      setCategories: (categories) => set({ categories }),
-      addCategory: (category) =>
+      setExpenseCategories: (categories) => set({ expenseCategories: categories }),
+      setIncomeCategories: (categories) => set({ incomeCategories: categories }),
+      addExpenseCategory: (category) =>
         set((state) => ({
-          categories: [...state.categories, category]
+          expenseCategories: [...state.expenseCategories, category]
         })),
-      removeCategory: (name) =>
+      addIncomeCategory: (category) =>
         set((state) => ({
-          categories: state.categories.filter((c) => c.name !== name)
+          incomeCategories: [...state.incomeCategories, category]
         })),
-      updateCategory: (name, updatedCategory) =>
+      removeExpenseCategory: (name) =>
         set((state) => ({
-          categories: state.categories.map((c) => (c.name === name ? updatedCategory : c))
+          expenseCategories: state.expenseCategories.filter((c) => c.name !== name)
+        })),
+      removeIncomeCategory: (title) =>
+        set((state) => ({
+          incomeCategories: state.incomeCategories.filter((c) => c.title !== title)
+        })),
+      updateExpenseCategory: (name, updatedCategory) =>
+        set((state) => ({
+          expenseCategories: state.expenseCategories.map((c) => (c.name === name ? updatedCategory : c))
+        })),
+      updateIncomeCategory: (title, updatedCategory) =>
+        set((state) => ({
+          incomeCategories: state.incomeCategories.map((c) => (c.title === title ? updatedCategory : c))
         })),
       setHydrated: () => set({ isHydrated: true })
     }),

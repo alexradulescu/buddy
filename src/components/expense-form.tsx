@@ -32,7 +32,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
   ])
   const [rowsToAdd, setRowsToAdd] = useState(1)
   const { addExpense } = useExpenseStore()
-  const categories = useCategoryStore((state) => state.categories)
+  const expenseCategories = useCategoryStore((state) => state.expenseCategories)
   const { toast } = useToast()
 
   function getDefaultDate(year: number, month: number): Date {
@@ -74,7 +74,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
         return null
       }
 
-      const validCategory = categories.some((c) => c.name === category) ? category : 'unknown'
+      const validCategory = expenseCategories.some((c) => c.name === category) ? category : 'unknown'
 
       return {
         amount: Number(amount),
@@ -219,7 +219,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                           <SelectContent>
-                            {categories.map((category) => (
+                            {expenseCategories.map((category) => (
                               <SelectItem key={category.name} value={category.name}>
                                 {category.name}
                               </SelectItem>

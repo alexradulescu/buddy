@@ -15,14 +15,12 @@ module.exports = {
     '^next$',
     '^remix$',
     '<THIRD_PARTY_MODULES>',
-    '',
     '^(@api|@assets|@ui|src|app|@/hooks|@/components)(/.*)$',
-    '',
     '^(?!.*[.]css$)[./].*$',
     '.css$'
   ],
 
-  importOrderSeparation: false,
+  importOrderSeparation: true,
   importOrderSortSpecifiers: true,
   importOrderBuiltinModulesToTop: true,
   importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],

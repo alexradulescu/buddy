@@ -1,101 +1,233 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import React from 'react'
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
+import { useCategoryStore } from '@/stores/category-store'
+import { useExpenseStore } from '@/stores/expense-store'
+import { useIncomeStore } from '@/stores/income-store'
+
+export default function HomePage() {
+  const currentDate = new Date()
+  const { selectedYear, setSelectedYear, selectedMonth, setSelectedMonth } = useSharedQueryParams()
+
+  const { expenseCategories, incomeCategories } = useCategoryStore()
+  const expenses = useExpenseStore((state) => state.expenses)
+  const incomes = useIncomeStore((state) => state.incomes)
+
+  const years = Array.from({ length: 5 }, (_, i) => currentDate.getFullYear() - i)
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ]
+
+  const calculateCategoryAmount = (
+    items: typeof expenses | typeof incomes,
+    categoryName: string,
+    isAnnual: boolean = false
+  ) => {
+    return items
+      .filter((item) => {
+        const itemDate = new Date(item.date)
+        return (
+          item.category === categoryName &&
+          (isAnnual
+            ? itemDate.getFullYear() === selectedYear
+            : itemDate.getFullYear() === selectedYear && itemDate.getMonth() === selectedMonth)
+        )
+      })
+      .reduce((total, item) => total + item.amount, 0)
+  }
+
+  const getRowBackgroundColor = (currentAmount: number, budget: number | undefined) => {
+    if (budget === undefined) return 'bg-gray-100'
+    const difference = budget - currentAmount
+    const percentageDifference = (difference / budget) * 100
+
+    if (percentageDifference > 20) return 'bg-green-100'
+    if (percentageDifference >= 0) return 'bg-orange-100'
+    return 'bg-red-100'
+  }
+
+  const totalMonthlyExpenses = expenses
+    .filter((expense) => {
+      const expenseDate = new Date(expense.date)
+      return expenseDate.getFullYear() === selectedYear && expenseDate.getMonth() === selectedMonth
+    })
+    .reduce((total, expense) => total + expense.amount, 0)
+
+  const totalMonthlyIncomes = incomes
+    .filter((income) => {
+      const incomeDate = new Date(income.date)
+      return incomeDate.getFullYear() === selectedYear && incomeDate.getMonth() === selectedMonth
+    })
+    .reduce((total, income) => total + income.amount, 0)
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="space-y-8">
+      <h1 className="text-3xl font-bold">Budget Overview</h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <div className="flex space-x-4">
+        <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Year" />
+          </SelectTrigger>
+          <SelectContent>
+            {years.map((year) => (
+              <SelectItem key={year} value={year.toString()}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Month" />
+          </SelectTrigger>
+          <SelectContent>
+            {months.map((month, index) => (
+              <SelectItem key={index} value={index.toString()}>
+                {month}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-6">
+        <h2 className="text-2xl font-semibold">Monthly Overview</h2>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Category</TableHead>
+              <TableHead className="text-right">Total</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow className="font-medium">
+              <TableCell>Total Income</TableCell>
+              <TableCell className="text-right">${totalMonthlyIncomes.toFixed(2)}</TableCell>
+            </TableRow>
+            <TableRow className="font-medium">
+              <TableCell>Total Expenses</TableCell>
+              <TableCell className="text-right">${totalMonthlyExpenses.toFixed(2)}</TableCell>
+            </TableRow>
+            <TableRow className="font-medium">
+              <TableCell>Net Income</TableCell>
+              <TableCell
+                className={`text-right ${totalMonthlyIncomes - totalMonthlyExpenses >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              >
+                ${(totalMonthlyIncomes - totalMonthlyExpenses).toFixed(2)}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="space-y-6">
+        <h2 className="text-2xl font-semibold">Expense Categories</h2>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Category</TableHead>
+              <TableHead className="text-right">Current Expense</TableHead>
+              <TableHead className="text-right">Monthly Budget</TableHead>
+              <TableHead className="text-right">Annual Budget</TableHead>
+              <TableHead>Overview</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {expenseCategories.map((category) => {
+              const currentMonthlyExpense = calculateCategoryAmount(expenses, category.name)
+              const currentAnnualExpense = calculateCategoryAmount(expenses, category.name, true)
+              const monthlyDifference =
+                category.maxBudget !== undefined ? category.maxBudget - currentMonthlyExpense : undefined
+              const annualDifference =
+                category.maxAnnualBudget !== undefined ? category.maxAnnualBudget - currentAnnualExpense : undefined
+              const rowColor = getRowBackgroundColor(currentMonthlyExpense, category.maxBudget)
+
+              return (
+                <TableRow key={category.name} className={rowColor}>
+                  <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell className="text-right">${currentMonthlyExpense.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">
+                    {category.maxBudget !== undefined ? `$${category.maxBudget.toFixed(2)}` : 'N/A'}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {category.maxAnnualBudget !== undefined ? `$${category.maxAnnualBudget.toFixed(2)}` : 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    {monthlyDifference !== undefined && (
+                      <span className={monthlyDifference >= 0 ? 'text-green-600' : 'text-red-600'}>
+                        Monthly: {monthlyDifference >= 0 ? 'Under by: ' : 'Over by: '}$
+                        {Math.abs(monthlyDifference).toFixed(2)}
+                      </span>
+                    )}
+                    {annualDifference !== undefined && (
+                      <span className={`block ${annualDifference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        Annual: {annualDifference >= 0 ? 'Under by: ' : 'Over by: '}$
+                        {Math.abs(annualDifference).toFixed(2)}
+                      </span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="space-y-6">
+        <h2 className="text-2xl font-semibold">Income Categories</h2>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Category</TableHead>
+              <TableHead className="text-right">Current Income</TableHead>
+              <TableHead className="text-right">Target Amount</TableHead>
+              <TableHead>Overview</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {incomeCategories.map((category) => {
+              const currentMonthlyIncome = calculateCategoryAmount(incomes, category.title)
+              const difference =
+                category.targetAmount !== undefined ? category.targetAmount - currentMonthlyIncome : undefined
+              const rowColor = getRowBackgroundColor(currentMonthlyIncome, category.targetAmount)
+
+              return (
+                <TableRow key={category.title} className={rowColor}>
+                  <TableCell className="font-medium">{category.title}</TableCell>
+                  <TableCell className="text-right">${currentMonthlyIncome.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">
+                    {category.targetAmount !== undefined ? `$${category.targetAmount.toFixed(2)}` : 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    {difference !== undefined && (
+                      <span className={difference >= 0 ? 'text-red-600' : 'text-green-600'}>
+                        {difference >= 0 ? 'Under by: ' : 'Over by: '}${Math.abs(difference).toFixed(2)}
+                      </span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
     </div>
-  );
+  )
 }

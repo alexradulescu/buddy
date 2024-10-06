@@ -2,20 +2,19 @@
 
 import React from 'react'
 
-import { ExpenseForm } from '@/components/expense-form'
-import { ExpenseList } from '@/components/expense-list'
+import { IncomeForm } from '@/components/income-form'
+import { IncomeList } from '@/components/income-list'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
-export default function ExpensesPage() {
-  const currentDate = new Date()
+export default function IncomesPage() {
   const { selectedYear, setSelectedYear, selectedMonth, setSelectedMonth } = useSharedQueryParams()
 
   return (
     <>
-      <h1 className="text-2xl font-bold mb-4">Expenses</h1>
+      <h1 className="text-2xl font-bold mb-4">Incomes</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <ExpenseList
+          <IncomeList
             selectedYear={selectedYear}
             selectedMonth={selectedMonth}
             onYearChange={setSelectedYear}
@@ -23,7 +22,7 @@ export default function ExpensesPage() {
           />
         </div>
         <div>
-          <ExpenseForm selectedYear={selectedYear} selectedMonth={selectedMonth} />
+          <IncomeForm selectedYear={selectedYear} selectedMonth={selectedMonth} />
         </div>
       </div>
     </>
