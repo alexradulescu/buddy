@@ -32,9 +32,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <HydrationBoundary>
-          <div className="min-h-screen flex flex-col">
+          <div className="flex min-h-screen bg-background">
             <Navigation />
-            <main className="flex-grow mx-auto p-4 max-w-7xl w-full">{children}</main>
+            <main className="flex-1 overflow-y-auto sm:pl-14">
+              <div className="container mx-auto p-4 sm:p-6 lg:p-8">{children}</div>
+            </main>
           </div>
           <Toaster />
         </HydrationBoundary>

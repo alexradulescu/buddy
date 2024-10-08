@@ -16,6 +16,7 @@ interface AccountStore {
   updateAccountBalance: (id: string, updatedBalance: Partial<AccountBalance>) => void
   removeAccountBalance: (id: string) => void
   getAccountBalances: (year: number, month: number) => AccountBalance[]
+  setAccountBalances: (accountBalances: AccountBalance[]) => void
   setHydrated: () => void
 }
 
@@ -42,6 +43,7 @@ export const useAccountStore = create<AccountStore>()(
         const state = get()
         return state.accountBalances.filter((balance) => balance.year === year && balance.month === month)
       },
+      setAccountBalances: (accountBalances) => set({ accountBalances }),
       setHydrated: () => set({ isHydrated: true })
     }),
     {

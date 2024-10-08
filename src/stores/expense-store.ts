@@ -14,6 +14,7 @@ interface ExpenseStore {
   isHydrated: boolean
   addExpense: (expense: Omit<Expense, 'id'>) => void
   removeExpense: (id: string) => void
+  setExpenses: (expenses: Expense[]) => void
   setHydrated: () => void
 }
 
@@ -30,6 +31,7 @@ export const useExpenseStore = create<ExpenseStore>()(
         set((state) => ({
           expenses: state.expenses.filter((e) => e.id !== id)
         })),
+      setExpenses: (expenses) => set({ expenses }),
       setHydrated: () => set({ isHydrated: true })
     }),
     {

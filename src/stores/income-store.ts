@@ -14,6 +14,7 @@ interface IncomeStore {
   isHydrated: boolean
   addIncome: (income: Omit<Income, 'id'>) => void
   removeIncome: (id: string) => void
+  setIncomes: (incomes: Income[]) => void
   setHydrated: () => void
 }
 
@@ -30,6 +31,7 @@ export const useIncomeStore = create<IncomeStore>()(
         set((state) => ({
           incomes: state.incomes.filter((i) => i.id !== id)
         })),
+      setIncomes: (incomes) => set({ incomes }),
       setHydrated: () => set({ isHydrated: true })
     }),
     {
