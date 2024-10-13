@@ -5,6 +5,7 @@ import localFont from 'next/font/local'
 
 import { HydrationBoundary } from '@/components/hydration-boundary'
 import { Navigation } from '@/components/navigation'
+import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 
 const geistSans = localFont({
@@ -29,17 +30,19 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <HydrationBoundary>
-          <div className="flex min-h-screen bg-background">
-            <Navigation />
-            <main className="flex-1 overflow-y-auto sm:pl-14">
-              <div className="container mx-auto p-4 sm:p-6 lg:p-8">{children}</div>
-            </main>
-          </div>
-          <Toaster />
-        </HydrationBoundary>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <HydrationBoundary>
+            <div className="flex min-h-screen bg-background">
+              <Navigation />
+              <main className="flex-1 overflow-y-auto sm:pl-14 bg-stone-50 dark:bg-stone-950">
+                <div className="container mx-auto p-4 sm:p-6 lg:p-8">{children}</div>
+              </main>
+            </div>
+            <Toaster />
+          </HydrationBoundary>
+        </ThemeProvider>
       </body>
     </html>
   )

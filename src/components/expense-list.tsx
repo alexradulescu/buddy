@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns'
 import { MoreHorizontal, Search } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -37,6 +37,10 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
       expense.amount.toString().includes(searchTerm)
     return matchesDate && matchesSearch
   })
+
+  useEffect(() => {
+    console.info({ filteredExpenses })
+  }, [filteredExpenses])
 
   const handleDelete = (id: string) => {
     removeExpense(id)
@@ -81,7 +85,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
                   <TableCell>{format(new Date(expense.date), 'dd MMM yyyy')}</TableCell>
                   <TableCell>{expense.description}</TableCell>
                   <TableCell>{expense.category}</TableCell>
-                  <TableCell className="text-right">${expense.amount.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">${Number(expense.amount).toFixed(2) || '000'}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

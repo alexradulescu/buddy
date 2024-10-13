@@ -4,12 +4,12 @@ import { TrashIcon } from 'lucide-react'
 import React, { useState } from 'react'
 
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'
+import { ExpenseTable } from '@/components/expense-table'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
 import { useCategoryStore } from '@/stores/category-store'
 import { Expense, useExpenseStore } from '@/stores/expense-store'
@@ -17,20 +17,11 @@ import { Expense, useExpenseStore } from '@/stores/expense-store'
 interface ExpenseFormProps {
   selectedYear: number
   selectedMonth: number
+  initialExpenses?: Expense[]
 }
 
-interface TableExpense {
-  amount: string
-  category: string
-  date: Date
-  description: string
-}
-
-export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selectedMonth }) => {
-  const [textareaContent, setTextareaContent] = useState('')
-  const [tableExpenses, setTableExpenses] = useState<TableExpense[]>([
-    { amount: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
-  ])
+export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selectedMonth, initialExpenses = [] }) => {
+  const [expenses, setExpenses] = useState<Expense[]>(initialExpenses)
   const [rowsToAdd, setRowsToAdd] = useState(1)
   const { addExpense } = useExpenseStore()
   const expenseCategories = useCategoryStore((state) => state.expenseCategories)
@@ -44,135 +35,67 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
     return new Date(year, month, 15)
   }
 
-  const handleTextareaAddExpenses = () => {
-    const lines = textareaContent.split('\n').filter((line) => line.trim() !== '')
-    const defaultDate = getDefaultDate(selectedYear, selectedMonth)
+  const handleAddExpenses = () => {
     let hasError = false
-
-    const newExpenses = lines.map((line, index) => {
-      const [amount, category = 'unknown', date = defaultDate.toISOString().split('T')[0], description = ''] = line
-        .split(',')
-        .map((s) => s.trim())
-
-      if (!amount || isNaN(Number(amount))) {
-        toast({
-          title: 'Invalid expense',
-          description: `Invalid amount in line ${index + 1}: ${line}`,
-          variant: 'destructive'
-        })
-        hasError = true
-        return null
-      }
-
-      const expenseDate = new Date(date)
-      if (expenseDate.getFullYear() !== selectedYear || expenseDate.getMonth() !== selectedMonth) {
-        toast({
-          title: 'Invalid date',
-          description: `Expense in line ${index + 1} is not for the selected month and year`,
-          variant: 'destructive'
-        })
-        hasError = true
-        return null
-      }
-
-      const validCategory = expenseCategories.some((c) => c.name === category) ? category : 'unknown'
-
-      return {
-        amount: Number(amount),
-        category: validCategory,
-        date: date,
-        description
-      }
-    })
-
-    if (!hasError) {
-      newExpenses.forEach((expense) => {
-        if (expense) addExpense(expense)
-      })
-      setTextareaContent('')
-      toast({
-        title: 'Expenses added',
-        description: `Added ${newExpenses.length} expense(s)`
-      })
-    }
-  }
-
-  const handleTableAddExpenses = () => {
-    let hasError = false
-    const newExpenses = tableExpenses.map((expense, index) => {
+    expenses.forEach((expense) => {
       if (!expense.amount || isNaN(Number(expense.amount)) || Number(expense.amount) <= 0) {
         toast({
           title: 'Invalid expense',
-          description: `Invalid amount in row ${index + 1}`,
+          description: `Invalid amount for expense: ${expense.description}`,
           variant: 'destructive'
         })
         hasError = true
-        return null
+        return
       }
 
       const expenseDate = new Date(expense.date)
       if (expenseDate.getFullYear() !== selectedYear || expenseDate.getMonth() !== selectedMonth) {
         toast({
           title: 'Invalid date',
-          description: `Expense in row ${index + 1} is not for the selected month and year`,
+          description: `Expense ${expense.description} is not for the selected month and year`,
           variant: 'destructive'
         })
         hasError = true
-        return null
-      }
-
-      return {
-        amount: Number(expense.amount),
-        category: expense.category || 'unknown',
-        date: expense.date.toISOString().split('T')[0],
-        description: expense.description
+        return
       }
     })
 
     if (!hasError) {
-      newExpenses.forEach((expense) => {
-        if (expense) addExpense(expense)
-      })
-      setTableExpenses([
-        { amount: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
-      ])
+      expenses.forEach((expense) => addExpense(expense))
+      setExpenses([])
       toast({
         title: 'Expenses added',
-        description: `Added ${newExpenses.length} expense(s)`
+        description: `Added ${expenses.length} expense(s)`
       })
     }
   }
 
-  const handleTableInputChange = (index: number, field: keyof TableExpense, value: string | Date) => {
-    const updatedExpenses = [...tableExpenses]
+  const handleInputChange = (index: number, field: keyof Expense, value: string | number) => {
+    const updatedExpenses = [...expenses]
     updatedExpenses[index] = { ...updatedExpenses[index], [field]: value }
-    setTableExpenses(updatedExpenses)
-  }
-
-  const handleTableKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      setTableExpenses([
-        ...tableExpenses,
-        { amount: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
-      ])
-    }
+    setExpenses(updatedExpenses)
   }
 
   const addRows = () => {
     const newRows = Array(rowsToAdd)
       .fill(null)
-      .map(() => ({ amount: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }))
-    setTableExpenses([...tableExpenses, ...newRows])
+      .map(() => ({
+        id: crypto.randomUUID(),
+        amount: 0,
+        category: '',
+        date: getDefaultDate(selectedYear, selectedMonth).toISOString().split('T')[0],
+        description: ''
+      }))
+    setExpenses([...expenses, ...newRows])
   }
 
-  const deleteRow = (index: number) => {
-    const updatedExpenses = tableExpenses.filter((_, i) => i !== index)
-    setTableExpenses(updatedExpenses)
+  const deleteRow = (id: string) => {
+    setExpenses(expenses.filter((expense) => expense.id !== id))
   }
 
-  const handleAddAiConvertedExpenses = (expenses: Omit<Expense, 'id'>[]) => {
-    expenses.forEach((expense) => addExpense(expense))
+  const handleAiConvertedExpenses = (aiExpenses: Expense[]) => {
+    setExpenses(aiExpenses)
+    handleAddExpenses()
   }
 
   return (
@@ -184,87 +107,16 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
       <Tabs defaultValue="table-form">
         <TabsList>
           <TabsTrigger value="table-form">Table Entry</TabsTrigger>
-          <TabsTrigger value="textarea-form">Bulk Entry</TabsTrigger>
           <TabsTrigger value="ai-converter">AI Converter</TabsTrigger>
         </TabsList>
         <TabsContent value="table-form">
           <div className="space-y-4">
-            <div className="overflow-x-auto">
-              <div className="max-h-[50vh] overflow-y-auto">
-                <table className="w-full border-collapse border border-gray-200">
-                  <thead className="sticky top-0 bg-background">
-                    <tr>
-                      <th className="border border-gray-200 p-2 w-[110px]">Amount</th>
-                      <th className="border border-gray-200 p-2 w-[130px]">Category</th>
-                      <th className="border border-gray-200 p-2 w-[130px]">Date</th>
-                      <th className="border border-gray-200 p-2 w-[150px]">Description</th>
-                      <th className="border border-gray-200 p-2 w-[50px]"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tableExpenses.map((expense, index) => (
-                      <tr key={index}>
-                        <td className="border border-gray-200 p-1">
-                          <Input
-                            type="number"
-                            value={expense.amount}
-                            onChange={(e) => handleTableInputChange(index, 'amount', e.target.value)}
-                            onKeyDown={(e) => handleTableKeyDown(e, index)}
-                            step="0.01"
-                            min="0"
-                            required
-                            className="w-full h-full rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none py-2"
-                          />
-                        </td>
-                        <td className="border border-gray-200 p-1">
-                          <Select
-                            value={expense.category}
-                            onValueChange={(value) => handleTableInputChange(index, 'category', value)}
-                          >
-                            <SelectTrigger className="w-full h-full rounded-none">
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {expenseCategories.map((category) => (
-                                <SelectItem key={category.name} value={category.name}>
-                                  {category.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td className="border border-gray-200 p-1">
-                          <DatePicker
-                            date={expense.date}
-                            onDateChange={(date) => handleTableInputChange(index, 'date', date!)}
-                            className="w-full h-full rounded-none"
-                          />
-                        </td>
-                        <td className="border border-gray-200 p-1">
-                          <Input
-                            type="text"
-                            value={expense.description}
-                            onChange={(e) => handleTableInputChange(index, 'description', e.target.value)}
-                            onKeyDown={(e) => handleTableKeyDown(e, index)}
-                            className="w-full h-full rounded-none py-2"
-                          />
-                        </td>
-                        <td className="border border-gray-200 p-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteRow(index)}
-                            className="w-full h-full rounded-none"
-                          >
-                            <TrashIcon className="h-4 w-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <ExpenseTable
+              expenses={expenses}
+              expenseCategories={expenseCategories}
+              onInputChange={handleInputChange}
+              onDeleteRow={deleteRow}
+            />
             <div className="flex items-center space-x-2">
               <Input
                 type="number"
@@ -275,27 +127,11 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
               />
               <Button onClick={addRows}>Add Rows</Button>
             </div>
-            <Button onClick={handleTableAddExpenses}>Save Expenses</Button>
-          </div>
-        </TabsContent>
-        <TabsContent value="textarea-form">
-          <div className="space-y-4">
-            <Textarea
-              value={textareaContent}
-              onChange={(e) => setTextareaContent(e.target.value)}
-              placeholder="Enter expenses (amount,category,date,description)"
-              rows={10}
-              className="font-mono w-full"
-            />
-            <Button onClick={handleTextareaAddExpenses}>Add Expenses</Button>
+            <Button onClick={handleAddExpenses}>Save Expenses</Button>
           </div>
         </TabsContent>
         <TabsContent value="ai-converter">
-          <ExpenseAiConverter
-            handleTextareaAddExpenses={handleTextareaAddExpenses}
-            setTextareaContent={setTextareaContent}
-            textareaContent={textareaContent}
-          />
+          <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
         </TabsContent>
       </Tabs>
     </div>

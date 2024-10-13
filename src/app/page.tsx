@@ -126,7 +126,7 @@ export default function HomePage() {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalMonthlyExpenses.toFixed(2)}</div>
+            <div className="text-2xl font-bold">${totalMonthlyExpenses ? totalMonthlyExpenses.toFixed(2) : 0}</div>
           </CardContent>
         </Card>
         <Card>

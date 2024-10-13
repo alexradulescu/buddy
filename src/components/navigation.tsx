@@ -4,6 +4,7 @@ import { BarChart2, CreditCard, Home, LucideIcon, Package2, PiggyBank, Settings 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { cn } from '@/lib/utils'
@@ -48,8 +49,8 @@ export function Navigation() {
                       query: { month: selectedMonth, year: selectedYear }
                     }}
                     className={cn(
-                      'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground hover:bg-gray-100 md:h-8 md:w-8',
-                      pathname === item.href && 'text-green-600'
+                      'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground hover:bg-accent md:h-8 md:w-8',
+                      pathname === item.href && 'text-primary bg-accent'
                     )}
                   >
                     <item.icon className="h-5 w-5" />
@@ -59,6 +60,9 @@ export function Navigation() {
                 <TooltipContent side="right">{item.label}</TooltipContent>
               </Tooltip>
             ))}
+            <div className="mt-auto mb-4">
+              <ThemeToggle />
+            </div>
           </nav>
         </aside>
 
@@ -73,13 +77,16 @@ export function Navigation() {
               }}
               className={cn(
                 'flex flex-col items-center justify-center px-2 py-1 text-xs text-muted-foreground',
-                pathname === item.href && 'bg-green-600 text-white rounded-md'
+                pathname === item.href && 'text-primary'
               )}
             >
               <item.icon className="h-5 w-5 mb-1" />
               {item.label}
             </Link>
           ))}
+          <div className="flex flex-col items-center justify-center px-2 py-1">
+            <ThemeToggle />
+          </div>
         </nav>
       </div>
     </TooltipProvider>

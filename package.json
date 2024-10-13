@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "pack": "repopack --ignore './src/components/ui/*'"
+    "pack": "repopack ./src --ignore './src/components/ui/*'"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.66",
