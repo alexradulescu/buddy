@@ -18,7 +18,7 @@ const navItems: NavItem[] = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/expenses', label: 'Expenses', icon: CreditCard },
   { href: '/incomes', label: 'Incomes', icon: PiggyBank },
-  { href: '/overview', label: 'Overview', icon: BarChart2 },
+  { href: '/accounts', label: 'Accounts', icon: BarChart2 },
   { href: '/settings', label: 'Settings', icon: Settings }
 ]
 

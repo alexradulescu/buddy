@@ -4,22 +4,18 @@ import React from 'react'
 
 import { IncomeForm } from '@/components/income-form'
 import { IncomeList } from '@/components/income-list'
+import { PageHeader } from '@/components/page-header'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function IncomesPage() {
-  const { selectedYear, setSelectedYear, selectedMonth, setSelectedMonth } = useSharedQueryParams()
+  const { selectedYear, selectedMonth } = useSharedQueryParams()
 
   return (
     <>
-      <h1 className="text-2xl font-bold mb-4">Incomes</h1>
+      <PageHeader title="Incomes" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <IncomeList
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-            onYearChange={setSelectedYear}
-            onMonthChange={setSelectedMonth}
-          />
+          <IncomeList selectedYear={selectedYear} selectedMonth={selectedMonth} />
         </div>
         <div>
           <IncomeForm selectedYear={selectedYear} selectedMonth={selectedMonth} />

@@ -2,9 +2,8 @@
 
 import React from 'react'
 
-import { Button } from '@/components/ui/button'
+import { PageHeader } from '@/components/page-header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { useCategoryStore } from '@/stores/category-store'
@@ -12,28 +11,11 @@ import { useExpenseStore } from '@/stores/expense-store'
 import { useIncomeStore } from '@/stores/income-store'
 
 export default function HomePage() {
-  const currentDate = new Date()
-  const { selectedYear, setSelectedYear, selectedMonth, setSelectedMonth } = useSharedQueryParams()
+  const { selectedYear, selectedMonth } = useSharedQueryParams()
 
   const { expenseCategories, incomeCategories } = useCategoryStore()
   const expenses = useExpenseStore((state) => state.expenses)
   const incomes = useIncomeStore((state) => state.incomes)
-
-  const years = Array.from({ length: 5 }, (_, i) => currentDate.getFullYear() - i)
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ]
 
   const calculateCategoryAmount = (
     items: typeof expenses | typeof incomes,
@@ -102,35 +84,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Budget Overview</h1>
-        <div className="flex space-x-4">
-          <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Year" />
-            </SelectTrigger>
-            <SelectContent>
-              {years.map((year) => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Month" />
-            </SelectTrigger>
-            <SelectContent>
-              {months.map((month, index) => (
-                <SelectItem key={index} value={index.toString()}>
-                  {month}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      <PageHeader title="Budget Overview" />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>

@@ -1,95 +1,108 @@
-import React, { useEffect } from 'react'
+'use client'
+
+import { format } from 'date-fns'
+import { MoreHorizontal, Search } from 'lucide-react'
+import React, { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useToast } from '@/hooks/use-toast'
 import { useExpenseStore } from '@/stores/expense-store'
 
 interface ExpenseListProps {
   selectedYear: number
   selectedMonth: number
-  onYearChange: (year: number) => void
-  onMonthChange: (year: number) => void
 }
 
-export const ExpenseList: React.FC<ExpenseListProps> = ({
-  selectedMonth,
-  selectedYear,
-  onYearChange,
-  onMonthChange
-}) => {
+export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selectedYear }) => {
   const { expenses, removeExpense } = useExpenseStore()
-
-  const currentYear = new Date().getFullYear()
-
-  const years = [currentYear, currentYear - 1, currentYear - 2]
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ]
+  const { toast } = useToast()
+  const [searchTerm, setSearchTerm] = useState('')
 
   const filteredExpenses = expenses.filter((expense) => {
     const expenseDate = new Date(expense.date)
-    return expenseDate.getFullYear() === selectedYear && expenseDate.getMonth() === selectedMonth
+    const matchesDate = expenseDate.getFullYear() === selectedYear && expenseDate.getMonth() === selectedMonth
+    const matchesSearch =
+      expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      expense.amount.toString().includes(searchTerm)
+    return matchesDate && matchesSearch
   })
+
+  const handleDelete = (id: string) => {
+    removeExpense(id)
+    toast({
+      title: 'Expense deleted',
+      description: 'The expense has been successfully removed.'
+    })
+  }
 
   return (
     <div className="space-y-4">
-      <div className="flex space-x-4">
-        <Select value={selectedYear.toString()} onValueChange={(value) => onYearChange(Number(value))}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select Year" />
-          </SelectTrigger>
-          <SelectContent>
-            {years.map((year) => (
-              <SelectItem key={year} value={year.toString()}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={selectedMonth.toString()} onValueChange={(value) => onMonthChange(Number(value))}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select Month" />
-          </SelectTrigger>
-          <SelectContent>
-            {months.map((month, index) => (
-              <SelectItem key={index} value={index.toString()}>
-                {month}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <h2 className="text-xl font-semibold">
-        Expenses for {months[selectedMonth]} {selectedYear}
+      <h2 className="text-xl text-muted-foreground mb-2">
+        {format(new Date(selectedYear, selectedMonth), 'MMMM yyyy')}
       </h2>
+
+      <label className="relative d-block">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search incomes..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
+      </label>
       {filteredExpenses.length === 0 ? (
-        <p>No expenses for this month.</p>
+        <p className="text-center text-muted-foreground py-4">No expenses found for this period.</p>
       ) : (
-        <ul className="space-y-2">
-          {filteredExpenses.map((expense) => (
-            <li key={expense.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-              <div>
-                <span className="font-semibold">{expense.date}</span>: {expense.amount.toFixed(2)} -{' '}
-                {expense.description}
-                <span className="ml-2 text-sm text-gray-600">({expense.category})</span>
-              </div>
-              <Button variant="destructive" size="sm" onClick={() => removeExpense(expense.id)}>
-                Delete
-              </Button>
-            </li>
-          ))}
-        </ul>
+        <div className="border rounded-md">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="w-[80px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredExpenses.map((expense) => (
+                <TableRow key={expense.id}>
+                  <TableCell>{format(new Date(expense.date), 'dd MMM yyyy')}</TableCell>
+                  <TableCell>{expense.description}</TableCell>
+                  <TableCell>{expense.category}</TableCell>
+                  <TableCell className="text-right">${expense.amount.toFixed(2)}</TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Open menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => handleDelete(expense.id)}>Delete</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
     </div>
   )

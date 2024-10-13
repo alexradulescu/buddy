@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
+import { useCategoryStore } from '@/stores/category-store'
 
 interface Props {
   handleTextareaAddExpenses: () => void
@@ -15,9 +16,13 @@ interface Props {
 
 export const ExpenseAiConverter = ({ handleTextareaAddExpenses, setTextareaContent, textareaContent }: Props) => {
   const { toast } = useToast()
+  const expenseCategories = useCategoryStore((state) => state.expenseCategories)
 
   const { completion, input, handleInputChange, handleSubmit, isLoading, error } = useCompletion({
     api: '/api/completion',
+    body: {
+      expenseCategories: expenseCategories.map((category) => category.name)
+    },
     onFinish: (prompt: string, completion: string) => {
       setTextareaContent(completion.replaceAll('```', ''))
     },

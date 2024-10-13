@@ -1,91 +1,98 @@
 'use client'
 
-import React from 'react'
+import { format } from 'date-fns'
+import { Search } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
+import { useToast } from '@/hooks/use-toast'
 import { useIncomeStore } from '@/stores/income-store'
 
 interface IncomeListProps {
   selectedYear: number
   selectedMonth: number
-  onYearChange: (year: number) => void
-  onMonthChange: (month: number) => void
 }
 
-export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedYear, onYearChange, onMonthChange }) => {
+export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedYear }) => {
   const { incomes, removeIncome } = useIncomeStore()
+  const { toast } = useToast()
+  const [searchTerm, setSearchTerm] = useState('')
 
-  const currentYear = new Date().getFullYear()
+  const filteredAndSortedIncomes = useMemo(() => {
+    return incomes
+      .filter((income) => {
+        const incomeDate = new Date(income.date)
+        const matchesDate = incomeDate.getFullYear() === selectedYear && incomeDate.getMonth() === selectedMonth
+        const matchesSearch =
+          income.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          income.amount.toString().includes(searchTerm) ||
+          income.category.toLowerCase().includes(searchTerm.toLowerCase())
+        return matchesDate && matchesSearch
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  }, [incomes, selectedYear, selectedMonth, searchTerm])
 
-  const years = [currentYear, currentYear - 1, currentYear - 2]
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ]
-
-  const filteredIncomes = incomes.filter((income) => {
-    const incomeDate = new Date(income.date)
-    return incomeDate.getFullYear() === selectedYear && incomeDate.getMonth() === selectedMonth
-  })
+  const handleDelete = (id: string) => {
+    removeIncome(id)
+    toast({
+      title: 'Income deleted',
+      description: 'The income has been successfully removed.',
+      variant: 'default'
+    })
+  }
 
   return (
     <div className="space-y-4">
-      <div className="flex space-x-4">
-        <Select value={selectedYear.toString()} onValueChange={(value) => onYearChange(Number(value))}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select Year" />
-          </SelectTrigger>
-          <SelectContent>
-            {years.map((year) => (
-              <SelectItem key={year} value={year.toString()}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={selectedMonth.toString()} onValueChange={(value) => onMonthChange(Number(value))}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select Month" />
-          </SelectTrigger>
-          <SelectContent>
-            {months.map((month, index) => (
-              <SelectItem key={index} value={index.toString()}>
-                {month}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <h2 className="text-xl font-semibold">
-        Incomes for {months[selectedMonth]} {selectedYear}
+      <h2 className="text-xl text-muted-foreground mb-2">
+        {format(new Date(selectedYear, selectedMonth), 'MMMM yyyy')}
       </h2>
-      {filteredIncomes.length === 0 ? (
-        <p>No incomes for this month.</p>
+
+      <label className="relative d-block">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search incomes..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
+      </label>
+
+      {filteredAndSortedIncomes.length === 0 ? (
+        <p className="text-center text-muted-foreground py-4">No incomes found for this period.</p>
       ) : (
-        <ul className="space-y-2">
-          {filteredIncomes.map((income) => (
-            <li key={income.id} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-              <div>
-                <span className="font-semibold">{income.date}</span>: ${income.amount.toFixed(2)} - {income.description}
-                <span className="ml-2 text-sm text-gray-600">({income.category})</span>
-              </div>
-              <Button variant="destructive" size="sm" onClick={() => removeIncome(income.id)}>
-                Delete
-              </Button>
-            </li>
-          ))}
-        </ul>
+        <Card>
+          <CardContent className="p-0">
+            <ul className="divide-y">
+              {filteredAndSortedIncomes.map((income, index) => (
+                <li key={income.id} className="p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-semibold">{income.description}</h3>
+                      <p className="text-sm text-muted-foreground">{income.category}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold">${income.amount.toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground">{format(new Date(income.date), 'dd MMM yyyy')}</p>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(income.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
       )}
     </div>
   )

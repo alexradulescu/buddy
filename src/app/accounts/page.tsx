@@ -4,37 +4,22 @@ import React, { useState } from 'react'
 
 import { AccountForm } from '@/components/account-form'
 import { AccountList } from '@/components/account-list'
+import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
+import { cn } from '@/lib/utils'
 import { useAccountStore } from '@/stores/account-store'
 import { useExpenseStore } from '@/stores/expense-store'
 import { useIncomeStore } from '@/stores/income-store'
 
 export default function OverviewPage() {
-  const { selectedYear, setSelectedYear, selectedMonth, setSelectedMonth } = useSharedQueryParams()
+  const { selectedYear, selectedMonth } = useSharedQueryParams()
   const { getAccountBalances } = useAccountStore()
   const { expenses } = useExpenseStore()
   const { incomes } = useIncomeStore()
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false)
-
-  const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ]
 
   const calculateTotalBalance = (year: number, month: number) => {
     return getAccountBalances(year, month).reduce((total, account) => total + account.amount, 0)
@@ -78,50 +63,44 @@ export default function OverviewPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold">Financial Overview</h1>
-
-      <div className="flex space-x-4">
-        <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select Year" />
-          </SelectTrigger>
-          <SelectContent>
-            {years.map((year) => (
-              <SelectItem key={year} value={year.toString()}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select Month" />
-          </SelectTrigger>
-          <SelectContent>
-            {months.map((month, index) => (
-              <SelectItem key={index} value={index.toString()}>
-                {month}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <PageHeader title="Accounts" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Summary</h2>
-          <ul className="space-y-2">
-            <li>Total Account Balances: ${currentMonthBalance.toFixed(2)}</li>
-            <li>Total Expenses: ${currentMonthExpenses.toFixed(2)}</li>
-            <li>Total Income: ${currentMonthIncome.toFixed(2)}</li>
-            <li>Expected Accounts Total: ${expectedAccountsTotal.toFixed(2)}</li>
-            <li>Real Accounts Total: ${realAccountsTotal.toFixed(2)}</li>
-            <li className={`font-bold ${discrepancy >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              Discrepancy: ${discrepancy.toFixed(2)}
-            </li>
-          </ul>
-        </div>
+        <Card className="overflow-hidden">
+          <CardHeader className="flex flex-row items-start bg-muted/50">
+            <CardTitle className="group flex items-center gap-1 text-md">Summary</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 text-sm">
+            <ul className="grid gap-3">
+              <li className="flex items-center justify-between">
+                <span className="text-muted-foreground">Total Account Balances</span>
+                <span>${currentMonthBalance.toFixed(2)}</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="text-muted-foreground">Total Expenses</span>
+                <span>${currentMonthExpenses.toFixed(2)}</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="text-muted-foreground">Total Income</span>
+                <span>${currentMonthIncome.toFixed(2)}</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="text-muted-foreground">Expected Accounts Total</span>
+                <span>${expectedAccountsTotal.toFixed(2)}</span>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="text-muted-foreground">Real Accounts Total</span>
+                <span>${realAccountsTotal.toFixed(2)}</span>
+              </li>
+            </ul>
+          </CardContent>
+          <CardFooter className="flex flex-row items-center justify-between border-t bg-muted/50 px-6 py-3">
+            <span className="text-muted-foreground">Discrepancy</span>
+            <span className={cn(discrepancy > 0 ? 'text-green-600' : 'text-red-600', 'font-semibold')}>
+              ${discrepancy.toFixed(2)}
+            </span>
+          </CardFooter>
+        </Card>
 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
