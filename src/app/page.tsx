@@ -22,7 +22,7 @@ export default function HomePage() {
     categoryName: string,
     isAnnual: boolean = false,
     isYearToDate: boolean = false
-  ) => {
+  ): number => {
     return items
       .filter((item) => {
         const itemDate = new Date(item.date)
@@ -42,7 +42,7 @@ export default function HomePage() {
           item.category === categoryName
         )
       })
-      .reduce((total, item) => total + item.amount, 0)
+      .reduce((total, item) => total + (item.amount || 0), 0)
   }
 
   const totalMonthlyExpenses = expenses
@@ -50,36 +50,43 @@ export default function HomePage() {
       const expenseDate = new Date(expense.date)
       return expenseDate.getFullYear() === selectedYear && expenseDate.getMonth() === selectedMonth
     })
-    .reduce((total, expense) => total + expense.amount, 0)
+    .reduce((total, expense) => total + (expense.amount || 0), 0)
 
   const totalMonthlyIncomes = incomes
     .filter((income) => {
       const incomeDate = new Date(income.date)
       return incomeDate.getFullYear() === selectedYear && incomeDate.getMonth() === selectedMonth
     })
-    .reduce((total, income) => total + income.amount, 0)
+    .reduce((total, income) => total + (income.amount || 0), 0)
 
   const netIncome = totalMonthlyIncomes - totalMonthlyExpenses
 
-  const getRowBackgroundColor = (currentAmount: number, budget: number | undefined) => {
+  const getRowBackgroundColor = (currentAmount: number, budget: number | undefined): string => {
     if (budget === undefined) return ''
     const difference = budget - currentAmount
     const percentageDifference = (difference / budget) * 100
 
-    if (percentageDifference > 20) return 'bg-green-100 dark:bg-green-900'
-    if (percentageDifference >= 0) return 'bg-orange-100 dark:bg-orange-900'
-    return 'bg-red-100 dark:bg-red-900'
+    if (percentageDifference > 20) return 'bg-green-100 dark:bg-green-950'
+    if (percentageDifference >= 0) return 'bg-orange-100 dark:bg-orange-950'
+    return 'bg-red-100 dark:bg-red-950'
   }
 
-  const calculateAnnualBudget = (maxBudget: number | undefined, maxAnnualBudget: number | undefined) => {
+  const calculateAnnualBudget = (
+    maxBudget: number | undefined,
+    maxAnnualBudget: number | undefined
+  ): number | undefined => {
     if (maxAnnualBudget !== undefined) return maxAnnualBudget
     if (maxBudget !== undefined) return maxBudget * 12
     return undefined
   }
 
-  const calculateYearToDateBudget = (maxBudget: number | undefined) => {
+  const calculateYearToDateBudget = (maxBudget: number | undefined): number | undefined => {
     if (maxBudget === undefined) return undefined
     return maxBudget * (selectedMonth + 1)
+  }
+
+  const formatCurrency = (amount: number | undefined): string => {
+    return amount !== undefined ? `$${amount.toFixed(2)}` : 'N/A'
   }
 
   return (
@@ -104,7 +111,7 @@ export default function HomePage() {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalMonthlyIncomes.toFixed(2)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(totalMonthlyIncomes)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -126,7 +133,7 @@ export default function HomePage() {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalMonthlyExpenses ? totalMonthlyExpenses.toFixed(2) : 0}</div>
+            <div className="text-2xl font-bold">{formatCurrency(totalMonthlyExpenses)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -146,8 +153,10 @@ export default function HomePage() {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              ${netIncome.toFixed(2)}
+            <div
+              className={`text-2xl font-bold ${netIncome >= 0 ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}`}
+            >
+              {formatCurrency(netIncome)}
             </div>
           </CardContent>
         </Card>
@@ -210,34 +219,38 @@ export default function HomePage() {
                 return (
                   <TableRow key={category.name} className={rowColor}>
                     <TableCell className="font-medium">{category.name}</TableCell>
-                    <TableCell className="text-right">${currentMonthlyExpense.toFixed(2)}</TableCell>
-                    <TableCell className="text-right">
-                      {category.maxBudget !== undefined ? `$${category.maxBudget.toFixed(2)}` : 'N/A'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {annualBudget !== undefined ? `$${annualBudget.toFixed(2)}` : 'N/A'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {yearToDateBudget !== undefined ? `$${yearToDateBudget.toFixed(2)}` : 'N/A'}
-                    </TableCell>
-                    <TableCell className="text-right">${currentYearToDateExpense.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(currentMonthlyExpense)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(category.maxBudget)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(annualBudget)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(yearToDateBudget)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(currentYearToDateExpense)}</TableCell>
                     <TableCell>
                       {monthlyDifference !== undefined && (
-                        <span className={monthlyDifference >= 0 ? 'text-green-600' : 'text-red-600'}>
-                          Monthly: {monthlyDifference >= 0 ? 'Under by: ' : 'Over by: '}$
-                          {Math.abs(monthlyDifference).toFixed(2)}
+                        <span
+                          className={
+                            monthlyDifference >= 0
+                              ? 'text-green-800 dark:text-green-200'
+                              : 'text-red-800 dark:text-red-200'
+                          }
+                        >
+                          Monthly: {monthlyDifference >= 0 ? 'Under by: ' : 'Over by: '}
+                          {formatCurrency(Math.abs(monthlyDifference))}
                         </span>
                       )}
                       {annualDifference !== undefined && (
-                        <span className={`block ${annualDifference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          Annual: {annualDifference >= 0 ? 'Under by: ' : 'Over by: '}$
-                          {Math.abs(annualDifference).toFixed(2)}
+                        <span
+                          className={`block ${annualDifference >= 0 ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}`}
+                        >
+                          Annual: {annualDifference >= 0 ? 'Under by: ' : 'Over by: '}
+                          {formatCurrency(Math.abs(annualDifference))}
                         </span>
                       )}
                       {yearToDateDifference !== undefined && (
-                        <span className={`block ${yearToDateDifference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          YTD: {yearToDateDifference >= 0 ? 'Under by: ' : 'Over by: '}$
-                          {Math.abs(yearToDateDifference).toFixed(2)}
+                        <span
+                          className={`block ${yearToDateDifference >= 0 ? 'text-green-880 dark:text-green-200' : 'text-red-800 dark:text-red-200'}`}
+                        >
+                          YTD: {yearToDateDifference >= 0 ? 'Under by: ' : 'Over by: '}
+                          {formatCurrency(Math.abs(yearToDateDifference))}
                         </span>
                       )}
                     </TableCell>
@@ -276,15 +289,14 @@ export default function HomePage() {
                 return (
                   <TableRow key={category.title} className={rowColor}>
                     <TableCell className="font-medium">{category.title}</TableCell>
-                    <TableCell className="text-right">${currentMonthlyIncome.toFixed(2)}</TableCell>
-                    <TableCell className="text-right">
-                      {category.targetAmount !== undefined ? `$${category.targetAmount.toFixed(2)}` : 'N/A'}
-                    </TableCell>
-                    <TableCell className="text-right">${currentYearToDateIncome.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(currentMonthlyIncome)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(category.targetAmount)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(currentYearToDateIncome)}</TableCell>
                     <TableCell>
                       {difference !== undefined && (
                         <span className={difference >= 0 ? 'text-red-600' : 'text-green-600'}>
-                          {difference >= 0 ? 'Under by: ' : 'Over by: '}${Math.abs(difference).toFixed(2)}
+                          {difference >= 0 ? 'Under by: ' : 'Over by: '}
+                          {formatCurrency(Math.abs(difference))}
                         </span>
                       )}
                     </TableCell>

@@ -44,7 +44,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                   <Input
                     type="number"
                     value={expense.amount}
-                    onChange={(e) => onInputChange(index, 'amount', e.target.value)}
+                    onChange={(e) => onInputChange(index, 'amount', Number(e.target.value))}
                     step="0.01"
                     min="0"
                     required
