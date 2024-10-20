@@ -1,9 +1,10 @@
 'use client'
 
-import { useCompletion } from 'ai/react'
+import { useCompletion, experimental_useObject as useObject } from 'ai/react'
 import { Loader2 } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 
+// import { expensesSchema } from '@/app/api/expenses/route'
 import { ExpenseTable } from '@/components/expense-table'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -27,16 +28,15 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
     const threeMonthsAgo = new Date()
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
 
-    const recentExpenses = expenses
-      .filter((expense) => new Date(expense.date) >= threeMonthsAgo)
-      .map(
-        ({ description, category }): HistoricalExpense => ({
-          description,
-          category
-        })
-      )
+    const historicalExpenses: Record<string, string> = {}
 
-    return recentExpenses
+    expenses.forEach(({ description, category, date }) => {
+      if (new Date(date) >= threeMonthsAgo) {
+        historicalExpenses[description] = category
+      }
+    })
+
+    return historicalExpenses
   }, [expenses])
 
   const { input, handleInputChange, handleSubmit, isLoading, error } = useCompletion({
@@ -46,8 +46,7 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
       historicalExpenses
     },
     onFinish: (prompt: string, completion: string) => {
-      const parsedExpenses = parseAiResponse(completion)
-      setAiGeneratedExpenses(parsedExpenses)
+      setAiGeneratedExpenses(JSON.parse(completion))
     },
     onError: (error: Error) => {
       toast({
@@ -58,19 +57,15 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
     }
   })
 
-  const parseAiResponse = (response: string): Expense[] => {
-    const lines = response.split('\n').filter((line) => line.trim() !== '')
-    return lines.map((line) => {
-      const [amount, category, date, description] = line.split(',').map((item) => item.trim())
-      return {
-        id: crypto.randomUUID(),
-        amount: parseFloat(amount),
-        category: category || 'Uncategorized',
-        date: date || new Date().toISOString().split('T')[0],
-        description: description || ''
-      }
-    })
-  }
+  // const { object, submit } = useObject({
+  //   api: '/api/expenses',
+  //   schema: expensesSchema,
+  //   onFinish: ({ object }) => {
+  //     if (object?.expenses.length) {
+  //       setAiGeneratedExpenses(object.expenses.map((expense) => ({ id: crypto.randomUUID(), ...expense })))
+  //     }
+  //   }
+  // })
 
   const handleExpenseChange = (index: number, field: keyof Expense, value: string | number) => {
     const updatedExpenses = [...aiGeneratedExpenses]
@@ -97,7 +92,7 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
           value={input}
           onChange={handleInputChange}
           placeholder="Enter your expense details here..."
-          className="min-h-[100px]"
+          className="min-h-[100px] max-h-96 overflow-auto"
         />
         <Button type="submit" disabled={isLoading} className="w-full">
           {isLoading ? (
@@ -110,6 +105,18 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
           )}
         </Button>
       </form>
+      {/* <Button
+        onClick={(e) => {
+          submit({
+            expenseCategories: expenseCategories.map((category) => category.name),
+            historicalExpenses,
+            bankExpenses: e.currentTarget.value
+          })
+        }}
+      >
+        Save Object Processed Expenses
+      </Button> */}
+      {/* {object ? <pre>{JSON.stringify(object, null, 2)}</pre> : null} */}
       {error && <div className="text-red-500 mt-4">Error: {error.message}</div>}
       {aiGeneratedExpenses.length > 0 && (
         <div className="space-y-4">

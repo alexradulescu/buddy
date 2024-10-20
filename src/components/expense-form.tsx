@@ -35,7 +35,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
     return new Date(year, month, 15)
   }
 
-  const handleAddExpenses = () => {
+  const addExpenses = (expenses: Expense[]) => {
     let hasError = false
     expenses.forEach((expense) => {
       if (!expense.amount || isNaN(Number(expense.amount)) || Number(expense.amount) <= 0) {
@@ -70,6 +70,10 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
     }
   }
 
+  const handleAddExpenses = () => {
+    addExpenses(expenses)
+  }
+
   const handleInputChange = (index: number, field: keyof Expense, value: string | number) => {
     const updatedExpenses = [...expenses]
     updatedExpenses[index] = { ...updatedExpenses[index], [field]: value }
@@ -94,8 +98,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
   }
 
   const handleAiConvertedExpenses = (aiExpenses: Expense[]) => {
-    setExpenses(aiExpenses)
-    handleAddExpenses()
+    addExpenses(aiExpenses)
   }
 
   return (

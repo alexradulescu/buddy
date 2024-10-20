@@ -30,10 +30,10 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[110px]">Amount</TableHead>
+              <TableHead className="w-[80px]">Amount</TableHead>
               <TableHead className="w-[130px]">Category</TableHead>
               <TableHead className="w-[130px]">Date</TableHead>
-              <TableHead className="w-[150px]">Description</TableHead>
+              <TableHead className="w-[220px]">Description</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -54,7 +54,9 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                 <TableCell className="p-1">
                   <Select value={expense.category} onValueChange={(value) => onInputChange(index, 'category', value)}>
                     <SelectTrigger className="w-full h-full rounded-none">
-                      <SelectValue placeholder="Select category" />
+                      <div className="w-full flex items-center truncate max-w-[100px] overflow-hidden">
+                        <SelectValue placeholder={'Select Category'} className="truncate overflow-hidden" />
+                      </div>
                     </SelectTrigger>
                     <SelectContent>
                       {expenseCategories.map((category) => (

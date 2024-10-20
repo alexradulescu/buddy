@@ -1,6 +1,19 @@
-import { streamText } from 'ai'
+import { streamObject } from 'ai'
+import { z } from 'zod'
 
 import { openai } from '@ai-sdk/openai'
+
+// define a schema for the notifications
+export const expensesSchema = z.object({
+  expenses: z.array(
+    z.object({
+      amount: z.number().positive().describe('The expense amount. Must be positive, with 2 decimals precision'),
+      category: z.string().describe('The expense category. Must be of the predefined list'),
+      date: z.string().describe('Date in string format, yyyy-MM-dd'),
+      description: z.string().describe('Expense description as it comes from the bank.')
+    })
+  )
+})
 
 interface BasePromptProps {
   transactions?: string
@@ -23,7 +36,7 @@ const basePrompt = ({
 - Format the amount as a number with two decimal places, without including the currency symbol.
 - Format the date as 'yyyy-MM-dd'.
 - Use the transaction description from the provided data, but remove any numeric values and the text "Singapore SG."
-- Return the results in the following format strictly as stringified array of JSON objects: [{amount, category, date, description}, ...]. Each entry on a new line. No other text, no other info, intro or markings.
+- Return the results in the following format: '<amount>, <category>, <date>, <description>'. Each entry on a new line. No other text, no other info, intro or markings.
 
 Here are examples of past expenses:
 ${historicalExpenses}
@@ -34,24 +47,27 @@ ${categories}
 Now, categorize the following new transactions:
 ${transactions}`
 
-/** Based on the first user and openai messages, generates a title for the conversation */
 export async function POST(req: Request) {
   const {
-    prompt,
+    rawTransactions,
     expenseCategories,
     historicalExpenses
-  }: { prompt: string; expenseCategories: string[]; historicalExpenses: Record<string, string> } = await req.json()
+  }: { rawTransactions: string; expenseCategories: string[]; historicalExpenses: Record<string, string> } =
+    await req.json()
 
-  /** Using plain generate, not streaming data as the whole response is very vast and short */
-  const result = await streamText({
-    /** Using gpt 4o mini as it is cheaper and yet fast, for limited task like a conversation title */
-    model: openai('gpt-4o-mini'),
+  console.info('INPUT')
+  console.info({ rawTransactions, expenseCategories, historicalExpenses })
+
+  const result = await streamObject({
+    model: openai('gpt-4-turbo'),
+    schema: expensesSchema,
+    // prompt: `Generate 3 notifications for a messages app in this context:` + context
     prompt: basePrompt({
-      transactions: prompt,
+      transactions: rawTransactions,
       categories: expenseCategories.join(', '),
       historicalExpenses: JSON.stringify(historicalExpenses)
     })
   })
 
-  return result.toDataStreamResponse()
+  return result.toTextStreamResponse()
 }
