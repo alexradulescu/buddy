@@ -1,15 +1,15 @@
 'use client'
 
-import { format } from 'date-fns'
-import { Search } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import React, { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Search } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
-import { useToast } from '@/hooks/use-toast'
+import { format } from 'date-fns'
 import { useIncomeStore } from '@/stores/income-store'
+import { useToast } from '@/hooks/use-toast'
 
 interface IncomeListProps {
   selectedYear: number
@@ -46,10 +46,6 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl text-muted-foreground mb-2">
-        {format(new Date(selectedYear, selectedMonth), 'MMMM yyyy')}
-      </h2>
-
       <label className="relative d-block">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input

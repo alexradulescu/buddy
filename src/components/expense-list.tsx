@@ -1,14 +1,14 @@
 'use client'
 
-import { format } from 'date-fns'
-import { Search, Trash } from 'lucide-react'
 import React, { useState } from 'react'
+import { Search, Trash } from 'lucide-react'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useToast } from '@/hooks/use-toast'
+import { format } from 'date-fns'
 import { useExpenseStore } from '@/stores/expense-store'
+import { useToast } from '@/hooks/use-toast'
 
 interface ExpenseListProps {
   selectedYear: number
@@ -20,15 +20,17 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState('')
 
-  const filteredExpenses = expenses.filter((expense) => {
-    const expenseDate = new Date(expense.date)
-    const matchesDate = expenseDate.getFullYear() === selectedYear && expenseDate.getMonth() === selectedMonth
-    const matchesSearch =
-      expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.amount.toString().includes(searchTerm)
-    return matchesDate && matchesSearch
-  })
+  const filteredExpenses = expenses
+    .filter((expense) => {
+      const expenseDate = new Date(expense.date)
+      const matchesDate = expenseDate.getFullYear() === selectedYear && expenseDate.getMonth() === selectedMonth
+      const matchesSearch =
+        expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        expense.amount.toString().includes(searchTerm)
+      return matchesDate && matchesSearch
+    })
+    .sort((a, b) => a.date.localeCompare(b.date))
 
   const handleDelete = (id: string) => {
     removeExpense(id)
@@ -40,10 +42,6 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl text-muted-foreground mb-2">
-        {format(new Date(selectedYear, selectedMonth), 'MMMM yyyy')}
-      </h2>
-
       <label className="relative block">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
@@ -57,7 +55,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
         <p className="text-center text-muted-foreground py-4">No expenses found for this period.</p>
       ) : (
         <div className="border rounded-md overflow-hidden">
-          <div className="max-h-[60vh] overflow-auto">
+          <div className="max-h-[60dvh] overflow-auto">
             <Table>
               <TableHeader className="sticky top-0 z-10">
                 <TableRow>

@@ -46,7 +46,9 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
       historicalExpenses
     },
     onFinish: (prompt: string, completion: string) => {
-      setAiGeneratedExpenses(JSON.parse(completion))
+      setAiGeneratedExpenses(
+        JSON.parse(completion).map((expense: Expense) => ({ ...expense, id: crypto.randomUUID() }))
+      )
     },
     onError: (error: Error) => {
       toast({

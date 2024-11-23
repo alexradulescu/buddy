@@ -1,18 +1,18 @@
 'use client'
 
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import React, { useState } from 'react'
 
 import { AccountForm } from '@/components/account-form'
 import { AccountList } from '@/components/account-list'
-import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
+import { PageHeader } from '@/components/page-header'
 import { cn } from '@/lib/utils'
 import { useAccountStore } from '@/stores/account-store'
 import { useExpenseStore } from '@/stores/expense-store'
 import { useIncomeStore } from '@/stores/income-store'
+import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function OverviewPage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
@@ -67,7 +67,7 @@ export default function OverviewPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <Card className="overflow-hidden">
-          <CardHeader className="flex flex-row items-start bg-muted/50">
+          <CardHeader className="flex flex-row items-start bg-muted/50 py-3">
             <CardTitle className="group flex items-center gap-1 text-md">Summary</CardTitle>
           </CardHeader>
           <CardContent className="p-6 text-sm">
@@ -102,27 +102,31 @@ export default function OverviewPage() {
           </CardFooter>
         </Card>
 
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">Account Balances</h2>
-            <Dialog open={isAddAccountDialogOpen} onOpenChange={setIsAddAccountDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>Add Account</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Account Balance</DialogTitle>
-                </DialogHeader>
-                <AccountForm
-                  onSubmit={() => setIsAddAccountDialogOpen(false)}
-                  selectedYear={selectedYear}
-                  selectedMonth={selectedMonth}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
-          <AccountList selectedYear={selectedYear} selectedMonth={selectedMonth} />
-        </div>
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-muted/50 py-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">Account Balances</CardTitle>
+              <Dialog open={isAddAccountDialogOpen} onOpenChange={setIsAddAccountDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button size={'sm'}>Add</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Account Balance</DialogTitle>
+                    </DialogHeader>
+                    <AccountForm
+                      onSubmit={() => setIsAddAccountDialogOpen(false)}
+                      selectedYear={selectedYear}
+                      selectedMonth={selectedMonth}
+                    />
+                  </DialogContent>
+                </Dialog>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <AccountList selectedYear={selectedYear} selectedMonth={selectedMonth} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

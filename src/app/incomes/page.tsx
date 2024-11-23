@@ -1,10 +1,11 @@
 'use client'
 
-import React from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 import { IncomeForm } from '@/components/income-form'
 import { IncomeList } from '@/components/income-list'
 import { PageHeader } from '@/components/page-header'
+import React from 'react'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function IncomesPage() {
@@ -13,13 +14,23 @@ export default function IncomesPage() {
   return (
     <>
       <PageHeader title="Incomes" />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <IncomeList selectedYear={selectedYear} selectedMonth={selectedMonth} />
-        </div>
-        <div>
-          <IncomeForm selectedYear={selectedYear} selectedMonth={selectedMonth} />
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Add Income</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <IncomeForm selectedYear={selectedYear} selectedMonth={selectedMonth} />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Income List</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <IncomeList selectedYear={selectedYear} selectedMonth={selectedMonth} />
+          </CardContent>
+        </Card>
       </div>
     </>
   )

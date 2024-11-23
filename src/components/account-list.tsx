@@ -1,9 +1,6 @@
 'use client'
 
-import { Edit2, MoreVertical, Trash2 } from 'lucide-react'
-import React, { useState } from 'react'
-
-import { AccountForm } from '@/components/account-form'
+import { AccountBalance, useAccountStore } from '@/stores/account-store'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,14 +11,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Edit2, MoreVertical, Trash2 } from 'lucide-react'
+import React, { useState } from 'react'
+
+import { AccountForm } from '@/components/account-form'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
-import { AccountBalance, useAccountStore } from '@/stores/account-store'
 
 interface AccountListProps {
   selectedYear: number
@@ -59,15 +59,8 @@ export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selected
   }
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-muted/50">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Account Balances</CardTitle>
-          <Badge variant="outline">{`${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`}</Badge>
-        </div>
-        <CardDescription>Manage your account balances for the selected period</CardDescription>
-      </CardHeader>
-      <CardContent className="p-6">
+    <>
+      <div className="p-6">
         {accountBalances.length === 0 ? (
           <p className="text-center text-muted-foreground py-4">No account balances for this month.</p>
         ) : (
@@ -106,10 +99,7 @@ export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selected
             ))}
           </ul>
         )}
-      </CardContent>
-      <CardFooter className="bg-muted/50 px-6 py-3">
-        <div className="text-xs text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</div>
-      </CardFooter>
+      </div>
 
       <Dialog open={editingAccount !== null} onOpenChange={(open) => !open && setEditingAccount(null)}>
         <DialogContent>
@@ -141,6 +131,6 @@ export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selected
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Card>
+    </>
   )
 }

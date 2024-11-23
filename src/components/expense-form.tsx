@@ -1,18 +1,18 @@
 'use client'
 
-import { TrashIcon } from 'lucide-react'
+import { Expense, useExpenseStore } from '@/stores/expense-store'
 import React, { useState } from 'react'
-
-import { ExpenseAiConverter } from '@/components/expense-ai-converter'
-import { ExpenseTable } from '@/components/expense-table'
-import { Button } from '@/components/ui/button'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useToast } from '@/hooks/use-toast'
+
+import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
+import { ExpenseAiConverter } from '@/components/expense-ai-converter'
+import { ExpenseTable } from '@/components/expense-table'
+import { Input } from '@/components/ui/input'
+import { TrashIcon } from 'lucide-react'
 import { useCategoryStore } from '@/stores/category-store'
-import { Expense, useExpenseStore } from '@/stores/expense-store'
+import { useToast } from '@/hooks/use-toast'
 
 interface ExpenseFormProps {
   selectedYear: number
@@ -102,41 +102,35 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">
-        Add Expenses for{' '}
-        {new Date(selectedYear, selectedMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}
-      </h2>
-      <Tabs defaultValue="table-form">
-        <TabsList>
-          <TabsTrigger value="table-form">Table Entry</TabsTrigger>
-          <TabsTrigger value="ai-converter">AI Converter</TabsTrigger>
-        </TabsList>
-        <TabsContent value="table-form">
-          <div className="space-y-4">
-            <ExpenseTable
-              expenses={expenses}
-              expenseCategories={expenseCategories}
-              onInputChange={handleInputChange}
-              onDeleteRow={deleteRow}
+    <Tabs defaultValue="table-form">
+      <TabsList>
+        <TabsTrigger value="table-form">Table Entry</TabsTrigger>
+        <TabsTrigger value="ai-converter">AI Converter</TabsTrigger>
+      </TabsList>
+      <TabsContent value="table-form">
+        <div className="space-y-4">
+          <ExpenseTable
+            expenses={expenses}
+            expenseCategories={expenseCategories}
+            onInputChange={handleInputChange}
+            onDeleteRow={deleteRow}
+          />
+          <div className="flex items-center space-x-2">
+            <Input
+              type="number"
+              value={rowsToAdd}
+              onChange={(e) => setRowsToAdd(Number(e.target.value))}
+              min="1"
+              className="w-20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
-            <div className="flex items-center space-x-2">
-              <Input
-                type="number"
-                value={rowsToAdd}
-                onChange={(e) => setRowsToAdd(Number(e.target.value))}
-                min="1"
-                className="w-20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
-              <Button onClick={addRows}>Add Rows</Button>
-            </div>
-            <Button onClick={handleAddExpenses}>Save Expenses</Button>
+            <Button onClick={addRows}>Add Rows</Button>
           </div>
-        </TabsContent>
-        <TabsContent value="ai-converter">
-          <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
-        </TabsContent>
-      </Tabs>
-    </div>
+          <Button onClick={handleAddExpenses}>Save Expenses</Button>
+        </div>
+      </TabsContent>
+      <TabsContent value="ai-converter">
+        <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
+      </TabsContent>
+    </Tabs>
   )
 }

@@ -1,15 +1,15 @@
 'use client'
 
-import { TrashIcon } from 'lucide-react'
 import React, { useState } from 'react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useToast } from '@/hooks/use-toast'
+import { TrashIcon } from 'lucide-react'
 import { useCategoryStore } from '@/stores/category-store'
 import { useIncomeStore } from '@/stores/income-store'
+import { useToast } from '@/hooks/use-toast'
 
 interface IncomeFormProps {
   selectedYear: number
@@ -115,11 +115,6 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">
-        Add Incomes for{' '}
-        {new Date(selectedYear, selectedMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}
-      </h2>
       <div className="space-y-4">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-200">
@@ -207,6 +202,5 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
         </div>
         <Button onClick={handleTableAddIncomes}>Save Incomes</Button>
       </div>
-    </div>
   )
 }

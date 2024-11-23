@@ -11,6 +11,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ExpenseCategory } from '@/stores/category-store'
 import { Expense } from '@/stores/expense-store'
 
+import { Textarea } from './ui/textarea'
+
 interface ExpenseTableProps {
   expenses: Expense[]
   expenseCategories: ExpenseCategory[]
@@ -75,8 +77,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                   />
                 </TableCell>
                 <TableCell className="p-1">
-                  <Input
-                    type="text"
+                  <Textarea
                     value={expense.description}
                     onChange={(e) => onInputChange(index, 'description', e.target.value)}
                     className="w-full h-full rounded-none py-2"

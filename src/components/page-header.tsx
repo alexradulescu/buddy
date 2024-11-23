@@ -1,12 +1,12 @@
 'use client'
 
-import { format } from 'date-fns'
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import React, { FC } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { format } from 'date-fns'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 interface Props {
@@ -34,7 +34,7 @@ export const PageHeader: FC<Props> = ({ title }) => {
 
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 mb-6">
-      <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
+      <h2 className="text-3xl font-normal tracking-tight">{title}</h2>
       <div className="flex items-center space-x-2">
         <Button variant="outline" size="icon" onClick={() => handleMonthChange(-1)}>
           <ChevronLeft className="h-4 w-4" />
