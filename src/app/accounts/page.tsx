@@ -1,17 +1,16 @@
 'use client'
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import React, { useState } from 'react'
-
-import { AccountForm } from '@/components/account-form'
-import { AccountList } from '@/components/account-list'
-import { Button } from '@/components/ui/button'
-import { PageHeader } from '@/components/page-header'
 import { cn } from '@/lib/utils'
 import { useAccountStore } from '@/stores/account-store'
 import { useExpenseStore } from '@/stores/expense-store'
 import { useIncomeStore } from '@/stores/income-store'
+import { AccountForm } from '@/components/account-form'
+import { AccountList } from '@/components/account-list'
+import { PageHeader } from '@/components/page-header'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function OverviewPage() {
@@ -107,20 +106,20 @@ export default function OverviewPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">Account Balances</CardTitle>
               <Dialog open={isAddAccountDialogOpen} onOpenChange={setIsAddAccountDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size={'sm'}>Add</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add New Account Balance</DialogTitle>
-                    </DialogHeader>
-                    <AccountForm
-                      onSubmit={() => setIsAddAccountDialogOpen(false)}
-                      selectedYear={selectedYear}
-                      selectedMonth={selectedMonth}
-                    />
-                  </DialogContent>
-                </Dialog>
+                <DialogTrigger asChild>
+                  <Button size={'sm'}>Add</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Account Balance</DialogTitle>
+                  </DialogHeader>
+                  <AccountForm
+                    onSubmit={() => setIsAddAccountDialogOpen(false)}
+                    selectedYear={selectedYear}
+                    selectedMonth={selectedMonth}
+                  />
+                </DialogContent>
+              </Dialog>
             </div>
           </CardHeader>
           <CardContent className="p-6">

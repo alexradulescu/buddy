@@ -1,11 +1,10 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
+import React from 'react'
 import { IncomeForm } from '@/components/income-form'
 import { IncomeList } from '@/components/income-list'
 import { PageHeader } from '@/components/page-header'
-import React from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function IncomesPage() {

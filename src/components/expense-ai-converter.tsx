@@ -1,16 +1,15 @@
 'use client'
 
+import React, { useMemo, useState } from 'react'
+import { useCategoryStore } from '@/stores/category-store'
+import { Expense, useExpenseStore } from '@/stores/expense-store'
 import { useCompletion, experimental_useObject as useObject } from 'ai/react'
 import { Loader2 } from 'lucide-react'
-import React, { useMemo, useState } from 'react'
-
 // import { expensesSchema } from '@/app/api/expenses/route'
 import { ExpenseTable } from '@/components/expense-table'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
-import { useCategoryStore } from '@/stores/category-store'
-import { Expense, useExpenseStore } from '@/stores/expense-store'
 
 interface ExpenseAiConverterProps {
   onExpensesGenerated: (expenses: Expense[]) => void

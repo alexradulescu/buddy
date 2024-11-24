@@ -1,13 +1,12 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
-import { PageHeader } from '@/components/page-header'
 import React from 'react'
 import { useCategoryStore } from '@/stores/category-store'
 import { useExpenseStore } from '@/stores/expense-store'
 import { useIncomeStore } from '@/stores/income-store'
+import { PageHeader } from '@/components/page-header'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function HomePage() {
@@ -219,7 +218,10 @@ export default function HomePage() {
                   <TableRow key={category.name} className={rowColor}>
                     <TableCell className="font-medium">{category.name}</TableCell>
                     <TableCell className="text-right">{formatCurrency(category.maxBudget)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(currentMonthlyExpense)}<br/>{monthlyDifference !== undefined && (
+                    <TableCell className="text-right">
+                      {formatCurrency(currentMonthlyExpense)}
+                      <br />
+                      {monthlyDifference !== undefined && (
                         <span
                           className={
                             monthlyDifference >= 0
@@ -230,25 +232,34 @@ export default function HomePage() {
                           {monthlyDifference >= 0 ? '+' : '-'}
                           {formatCurrency(Math.abs(monthlyDifference))}
                         </span>
-                      )}</TableCell>
-                   
+                      )}
+                    </TableCell>
+
                     <TableCell className="text-right">{formatCurrency(currentYearToDateExpense)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(yearToDateBudget)}<br/>{yearToDateDifference !== undefined && (
+                    <TableCell className="text-right">
+                      {formatCurrency(yearToDateBudget)}
+                      <br />
+                      {yearToDateDifference !== undefined && (
                         <span
                           className={`block ${yearToDateDifference >= 0 ? 'text-green-880 dark:text-green-200' : 'text-red-800 dark:text-red-200'}`}
                         >
                           {yearToDateDifference >= 0 ? '+' : '-'}
                           {formatCurrency(Math.abs(yearToDateDifference))}
                         </span>
-                      )}</TableCell> 
-                    <TableCell className="text-right">{formatCurrency(annualBudget)}<br/>{annualDifference !== undefined && (
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {formatCurrency(annualBudget)}
+                      <br />
+                      {annualDifference !== undefined && (
                         <span
                           className={`block ${annualDifference >= 0 ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}`}
                         >
                           {annualDifference >= 0 ? '+' : '-'}
                           {formatCurrency(Math.abs(annualDifference))}
                         </span>
-                      )}</TableCell>
+                      )}
+                    </TableCell>
                   </TableRow>
                 )
               })}

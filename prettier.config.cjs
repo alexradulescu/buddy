@@ -19,7 +19,6 @@ module.exports = {
     '^(?!.*[.]css$)[./].*$',
     '.css$'
   ],
-
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
   importOrderBuiltinModulesToTop: true,

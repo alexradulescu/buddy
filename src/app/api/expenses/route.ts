@@ -1,7 +1,6 @@
+import { openai } from '@ai-sdk/openai'
 import { streamObject } from 'ai'
 import { z } from 'zod'
-
-import { openai } from '@ai-sdk/openai'
 
 // define a schema for the notifications
 export const expensesSchema = z.object({
