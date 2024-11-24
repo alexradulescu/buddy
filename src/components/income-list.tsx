@@ -6,9 +6,8 @@ import React, { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
-import { Separator } from '@/components/ui/separator'
 import { format } from 'date-fns'
-import { useIncomeStore } from '@/stores/income-store'
+import { useIncomeStore } from '@/stores/instantdb'
 import { useToast } from '@/hooks/use-toast'
 
 interface IncomeListProps {
@@ -17,7 +16,7 @@ interface IncomeListProps {
 }
 
 export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedYear }) => {
-  const { incomes, removeIncome } = useIncomeStore()
+  const { data: { incomes = [] } = {}, removeIncome } = useIncomeStore()
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState('')
 

@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import { TrashIcon } from 'lucide-react'
-import { useCategoryStore } from '@/stores/category-store'
-import { useIncomeStore } from '@/stores/income-store'
+import { useCategoryStore } from '@/stores/instantdb'
+import { useIncomeStore } from '@/stores/instantdb'
 import { useToast } from '@/hooks/use-toast'
 
 interface IncomeFormProps {
@@ -29,7 +29,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
   ])
   const [rowsToAdd, setRowsToAdd] = useState(1)
   const { addIncome } = useIncomeStore()
-  const { incomeCategories } = useCategoryStore()
+  const { data: { incomeCategories = [] } = {} } = useCategoryStore()
   const { toast } = useToast()
 
   function getDefaultDate(year: number, month: number): Date {

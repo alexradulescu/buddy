@@ -1,12 +1,12 @@
 'use client'
 
+import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
 import React, { useState } from 'react'
-import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useForm } from 'react-hook-form'
 import { useToast } from '@/hooks/use-toast'
-import { AccountBalance, useAccountStore } from '@/stores/account-store'
 
 interface AccountFormProps {
   initialData?: AccountBalance
@@ -16,7 +16,7 @@ interface AccountFormProps {
 }
 
 export const AccountForm: React.FC<AccountFormProps> = ({ initialData, onSubmit, selectedYear, selectedMonth }) => {
-  const { addAccountBalance, updateAccountBalance } = useAccountStore()
+  const { addAccountBalance, updateAccountBalance } = useAccountBalances(selectedYear, selectedMonth)
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
 

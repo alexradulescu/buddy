@@ -1,14 +1,14 @@
 'use client'
 
+import { Expense, useExpenseStore } from '@/stores/instantdb'
 import React, { useMemo, useState } from 'react'
-import { useCategoryStore } from '@/stores/category-store'
-import { Expense, useExpenseStore } from '@/stores/expense-store'
 import { useCompletion, experimental_useObject as useObject } from 'ai/react'
-import { Loader2 } from 'lucide-react'
-// import { expensesSchema } from '@/app/api/expenses/route'
-import { ExpenseTable } from '@/components/expense-table'
+
 import { Button } from '@/components/ui/button'
+import { ExpenseTable } from '@/components/expense-table'
+import { Loader2 } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
+import { useCategoryStore } from '@/stores/instantdb'
 import { useToast } from '@/hooks/use-toast'
 
 interface ExpenseAiConverterProps {
@@ -19,8 +19,8 @@ export interface HistoricalExpense extends Omit<Expense, 'amount' | 'id' | 'date
 
 export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpensesGenerated }) => {
   const { toast } = useToast()
-  const expenseCategories = useCategoryStore((state) => state.expenseCategories)
-  const { expenses } = useExpenseStore()
+  const {data: { expenseCategories = [] } = {}} = useCategoryStore()
+  const { data: { expenses = [] } = {} } = useExpenseStore()
   const [aiGeneratedExpenses, setAiGeneratedExpenses] = useState<Expense[]>([])
 
   const historicalExpenses = useMemo(() => {

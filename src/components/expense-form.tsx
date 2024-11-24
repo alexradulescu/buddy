@@ -1,17 +1,14 @@
 'use client'
 
-import { Expense, useExpenseStore } from '@/stores/expense-store'
+import { Expense, useExpenseStore } from '@/stores/instantdb'
 import React, { useState } from 'react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { Button } from '@/components/ui/button'
-import { DatePicker } from '@/components/ui/date-picker'
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'
 import { ExpenseTable } from '@/components/expense-table'
 import { Input } from '@/components/ui/input'
-import { TrashIcon } from 'lucide-react'
-import { useCategoryStore } from '@/stores/category-store'
+import { useCategoryStore } from '@/stores/instantdb'
 import { useToast } from '@/hooks/use-toast'
 
 interface ExpenseFormProps {
@@ -24,7 +21,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses)
   const [rowsToAdd, setRowsToAdd] = useState(1)
   const { addExpense } = useExpenseStore()
-  const expenseCategories = useCategoryStore((state) => state.expenseCategories)
+  const { data: { expenseCategories = [] } = {} } = useCategoryStore()
   const { toast } = useToast()
 
   function getDefaultDate(year: number, month: number): Date {

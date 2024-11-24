@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { format } from 'date-fns'
-import { useExpenseStore } from '@/stores/expense-store'
+import { useExpenseStore } from '@/stores/instantdb'
 import { useToast } from '@/hooks/use-toast'
 
 interface ExpenseListProps {
@@ -16,7 +16,7 @@ interface ExpenseListProps {
 }
 
 export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selectedYear }) => {
-  const { expenses, removeExpense } = useExpenseStore()
+  const { data: { expenses = [] } = {}, removeExpense } = useExpenseStore()
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState('')
 

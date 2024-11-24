@@ -1,22 +1,9 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-
-import { useCategoryStore } from '@/stores/category-store'
-import { useExpenseStore } from '@/stores/expense-store'
-import { useIncomeStore } from '@/stores/income-store'
+import React, { useState } from 'react'
 
 export function HydrationBoundary({ children }: { children: React.ReactNode }) {
-  const [isHydrated, setIsHydrated] = useState(false)
-  const categoryHydrated = useCategoryStore((state) => state.isHydrated)
-  const expenseHydrated = useExpenseStore((state) => state.isHydrated)
-  const incomeHydrated = useIncomeStore((state) => state.isHydrated)
-
-  useEffect(() => {
-    if (categoryHydrated && expenseHydrated && incomeHydrated) {
-      setIsHydrated(true)
-    }
-  }, [categoryHydrated, expenseHydrated, incomeHydrated])
+  const [isHydrated, setIsHydrated] = useState(true)
 
   if (!isHydrated) {
     return <div>Loading...</div>

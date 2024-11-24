@@ -1,15 +1,16 @@
 'use client'
 
-import React from 'react'
-import { ExpenseCategory } from '@/stores/category-store'
-import { Expense } from '@/stores/expense-store'
-import { TrashIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+
+import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Expense } from '@/stores/expense-store'
+import { ExpenseCategory } from '@/stores/instantdb'
+import { Input } from '@/components/ui/input'
+import React from 'react'
 import { Textarea } from './ui/textarea'
+import { TrashIcon } from 'lucide-react'
 
 interface ExpenseTableProps {
   expenses: Expense[]

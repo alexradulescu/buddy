@@ -1,6 +1,6 @@
 'use client'
 
-import { AccountBalance, useAccountStore } from '@/stores/account-store'
+import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,14 +11,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Edit2, MoreVertical, Trash2 } from 'lucide-react'
 import React, { useState } from 'react'
 
 import { AccountForm } from '@/components/account-form'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
@@ -29,13 +27,12 @@ interface AccountListProps {
 }
 
 export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selectedMonth }) => {
-  const { getAccountBalances, removeAccountBalance } = useAccountStore()
+  const { data: { accountBalances = [] } = {}, removeAccountBalance } = useAccountBalances(selectedYear, selectedMonth)
   const { toast } = useToast()
   const [editingAccount, setEditingAccount] = useState<AccountBalance | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [accountToDelete, setAccountToDelete] = useState<AccountBalance | null>(null)
 
-  const accountBalances = getAccountBalances(selectedYear, selectedMonth)
 
   const handleEdit = (account: AccountBalance) => {
     setEditingAccount(account)
@@ -65,15 +62,15 @@ export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selected
           <p className="text-center text-muted-foreground py-4">No account balances for this month.</p>
         ) : (
           <ul className="space-y-4">
-            {accountBalances.map((account) => (
-              <li key={account.id}>
+            {accountBalances.map((balance) => (
+              <li key={balance.id}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold">{account.title}</h3>
-                    <p className="text-sm text-muted-foreground">ID: {account.id}</p>
+                    <h3 className="font-semibold">{balance.title}</h3>
+                    <p className="text-sm text-muted-foreground">ID: {balance.id}</p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="text-right font-semibold">${account.amount.toFixed(2)}</div>
+                    <div className="text-right font-semibold">${balance.amount.toFixed(2)}</div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
@@ -82,11 +79,11 @@ export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selected
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(account)}>
+                        <DropdownMenuItem onClick={() => handleEdit(balance)}>
                           <Edit2 className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(account)}>
+                        <DropdownMenuItem onClick={() => handleDelete(balance)}>
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
                         </DropdownMenuItem>

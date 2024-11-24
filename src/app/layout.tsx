@@ -1,10 +1,11 @@
 import './globals.css'
-import type { Metadata } from 'next'
-import localFont from 'next/font/local'
+
 import { HydrationBoundary } from '@/components/hydration-boundary'
+import type { Metadata } from 'next'
 import { Navigation } from '@/components/navigation'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
+import localFont from 'next/font/local'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
