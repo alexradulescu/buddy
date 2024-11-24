@@ -71,7 +71,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
     addExpenses(expenses)
   }
 
-  const handleInputChange = (index: number, field: keyof Expense, value: string | number) => {
+  const handleInputChange = (index: number, field: keyof Expense, value: string | number | Date) => {
     const updatedExpenses = [...expenses]
     updatedExpenses[index] = { ...updatedExpenses[index], [field]: value }
     setExpenses(updatedExpenses)
@@ -85,7 +85,8 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
         amount: 0,
         category: '',
         date: getDefaultDate(selectedYear, selectedMonth).toISOString().split('T')[0],
-        description: ''
+        description: '',
+        createdAt: Date.now()
       }))
     setExpenses([...expenses, ...newRows])
   }

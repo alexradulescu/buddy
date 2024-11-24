@@ -27,12 +27,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 
-type EditableExpenseCategory = Omit<ExpenseCategory, 'id' | 'createdAt'> & {
+type EditableExpenseCategory = Partial<ExpenseCategory> & {
   id?: string
   isNew?: boolean
 }
 
-type EditableIncomeCategory = Omit<IncomeCategory, 'id' | 'createdAt'> & {
+type EditableIncomeCategory = Partial<IncomeCategory> & {
   id?: string
   isNew?: boolean
 }
@@ -113,6 +113,14 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
     return true
   }
 
+  const isExpenseCategory = (category: EditableCategory): category is EditableExpenseCategory => {
+    return type === 'expense';
+  }
+
+  const isIncomeCategory = (category: EditableCategory): category is EditableIncomeCategory => {
+    return type === 'income';
+  }
+
   const handleAddRow = () => {
     const newCategory = type === 'expense' 
       ? { name: '', isNew: true } as EditableExpenseCategory
@@ -164,6 +172,42 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
     setDeletingCategoryId(undefined)
   }
 
+  const handleSave = async (category: EditableCategory) => {
+    if (isExpenseCategory(category) && !category.name) {
+      toast({
+        title: 'Error',
+        description: 'Name is required for expense categories',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    if (isIncomeCategory(category) && !category.title) {
+      toast({
+        title: 'Error',
+        description: 'Title is required for income categories',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    try {
+      if (category.isNew) {
+        const { id, isNew, ...newCategory } = category
+        await onAdd(newCategory)
+      } else if (category.id) {
+        const { id, isNew, ...updateData } = category
+        await onUpdate(category.id, updateData)
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: `Failed to save category: ${error}`,
+        variant: 'destructive'
+      })
+    }
+  }
+
   const handleSaveChanges = async () => {
     let hasError = false
 
@@ -174,33 +218,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
         break
       }
 
-      try {
-        if (category.isNew) {
-          const { id, isNew, ...newCategory } = category
-          if (type === 'expense') {
-            await onAdd(newCategory as Omit<ExpenseCategory, 'id' | 'createdAt'>)
-          } else {
-            await onAdd(newCategory as Omit<IncomeCategory, 'id' | 'createdAt'>)
-          }
-        } else if (category.id) {
-          const { id, isNew, ...updateData } = category
-            if (type === 'expense') {
-              await onUpdate(category.id, updateData as Partial<ExpenseCategory>)
-            } else {
-              await onUpdate(category.id, updateData as Partial<IncomeCategory>)
-            }
-        }
-      } catch (error) {
-        toast({
-          title: 'Error',
-          description: `Failed to save category: ${type === 'expense' 
-            ? (category as EditableExpenseCategory).name 
-            : (category as EditableIncomeCategory).title}`,
-          variant: 'destructive'
-        })
-        hasError = true
-        break
-      }
+      await handleSave(category)
     }
 
     if (!hasError) {

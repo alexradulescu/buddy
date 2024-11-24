@@ -1,12 +1,11 @@
 'use client'
 
+import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Expense } from '@/stores/expense-store'
-import { ExpenseCategory } from '@/stores/instantdb'
 import { Input } from '@/components/ui/input'
 import React from 'react'
 import { Textarea } from './ui/textarea'
@@ -15,7 +14,7 @@ import { TrashIcon } from 'lucide-react'
 interface ExpenseTableProps {
   expenses: Expense[]
   expenseCategories: ExpenseCategory[]
-  onInputChange: (index: number, field: keyof Expense, value: string | number) => void
+  onInputChange: (index: number, field: 'amount' | 'category' | 'date' | 'description', value: string | number | Date) => void
   onDeleteRow: (id: string) => void
 }
 
@@ -71,7 +70,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                 <TableCell className="p-1">
                   <DatePicker
                     date={new Date(expense.date)}
-                    onDateChange={(date) => onInputChange(index, 'date', date!.toISOString().split('T')[0])}
+                    onDateChange={(date) => onInputChange(index, 'date', date!)}
                     className="w-full h-full rounded-none"
                   />
                 </TableCell>

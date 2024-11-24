@@ -99,7 +99,7 @@ export function useCategoryStore() {
     incomeCategories: {}
   })
 
-  const addExpenseCategory = async (category: Omit<ExpenseCategory, 'id' | 'createdAt'>) => {
+  const addExpenseCategory = async (category: Partial<ExpenseCategory>) => {
     await db.transact([
       db.tx.expenseCategories[id()].update({
         ...category,
@@ -125,12 +125,12 @@ export function useCategoryStore() {
     await db.transact([db.tx.incomeCategories[categoryId].delete()])
   }
 
-  const updateExpenseCategory = async (categoryId: string, updates: Partial<ExpenseCategory>) => {
-    await db.transact([db.tx.expenseCategories[categoryId].update(updates)])
+  const updateExpenseCategory = async (categoryId: string, category: Partial<ExpenseCategory>) => {
+    await db.transact([db.tx.expenseCategories[categoryId].update(category)])
   }
 
-  const updateIncomeCategory = async (categoryId: string, updates: Partial<IncomeCategory>) => {
-    await db.transact([db.tx.incomeCategories[categoryId].update(updates)])
+  const updateIncomeCategory = async (categoryId: string, category: Partial<IncomeCategory>) => {
+    await db.transact([db.tx.incomeCategories[categoryId].update(category)])
   }
 
   return {

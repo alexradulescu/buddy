@@ -58,9 +58,23 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
     }
   })
 
-  const handleExpenseChange = (index: number, field: keyof Expense, value: string | number) => {
+  const handleExpenseChange = (
+    index: number,
+    field: 'amount' | 'category' | 'date' | 'description',
+    value: string | number | Date
+  ) => {
     const updatedExpenses = [...aiGeneratedExpenses]
-    updatedExpenses[index] = { ...updatedExpenses[index], [field]: value }
+    if (field === 'date' && value instanceof Date) {
+      updatedExpenses[index] = { 
+        ...updatedExpenses[index], 
+        [field]: value.toISOString().split('T')[0]
+      }
+    } else {
+      updatedExpenses[index] = { 
+        ...updatedExpenses[index], 
+        [field]: value 
+      }
+    }
     setAiGeneratedExpenses(updatedExpenses)
   }
 
@@ -96,18 +110,7 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
           )}
         </Button>
       </form>
-      {/* <Button
-        onClick={(e) => {
-          submit({
-            expenseCategories: expenseCategories.map((category) => category.name),
-            historicalExpenses,
-            bankExpenses: e.currentTarget.value
-          })
-        }}
-      >
-        Save Object Processed Expenses
-      </Button> */}
-      {/* {object ? <pre>{JSON.stringify(object, null, 2)}</pre> : null} */}
+     
       {error && <div className="text-red-500 mt-4">Error: {error.message}</div>}
       {aiGeneratedExpenses.length > 0 && (
         <div className="space-y-4">
