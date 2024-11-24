@@ -1,12 +1,11 @@
 import './globals.css'
-
-import { HydrationBoundary } from '@/components/hydration-boundary'
 import type { Metadata } from 'next'
-import { Navigation } from '@/components/navigation'
+import localFont from 'next/font/local'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { HydrationBoundary } from '@/components/hydration-boundary'
+import { Navigation } from '@/components/navigation'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
-import localFont from 'next/font/local'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -32,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <NuqsAdapter >
+        <NuqsAdapter>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <HydrationBoundary>
               <div className="flex min-h-screen bg-background">

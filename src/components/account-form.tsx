@@ -1,11 +1,10 @@
 'use client'
 
-import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
 import React, { useState } from 'react'
-
+import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
+import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useForm } from 'react-hook-form'
 import { useToast } from '@/hooks/use-toast'
 
 interface AccountFormProps {

@@ -1,6 +1,6 @@
-import { expensesSchema } from './schema'
 import { openai } from '@ai-sdk/openai'
 import { streamObject } from 'ai'
+import { expensesSchema } from './schema'
 
 interface BasePromptProps {
   transactions?: string

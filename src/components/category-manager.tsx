@@ -1,5 +1,8 @@
 'use client'
 
+import React, { useEffect, useState } from 'react'
+import { ExpenseCategory, IncomeCategory, Schema } from '@/stores/instantdb'
+import { Plus, Save, Trash2 } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,21 +13,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ExpenseCategory, IncomeCategory, Schema } from '@/stores/instantdb'
-import { Plus, Save, Trash2 } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
-
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/hooks/use-toast'
 
 type EditableExpenseCategory = Partial<ExpenseCategory> & {
@@ -50,7 +42,7 @@ interface CategoryManagerProps {
 export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categories, onAdd, onUpdate, onDelete }) => {
   const { toast } = useToast()
   const [editableCategories, setEditableCategories] = useState<EditableCategory[]>(
-    categories.map(category => ({
+    categories.map((category) => ({
       ...category,
       isNew: false
     }))
@@ -60,7 +52,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
   const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
-    setEditableCategories(categories.map(category => ({ ...category, isNew: false })))
+    setEditableCategories(categories.map((category) => ({ ...category, isNew: false })))
   }, [categories])
 
   const validateCategory = (category: EditableCategory): boolean => {
@@ -114,23 +106,24 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
   }
 
   const isExpenseCategory = (category: EditableCategory): category is EditableExpenseCategory => {
-    return type === 'expense';
+    return type === 'expense'
   }
 
   const isIncomeCategory = (category: EditableCategory): category is EditableIncomeCategory => {
-    return type === 'income';
+    return type === 'income'
   }
 
   const handleAddRow = () => {
-    const newCategory = type === 'expense' 
-      ? { name: '', isNew: true } as EditableExpenseCategory
-      : { title: '', isNew: true } as EditableIncomeCategory
-    
-    setEditableCategories(prevCategories => {
+    const newCategory =
+      type === 'expense'
+        ? ({ name: '', isNew: true } as EditableExpenseCategory)
+        : ({ title: '', isNew: true } as EditableIncomeCategory)
+
+    setEditableCategories((prevCategories) => {
       if (type === 'expense') {
-        return [...prevCategories as EditableExpenseCategory[], newCategory]
+        return [...(prevCategories as EditableExpenseCategory[]), newCategory]
       } else {
-        return [...prevCategories as EditableIncomeCategory[], newCategory]
+        return [...(prevCategories as EditableIncomeCategory[]), newCategory]
       }
     })
     setHasChanges(true)
@@ -153,9 +146,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
     if (deletingCategoryId) {
       try {
         await onDelete(deletingCategoryId)
-        setEditableCategories(editableCategories.filter(cat => 
-          'id' in cat && cat.id !== deletingCategoryId
-        ))
+        setEditableCategories(editableCategories.filter((cat) => 'id' in cat && cat.id !== deletingCategoryId))
         toast({
           title: 'Success',
           description: 'Category deleted successfully'
@@ -237,17 +228,11 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
           {type === 'expense' ? 'Expense Categories' : 'Income Categories'}
         </CardTitle>
         <div className="space-x-2">
-          <Button 
-            variant="outline" 
-            onClick={handleAddRow}
-          >
+          <Button variant="outline" onClick={handleAddRow}>
             <Plus className="h-4 w-4 mr-2" />
             Add Row
           </Button>
-          <Button 
-            onClick={handleSaveChanges} 
-            disabled={!hasChanges}
-          >
+          <Button onClick={handleSaveChanges} disabled={!hasChanges}>
             <Save className="h-4 w-4 mr-2" />
             Save Changes
           </Button>
@@ -274,13 +259,12 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
               <TableRow key={category.id || `new-${index}`}>
                 <TableCell>
                   <Input
-                    value={type === 'expense' 
-                      ? (category as EditableExpenseCategory).name 
-                      : (category as EditableIncomeCategory).title}
-                    onChange={(e) => handleInputChange(index, 
-                      type === 'expense' ? 'name' : 'title', 
-                      e.target.value
-                    )}
+                    value={
+                      type === 'expense'
+                        ? (category as EditableExpenseCategory).name
+                        : (category as EditableIncomeCategory).title
+                    }
+                    onChange={(e) => handleInputChange(index, type === 'expense' ? 'name' : 'title', e.target.value)}
                     placeholder={`Enter category ${type === 'expense' ? 'name' : 'title'}`}
                   />
                 </TableCell>
@@ -291,9 +275,10 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
                         type="number"
                         value={(category as EditableExpenseCategory).maxBudget || ''}
                         onChange={(e) => {
-                            if (e.target.value) {handleInputChange(index, 'maxBudget', 
-                                parseFloat(e.target.value)
-                            )}}}
+                          if (e.target.value) {
+                            handleInputChange(index, 'maxBudget', parseFloat(e.target.value))
+                          }
+                        }}
                         placeholder="Monthly budget"
                         step="0.01"
                       />
@@ -303,9 +288,10 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
                         type="number"
                         value={(category as EditableExpenseCategory).maxAnnualBudget || ''}
                         onChange={(e) => {
-                            if (e.target.value) { 
-                                handleInputChange(index, 'maxAnnualBudget', parseFloat(e.target.value))
-                            }}}
+                          if (e.target.value) {
+                            handleInputChange(index, 'maxAnnualBudget', parseFloat(e.target.value))
+                          }
+                        }}
                         placeholder="Annual budget"
                         step="0.01"
                       />
@@ -318,7 +304,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
                       value={(category as EditableIncomeCategory).targetAmount || ''}
                       onChange={(e) => {
                         if (e.target.value) {
-                            handleInputChange(index, 'targetAmount', parseFloat(e.target.value))
+                          handleInputChange(index, 'targetAmount', parseFloat(e.target.value))
                         }
                       }}
                       placeholder="Target amount"

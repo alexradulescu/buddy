@@ -1,12 +1,11 @@
 'use client'
 
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import React, { FC } from 'react'
-
+import { format } from 'date-fns'
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { format } from 'date-fns'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 interface Props {

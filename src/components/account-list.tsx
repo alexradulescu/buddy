@@ -1,6 +1,9 @@
 'use client'
 
+import React, { useState } from 'react'
 import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
+import { Edit2, MoreVertical, Trash2 } from 'lucide-react'
+import { AccountForm } from '@/components/account-form'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,13 +14,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Edit2, MoreVertical, Trash2 } from 'lucide-react'
-import React, { useState } from 'react'
-
-import { AccountForm } from '@/components/account-form'
-import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
 
@@ -32,7 +31,6 @@ export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selected
   const [editingAccount, setEditingAccount] = useState<AccountBalance | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [accountToDelete, setAccountToDelete] = useState<AccountBalance | null>(null)
-
 
   const handleEdit = (account: AccountBalance) => {
     setEditingAccount(account)

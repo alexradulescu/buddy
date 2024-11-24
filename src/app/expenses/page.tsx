@@ -1,11 +1,10 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
+import React from 'react'
 import { ExpenseForm } from '@/components/expense-form'
 import { ExpenseList } from '@/components/expense-list'
 import { PageHeader } from '@/components/page-header'
-import React from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function ExpensesPage() {

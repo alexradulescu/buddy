@@ -1,14 +1,12 @@
 'use client'
 
-import { Expense, useExpenseStore } from '@/stores/instantdb'
 import React, { useMemo, useState } from 'react'
+import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { useCompletion, experimental_useObject as useObject } from 'ai/react'
-
-import { Button } from '@/components/ui/button'
-import { ExpenseTable } from '@/components/expense-table'
 import { Loader2 } from 'lucide-react'
+import { ExpenseTable } from '@/components/expense-table'
+import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { useCategoryStore } from '@/stores/instantdb'
 import { useToast } from '@/hooks/use-toast'
 
 interface ExpenseAiConverterProps {
@@ -19,7 +17,7 @@ export interface HistoricalExpense extends Omit<Expense, 'amount' | 'id' | 'date
 
 export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpensesGenerated }) => {
   const { toast } = useToast()
-  const {data: { expenseCategories = [] } = {}} = useCategoryStore()
+  const { data: { expenseCategories = [] } = {} } = useCategoryStore()
   const { data: { expenses = [] } = {} } = useExpenseStore()
   const [aiGeneratedExpenses, setAiGeneratedExpenses] = useState<Expense[]>([])
 
@@ -65,14 +63,14 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
   ) => {
     const updatedExpenses = [...aiGeneratedExpenses]
     if (field === 'date' && value instanceof Date) {
-      updatedExpenses[index] = { 
-        ...updatedExpenses[index], 
+      updatedExpenses[index] = {
+        ...updatedExpenses[index],
         [field]: value.toISOString().split('T')[0]
       }
     } else {
-      updatedExpenses[index] = { 
-        ...updatedExpenses[index], 
-        [field]: value 
+      updatedExpenses[index] = {
+        ...updatedExpenses[index],
+        [field]: value
       }
     }
     setAiGeneratedExpenses(updatedExpenses)
@@ -110,7 +108,7 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
           )}
         </Button>
       </form>
-     
+
       {error && <div className="text-red-500 mt-4">Error: {error.message}</div>}
       {aiGeneratedExpenses.length > 0 && (
         <div className="space-y-4">

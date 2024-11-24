@@ -1,12 +1,11 @@
 'use client'
 
-import { BarChart2, CreditCard, Home, LucideIcon, Package2, PiggyBank, Settings } from 'lucide-react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-
-import Link from 'next/link'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
+import { BarChart2, CreditCard, Home, LucideIcon, Package2, PiggyBank, Settings } from 'lucide-react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 interface NavItem {

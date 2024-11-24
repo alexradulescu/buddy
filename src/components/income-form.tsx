@@ -1,14 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-
+import { useCategoryStore, useIncomeStore } from '@/stores/instantdb'
+import { TrashIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
-import { TrashIcon } from 'lucide-react'
-import { useCategoryStore } from '@/stores/instantdb'
-import { useIncomeStore } from '@/stores/instantdb'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 
 interface IncomeFormProps {
@@ -115,92 +113,92 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
   }
 
   return (
-      <div className="space-y-4">
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-200">
-            <thead>
-              <tr>
-                <th className="border border-gray-200 p-2 w-[110px]">Amount</th>
-                <th className="border border-gray-200 p-2 w-[130px]">Category</th>
-                <th className="border border-gray-200 p-2 w-[130px]">Date</th>
-                <th className="border border-gray-200 p-2 w-[150px]">Description</th>
-                <th className="border border-gray-200 p-2 w-[50px]"></th>
+    <div className="space-y-4">
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse border border-gray-200">
+          <thead>
+            <tr>
+              <th className="border border-gray-200 p-2 w-[110px]">Amount</th>
+              <th className="border border-gray-200 p-2 w-[130px]">Category</th>
+              <th className="border border-gray-200 p-2 w-[130px]">Date</th>
+              <th className="border border-gray-200 p-2 w-[150px]">Description</th>
+              <th className="border border-gray-200 p-2 w-[50px]"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {tableIncomes.map((income, index) => (
+              <tr key={index}>
+                <td className="border border-gray-200 p-1">
+                  <Input
+                    type="number"
+                    value={income.amount}
+                    onChange={(e) => handleTableInputChange(index, 'amount', e.target.value)}
+                    onKeyDown={(e) => handleTableKeyDown(e, index)}
+                    step="0.01"
+                    min="0"
+                    required
+                    className="w-full h-full rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none py-2"
+                  />
+                </td>
+                <td className="border border-gray-200 p-1">
+                  <Select
+                    value={income.category}
+                    onValueChange={(value) => handleTableInputChange(index, 'category', value)}
+                  >
+                    <SelectTrigger className="w-full h-full rounded-none">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {incomeCategories.map((category) => (
+                        <SelectItem key={category.title} value={category.title}>
+                          {category.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </td>
+                <td className="border border-gray-200 p-1">
+                  <DatePicker
+                    date={income.date}
+                    onDateChange={(date) => handleTableInputChange(index, 'date', date!)}
+                    className="w-full h-full rounded-none"
+                  />
+                </td>
+                <td className="border border-gray-200 p-1">
+                  <Input
+                    type="text"
+                    value={income.description}
+                    onChange={(e) => handleTableInputChange(index, 'description', e.target.value)}
+                    onKeyDown={(e) => handleTableKeyDown(e, index)}
+                    className="w-full h-full rounded-none py-2"
+                  />
+                </td>
+                <td className="border border-gray-200 p-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteRow(index)}
+                    className="w-full h-full rounded-none"
+                  >
+                    <TrashIcon className="h-7 w-4" />
+                  </Button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {tableIncomes.map((income, index) => (
-                <tr key={index}>
-                  <td className="border border-gray-200 p-1">
-                    <Input
-                      type="number"
-                      value={income.amount}
-                      onChange={(e) => handleTableInputChange(index, 'amount', e.target.value)}
-                      onKeyDown={(e) => handleTableKeyDown(e, index)}
-                      step="0.01"
-                      min="0"
-                      required
-                      className="w-full h-full rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none py-2"
-                    />
-                  </td>
-                  <td className="border border-gray-200 p-1">
-                    <Select
-                      value={income.category}
-                      onValueChange={(value) => handleTableInputChange(index, 'category', value)}
-                    >
-                      <SelectTrigger className="w-full h-full rounded-none">
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {incomeCategories.map((category) => (
-                          <SelectItem key={category.title} value={category.title}>
-                            {category.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </td>
-                  <td className="border border-gray-200 p-1">
-                    <DatePicker
-                      date={income.date}
-                      onDateChange={(date) => handleTableInputChange(index, 'date', date!)}
-                      className="w-full h-full rounded-none"
-                    />
-                  </td>
-                  <td className="border border-gray-200 p-1">
-                    <Input
-                      type="text"
-                      value={income.description}
-                      onChange={(e) => handleTableInputChange(index, 'description', e.target.value)}
-                      onKeyDown={(e) => handleTableKeyDown(e, index)}
-                      className="w-full h-full rounded-none py-2"
-                    />
-                  </td>
-                  <td className="border border-gray-200 p-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => deleteRow(index)}
-                      className="w-full h-full rounded-none"
-                    >
-                      <TrashIcon className="h-7 w-4" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Input
-            type="number"
-            value={rowsToAdd}
-            onChange={(e) => setRowsToAdd(Number(e.target.value))}
-            min="1"
-            className="w-20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-          <Button onClick={addRows}>Add Rows</Button>
-        </div>
-        <Button onClick={handleTableAddIncomes}>Save Incomes</Button>
+            ))}
+          </tbody>
+        </table>
       </div>
+      <div className="flex items-center space-x-2">
+        <Input
+          type="number"
+          value={rowsToAdd}
+          onChange={(e) => setRowsToAdd(Number(e.target.value))}
+          min="1"
+          className="w-20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        />
+        <Button onClick={addRows}>Add Rows</Button>
+      </div>
+      <Button onClick={handleTableAddIncomes}>Save Incomes</Button>
+    </div>
   )
 }

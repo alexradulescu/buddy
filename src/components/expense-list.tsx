@@ -1,13 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useExpenseStore } from '@/stores/instantdb'
+import { format } from 'date-fns'
 import { Search, Trash } from 'lucide-react'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { format } from 'date-fns'
-import { useExpenseStore } from '@/stores/instantdb'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/hooks/use-toast'
 
 interface ExpenseListProps {

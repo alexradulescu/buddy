@@ -1,20 +1,23 @@
 'use client'
 
+import React from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
+import { TrashIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
-import React from 'react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Textarea } from './ui/textarea'
-import { TrashIcon } from 'lucide-react'
 
 interface ExpenseTableProps {
   expenses: Expense[]
   expenseCategories: ExpenseCategory[]
-  onInputChange: (index: number, field: 'amount' | 'category' | 'date' | 'description', value: string | number | Date) => void
+  onInputChange: (
+    index: number,
+    field: 'amount' | 'category' | 'date' | 'description',
+    value: string | number | Date
+  ) => void
   onDeleteRow: (id: string) => void
 }
 

@@ -1,20 +1,17 @@
 'use client'
 
+import React from 'react'
+import { useCategoryStore, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
+import { PageHeader } from '@/components/page-header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
-import { PageHeader } from '@/components/page-header'
-import React from 'react'
-import { useCategoryStore } from '@/stores/instantdb'
-import { useExpenseStore } from '@/stores/instantdb'
-import { useIncomeStore } from '@/stores/instantdb'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function HomePage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
 
   const { data: { expenseCategories = [], incomeCategories = [] } = {} } = useCategoryStore()
-  const { data : { expenses = [] } = {}} = useExpenseStore()
+  const { data: { expenses = [] } = {} } = useExpenseStore()
   const { data: { incomes = [] } = {} } = useIncomeStore()
 
   const calculateCategoryAmount = (

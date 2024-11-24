@@ -1,9 +1,9 @@
 'use client'
 
-import { CategoryManager } from '@/components/category-manager'
-import { PageHeader } from '@/components/page-header'
 import React from 'react'
 import { useCategoryStore } from '@/stores/instantdb'
+import { CategoryManager } from '@/components/category-manager'
+import { PageHeader } from '@/components/page-header'
 
 export default function SettingsPage() {
   const {

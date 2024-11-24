@@ -1,14 +1,12 @@
 'use client'
 
-import { Expense, useExpenseStore } from '@/stores/instantdb'
 import React, { useState } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
-import { Button } from '@/components/ui/button'
+import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'
 import { ExpenseTable } from '@/components/expense-table'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useCategoryStore } from '@/stores/instantdb'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 
 interface ExpenseFormProps {
