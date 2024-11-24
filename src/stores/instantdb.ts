@@ -49,13 +49,11 @@ export interface Schema {
 }
 
 export const db = init<Schema>({
-  appId: '59a9af2c-e8d2-4acd-af98-062f1d426541'
+  appId: process.env.VITE_INSTANTDB_APP_ID || ''
 })
 
 export const { useQuery, transact, tx } = db
 export { id } from '@instantdb/react'
-
-// import { useQuery, transact, tx, id } from '@/lib/db'
 
 export function useAccountBalances(year: number, month: number) {
   const query = useQuery({
