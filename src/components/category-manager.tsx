@@ -42,8 +42,8 @@ type EditableCategory = EditableExpenseCategory | EditableIncomeCategory
 interface CategoryManagerProps {
   type: 'expense' | 'income'
   categories: ExpenseCategory[] | IncomeCategory[]
-  onAdd: (category: Omit<ExpenseCategory, 'id' | 'createdAt'> | Omit<IncomeCategory, 'id' | 'createdAt'>) => Promise<void>
-  onUpdate: (id: string, category: Partial<ExpenseCategory> | Partial<IncomeCategory>) => Promise<void>
+  onAdd: (category: Partial<ExpenseCategory | IncomeCategory>) => Promise<void>
+  onUpdate: (id: string, category: Partial<ExpenseCategory | IncomeCategory>) => Promise<void>
   onDelete: (id: string) => Promise<void>
 }
 
@@ -177,10 +177,18 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
       try {
         if (category.isNew) {
           const { id, isNew, ...newCategory } = category
-          await onAdd(newCategory)
+          if (type === 'expense') {
+            await onAdd(newCategory as Omit<ExpenseCategory, 'id' | 'createdAt'>)
+          } else {
+            await onAdd(newCategory as Omit<IncomeCategory, 'id' | 'createdAt'>)
+          }
         } else if (category.id) {
           const { id, isNew, ...updateData } = category
-          await onUpdate(category.id, updateData)
+            if (type === 'expense') {
+              await onUpdate(category.id, updateData as Partial<ExpenseCategory>)
+            } else {
+              await onUpdate(category.id, updateData as Partial<IncomeCategory>)
+            }
         }
       } catch (error) {
         toast({

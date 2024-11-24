@@ -58,16 +58,6 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
     }
   })
 
-  // const { object, submit } = useObject({
-  //   api: '/api/expenses',
-  //   schema: expensesSchema,
-  //   onFinish: ({ object }) => {
-  //     if (object?.expenses.length) {
-  //       setAiGeneratedExpenses(object.expenses.map((expense) => ({ id: crypto.randomUUID(), ...expense })))
-  //     }
-  //   }
-  // })
-
   const handleExpenseChange = (index: number, field: keyof Expense, value: string | number) => {
     const updatedExpenses = [...aiGeneratedExpenses]
     updatedExpenses[index] = { ...updatedExpenses[index], [field]: value }

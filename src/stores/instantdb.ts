@@ -108,7 +108,7 @@ export function useCategoryStore() {
     ])
   }
 
-  const addIncomeCategory = async (category: Omit<IncomeCategory, 'id' | 'createdAt'>) => {
+  const addIncomeCategory = async (category: Partial<IncomeCategory>) => {
     await db.transact([
       db.tx.incomeCategories[id()].update({
         ...category,
