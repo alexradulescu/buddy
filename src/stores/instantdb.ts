@@ -49,7 +49,7 @@ export interface Schema {
 }
 
 export const db = init<Schema>({
-  appId: process.env.VITE_INSTANTDB_APP_ID || ''
+  appId: process.env.INSTANTDB_APP_ID || ''
 })
 
 export const { useQuery, transact, tx } = db
