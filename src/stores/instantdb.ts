@@ -48,8 +48,9 @@ export interface Schema {
   incomeCategories: IncomeCategory
 }
 
+console.info(process.env.NEXT_PUBLIC_INSTANTDB_APP_ID)
 export const db = init<Schema>({
-  appId: process.env.INSTANTDB_APP_ID || ''
+  appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID || ''
 })
 
 export const { useQuery, transact, tx } = db
