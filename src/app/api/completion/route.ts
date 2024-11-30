@@ -33,6 +33,8 @@ ${categories}
 Now, categorize the following new transactions:
 ${transactions}`
 
+export const maxDuration = 30
+
 /** Based on the first user and openai messages, generates a title for the conversation */
 export async function POST(req: Request) {
   const {

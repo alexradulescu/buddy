@@ -34,6 +34,8 @@ ${categories}
 Now, categorize the following new transactions:
 ${transactions}`
 
+export const maxDuration = 30
+
 export async function POST(req: Request) {
   const {
     rawTransactions,
@@ -46,7 +48,7 @@ export async function POST(req: Request) {
   console.info({ rawTransactions, expenseCategories, historicalExpenses })
 
   const result = await streamObject({
-    model: openai('gpt-4-turbo'),
+    model: openai('gpt-4o-mini'),
     schema: expensesSchema,
     // prompt: `Generate 3 notifications for a messages app in this context:` + context
     prompt: basePrompt({
