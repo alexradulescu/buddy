@@ -23,7 +23,6 @@ const basePrompt = ({
 - Format the date as 'yyyy-MM-dd'.
 - Use the transaction description from the provided data, but remove any numeric values and the text "Singapore SG."
 - Return the results in the following format strictly as stringified array of JSON objects: [{amount, category, date, description}, ...]. Each entry on a new line. No other text, no other info, intro or markings.
-- If you can't infer any transactions from the input, reply with "Error: No transactions available."
 
 Here are examples of past expenses:
 ${historicalExpenses}
