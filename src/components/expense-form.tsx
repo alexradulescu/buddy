@@ -17,6 +17,7 @@ interface ExpenseFormProps {
 
 export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selectedMonth, initialExpenses = [] }) => {
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses)
+  const [errors, setErrors] = useState<string[]>([])
   const [rowsToAdd, setRowsToAdd] = useState(1)
   const { addExpense } = useExpenseStore()
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
@@ -34,22 +35,17 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
     let hasError = false
     expenses.forEach((expense) => {
       if (!expense.amount || isNaN(Number(expense.amount)) || Number(expense.amount) <= 0) {
-        toast({
-          title: 'Invalid expense',
-          description: `Invalid amount for expense: ${expense.description}`,
-          variant: 'destructive'
-        })
+        setErrors((previousErrors) => [...previousErrors, `Invalid amount for expense: ${expense.description}`])
         hasError = true
         return
       }
 
       const expenseDate = new Date(expense.date)
       if (expenseDate.getFullYear() !== selectedYear || expenseDate.getMonth() !== selectedMonth) {
-        toast({
-          title: 'Invalid date',
-          description: `Expense ${expense.description} is not for the selected month and year`,
-          variant: 'destructive'
-        })
+        setErrors((previousErrors) => [
+          ...previousErrors,
+          `Expense ${expense.description} is not for the selected month and year`
+        ])
         hasError = true
         return
       }
@@ -62,6 +58,20 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
         title: 'Expenses added',
         description: `Added ${expenses.length} expense(s)`
       })
+    } else {
+      toast({
+        title: 'Error adding expenses',
+        description: `Expense have not been added, there was an error, please check them again`,
+        variant: 'destructive'
+      })
+      errors.forEach((errorMesaage) => {
+        toast({
+          title: 'Error',
+          description: errorMesaage,
+          variant: 'destructive'
+        })
+      })
+      setErrors([])
     }
   }
 
