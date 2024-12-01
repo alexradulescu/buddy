@@ -21,7 +21,7 @@ const basePrompt = ({
 - If no clear match exists, make your best guess based on the description while adhering strictly to the category list.
 - Format the amount as a number with two decimal places, without including the currency symbol.
 - Format the date as 'yyyy-MM-dd'.
-- Use the transaction description from the provided data, but remove any numeric values and the text "Singapore SG."
+- Format and reword the description to be as short and clear based on available info.
 - Return the results in the following format strictly as stringified array of JSON objects: [{amount, category, date, description}, ...]. Each entry on a new line. No other text, no other info, intro or markings.
 
 Here are examples of past expenses:
