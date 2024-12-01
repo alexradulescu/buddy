@@ -67,7 +67,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
         return false
       }
       // Allow either monthly or annual budget to be set, but validate they are positive if set
-      if (expenseCategory.maxBudget !== undefined && expenseCategory.maxBudget <= 0) {
+      if (expenseCategory.maxBudget !== undefined && expenseCategory?.maxBudget < 0) {
         toast({
           title: 'Validation Error',
           description: 'Monthly budget must be positive',
@@ -75,7 +75,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
         })
         return false
       }
-      if (expenseCategory.maxAnnualBudget !== undefined && expenseCategory.maxAnnualBudget <= 0) {
+      if (expenseCategory.maxAnnualBudget !== undefined && expenseCategory.maxAnnualBudget < 0) {
         toast({
           title: 'Validation Error',
           description: 'Annual budget must be positive',
@@ -93,7 +93,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
         })
         return false
       }
-      if (incomeCategory.targetAmount !== undefined && incomeCategory.targetAmount <= 0) {
+      if (incomeCategory.targetAmount !== undefined && incomeCategory.targetAmount < 0) {
         toast({
           title: 'Validation Error',
           description: 'Target amount must be positive',
