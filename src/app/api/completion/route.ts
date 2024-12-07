@@ -20,8 +20,8 @@ const basePrompt = ({
 - If a new transaction's description or context closely matches a past transaction, use the same category.
 - If no clear match exists, make your best guess based on the description while adhering strictly to the category list.
 - Format the amount as a number with two decimal places, without including the currency symbol.
-- Format the date as 'yyyy-MM-dd'.
-- Format and reword the description to be as short and clear based on available info.
+- Format the date as 'yyyy-MM-dd'. If no year is present on the date of an expense, set current year, 2024.
+- Keep the original description, exactly as it was.
 - Return the results in the following format strictly as stringified array of JSON objects: [{amount, category, date, description}, ...]. Each entry on a new line. No other text, no other info, intro or markings.
 
 Here are examples of past expenses:
