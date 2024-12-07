@@ -15,12 +15,15 @@ const basePrompt = ({
 1. A list of past transactions, each with a description and its assigned category.
 2. A user-defined list of categories that must be strictly followed.
 3. List of current transactions to process based in the following rules:
+- Skip/ignore any expense with the description containing any of the following words: Salary, Bullish
 - Use the past transactions to help infer the correct categories for new transactions.
 - Only assign categories from the provided list of categories.
 - If a new transaction's description or context closely matches a past transaction, use the same category.
 - If no clear match exists, make your best guess based on the description while adhering strictly to the category list.
 - Format the amount as a number with two decimal places, without including the currency symbol.
+- If there are 2 amounts for an expense the smaller one is the amount, the larger one is the remaining balance.
 - Format the date as 'yyyy-MM-dd'. If no year is present on the date of an expense, set current year, 2024.
+- If there are 2 dates on an expense, use the first one available.
 - Keep the full, original description, even when it includes dates and other info, exactly as it was.
 - Return the results in the following format strictly as stringified array of JSON objects: [{amount, category, date, description}, ...]. Each entry on a new line. No other text, no other info, intro or markings.
 
