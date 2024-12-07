@@ -11,17 +11,17 @@ const basePrompt = ({
   transactions,
   categories,
   historicalExpenses
-}: BasePromptProps) => `You are an intelligent assistant tasked with categorizing a list of bank transactions. The user has provided two key inputs:
+}: BasePromptProps) => `You are an intelligent assistant tasked with categorizing a list of bank transactions. The user has provided 3 key inputs:
 1. A list of past transactions, each with a description and its assigned category.
 2. A user-defined list of categories that must be strictly followed.
-
+3. List of current transactions to process based in the following rules:
 - Use the past transactions to help infer the correct categories for new transactions.
 - Only assign categories from the provided list of categories.
 - If a new transaction's description or context closely matches a past transaction, use the same category.
 - If no clear match exists, make your best guess based on the description while adhering strictly to the category list.
 - Format the amount as a number with two decimal places, without including the currency symbol.
 - Format the date as 'yyyy-MM-dd'. If no year is present on the date of an expense, set current year, 2024.
-- Keep the original description, exactly as it was.
+- Keep the full, original description, even when it includes dates and other info, exactly as it was.
 - Return the results in the following format strictly as stringified array of JSON objects: [{amount, category, date, description}, ...]. Each entry on a new line. No other text, no other info, intro or markings.
 
 Here are examples of past expenses:
