@@ -23,7 +23,7 @@ const basePrompt = ({
 - Format the amount as a number with two decimal places, without including the currency symbol.
 - If there are 2 amounts for an expense the smaller one is the amount, the larger one is the remaining balance.
 - Format the date as 'yyyy-MM-dd'. If no year is present on the date of an expense, set current year, 2024.
-- If there are 2 dates on an expense, use the first one available.
+- If there are 2 dates on an expense, use the latest one available.
 - Keep the full, original description, even when it includes dates and other info, exactly as it was.
 - Return the results in the following format strictly as stringified array of JSON objects: [{amount, category, date, description}, ...]. Each entry on a new line. No other text, no other info, intro or markings.
 
