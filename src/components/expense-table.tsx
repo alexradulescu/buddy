@@ -8,6 +8,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Textarea } from './ui/textarea'
 
 interface ExpenseTableProps {
@@ -33,11 +34,33 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[80px]">Amount</TableHead>
-              <TableHead className="w-[130px]">Category</TableHead>
-              <TableHead className="w-[130px]">Date</TableHead>
-              <TableHead className="w-[220px]">Description</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TableHead className="w-[80px]">Amount</TableHead>
+                  </TooltipTrigger>
+                  <TooltipContent>The expense amount.</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TableHead className="w-[130px]">Category</TableHead>
+                  </TooltipTrigger>
+                  <TooltipContent>Expense category.</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TableHead className="w-[130px]">Date</TableHead>
+                  </TooltipTrigger>
+                  <TooltipContent>The date of the expense</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TableHead className="w-[220px]">Description</TableHead>
+                  </TooltipTrigger>
+                  <TooltipContent>Description of the expense</TooltipContent>
+                </Tooltip>
+                <TableHead className="w-[50px]"></TableHead>
+              </TooltipProvider>
             </TableRow>
           </TableHeader>
           <TableBody>
