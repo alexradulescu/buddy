@@ -15,6 +15,7 @@ export interface Expense {
   amount: number
   description: string
   category: string
+  categoryId: string
   createdAt: number
 }
 
@@ -23,6 +24,7 @@ export interface ExpenseCategory {
   name: string
   maxBudget?: number
   maxAnnualBudget?: number
+  isArchived?: boolean
 }
 
 export interface Income {
@@ -31,6 +33,7 @@ export interface Income {
   amount: number
   description: string
   category: string
+  categoryId: string
   createdAt: number
 }
 
@@ -38,6 +41,7 @@ export interface IncomeCategory {
   id: string
   title: string
   targetAmount?: number
+  isArchived?: boolean
 }
 
 export interface Schema {

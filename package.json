@@ -12,6 +12,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^0.0.68",
     "@ai-sdk/react": "^0.0.64",
+    "@handsontable/react": "^15.0.0",
     "@hookform/resolvers": "^3.9.1",
     "@instantdb/react": "^0.15.7",
     "@phosphor-icons/react": "^2.1.7",
@@ -48,6 +49,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "handsontable": "^15.0.0",
     "input-otp": "^1.4.1",
     "lucide-react": "^0.460.0",
     "next": "14.2.18",

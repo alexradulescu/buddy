@@ -1,27 +1,41 @@
 'use client'
 
-import React, { useState } from 'react'
-import { cn } from '@/lib/utils'
-import { useAccountBalances, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
-import { AccountForm } from '@/components/account-form'
-import { AccountList } from '@/components/account-list'
-import { PageHeader } from '@/components/page-header'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import React, { useState } from 'react'
+import { useAccountBalances, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
+
+import { AccountForm } from '@/components/account-form'
+import { AccountList } from '@/components/account-list'
+import { Button } from '@/components/ui/button'
+import { PageHeader } from '@/components/page-header'
+import { cn } from '@/lib/utils'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
+
+const getPreviousMonthYear = (year: number, month: number) => {
+  if (month === 0) {
+    return { year: year - 1, month: 11 }
+  }
+  return { year, month: month - 1 }
+}
 
 export default function OverviewPage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
+  const { year: prevYear, month: prevMonth } = getPreviousMonthYear(selectedYear, selectedMonth)
   const { data: { accountBalances = [] } = {} } = useAccountBalances(selectedYear, selectedMonth)
+  const { data: { accountBalances: previousMonthAccountBalances = [] } = {} } = useAccountBalances(prevYear, prevMonth)
 
   const { data: { expenses = [] } = {} } = useExpenseStore()
   const { data: { incomes = [] } = {} } = useIncomeStore()
 
   const [isAddAccountDialogOpen, setIsAddAccountDialogOpen] = useState(false)
 
-  const calculateTotalBalance = (year: number, month: number) => {
+  const calculateTotalBalance = () => {
     return accountBalances.reduce((total, account) => total + account.amount, 0)
+  }
+
+  const calculateTotalPreviousMonthBalance = () => {
+    return previousMonthAccountBalances.reduce((total, account) => total + account.amount, 0)
   }
 
   const calculateTotalExpenses = (year: number, month: number) => {
@@ -42,19 +56,13 @@ export default function OverviewPage() {
       .reduce((total, income) => total + income.amount, 0)
   }
 
-  const getPreviousMonthYear = (year: number, month: number) => {
-    if (month === 0) {
-      return { year: year - 1, month: 11 }
-    }
-    return { year, month: month - 1 }
-  }
 
-  const currentMonthBalance = calculateTotalBalance(selectedYear, selectedMonth)
+
+  const currentMonthBalance = calculateTotalBalance()
   const currentMonthExpenses = calculateTotalExpenses(selectedYear, selectedMonth)
   const currentMonthIncome = calculateTotalIncome(selectedYear, selectedMonth)
 
-  const { year: prevYear, month: prevMonth } = getPreviousMonthYear(selectedYear, selectedMonth)
-  const previousMonthBalance = calculateTotalBalance(prevYear, prevMonth)
+  const previousMonthBalance = calculateTotalPreviousMonthBalance()
 
   const expectedAccountsTotal = previousMonthBalance + currentMonthIncome - currentMonthExpenses
   const realAccountsTotal = currentMonthBalance

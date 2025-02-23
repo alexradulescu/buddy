@@ -1,8 +1,5 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { ExpenseCategory, IncomeCategory, Schema } from '@/stores/instantdb'
-import { Plus, Save, Trash2 } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,10 +10,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { ExpenseCategory, IncomeCategory, Schema } from '@/stores/instantdb'
+import { Plus, Save, Trash2 } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+
+import { Button } from '@/components/ui/button'
+import { Checkbox } from './ui/checkbox'
+import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 
 type EditableExpenseCategory = Partial<ExpenseCategory> & {
@@ -129,7 +131,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
     setHasChanges(true)
   }
 
-  const handleInputChange = (index: number, field: string, value: string | number) => {
+  const handleInputChange = (index: number, field: string, value: string | number | boolean) => {
     const updatedCategories = [...editableCategories]
     const updatedCategory = { ...updatedCategories[index], [field]: value }
     updatedCategories[index] = updatedCategory
@@ -251,6 +253,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
               ) : (
                 <TableHead>Target Amount</TableHead>
               )}
+              <TableHead>Archived</TableHead>
               <TableHead className="w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -296,8 +299,17 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
                         step="0.01"
                       />
                     </TableCell>
+                    <TableCell>
+                      <Checkbox
+                        checked={(category as EditableExpenseCategory).isArchived}
+                        onCheckedChange={(checked) => {
+                          handleInputChange(index, 'isArchived', checked)
+                        }}
+                      />
+                    </TableCell>
                   </>
                 ) : (
+                  <>
                   <TableCell>
                     <Input
                       type="number"
@@ -311,6 +323,15 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
                       step="0.01"
                     />
                   </TableCell>
+                  <TableCell>
+                    <Checkbox
+                      checked={(category as EditableIncomeCategory).isArchived}
+                      onCheckedChange={(checked) => {
+                        handleInputChange(index, 'isArchived', checked)
+                      }}
+                    />
+                  </TableCell>
+                  </>
                 )}
                 <TableCell>
                   {category.id && (
