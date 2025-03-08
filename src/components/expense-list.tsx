@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useCategoryStore, useExpenseStore } from '@/stores/instantdb'
+import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { format } from 'date-fns'
 import { Search, Trash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -22,12 +22,12 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
   const [searchTerm, setSearchTerm] = useState('')
 
   const filteredExpenses = expenses
-    .filter((expense) => {
+    .filter((expense: Expense) => {
       const expenseDate = new Date(expense.date)
       const matchesDate = expenseDate.getFullYear() === selectedYear && expenseDate.getMonth() === selectedMonth
       const matchesSearch =
         expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        expense.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         expense.amount.toString().includes(searchTerm)
       return matchesDate && matchesSearch
     })

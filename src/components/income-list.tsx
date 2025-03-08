@@ -27,7 +27,7 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
         const matchesSearch =
           income.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
           income.amount.toString().includes(searchTerm) ||
-          income.category.toLowerCase().includes(searchTerm.toLowerCase())
+          income.category?.toLowerCase().includes(searchTerm.toLowerCase())
         return matchesDate && matchesSearch
       })
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())

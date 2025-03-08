@@ -15,7 +15,7 @@ const schema = i.schema({
       date: i.string(),
       amount: i.number(),
       description: i.string(),
-      category: i.string(),
+      category: i.string().optional(),
       categoryId: i.string(),
       createdAt: i.number()
     }),
@@ -31,7 +31,7 @@ const schema = i.schema({
       date: i.string(),
       amount: i.number(),
       description: i.string(),
-      category: i.string(),
+      category: i.string().optional(),
       categoryId: i.string(),
       createdAt: i.number()
     }),
