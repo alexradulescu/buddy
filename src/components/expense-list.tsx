@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useExpenseStore } from '@/stores/instantdb'
+import { useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { format } from 'date-fns'
 import { Search, Trash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,6 +16,8 @@ interface ExpenseListProps {
 
 export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selectedYear }) => {
   const { data: { expenses = [] } = {}, removeExpense } = useExpenseStore()
+  const { data: { expenseCategories = [] } = {} } = useCategoryStore()
+
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -30,6 +32,10 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
       return matchesDate && matchesSearch
     })
     .sort((a, b) => a.date.localeCompare(b.date))
+    .map((expense) => ({
+      ...expense,
+      category: expenseCategories.find((expenseCategory) => expenseCategory.id === expense.categoryId)?.name
+    }))
 
   const handleDelete = (id: string) => {
     removeExpense(id)

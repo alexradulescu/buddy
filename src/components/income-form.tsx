@@ -1,12 +1,13 @@
 'use client'
 
 import React, { useState } from 'react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCategoryStore, useIncomeStore } from '@/stores/instantdb'
-import { TrashIcon } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { TrashIcon } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface IncomeFormProps {
@@ -16,14 +17,14 @@ interface IncomeFormProps {
 
 interface TableIncome {
   amount: string
-  category: string
+  categoryId: string
   date: Date
   description: string
 }
 
 export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMonth }) => {
   const [tableIncomes, setTableIncomes] = useState<TableIncome[]>([
-    { amount: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
+    { amount: '', categoryId: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
   ])
   const [rowsToAdd, setRowsToAdd] = useState(1)
   const { addIncome } = useIncomeStore()
@@ -64,7 +65,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
 
       return {
         amount: Number(income.amount),
-        category: income.category || 'uncategorized',
+        categoryId: income.categoryId || '',
         date: income.date.toISOString().split('T')[0],
         description: income.description
       }
@@ -75,7 +76,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
         if (income) addIncome(income)
       })
       setTableIncomes([
-        { amount: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
+        { amount: '', categoryId: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
       ])
       toast({
         title: 'Incomes added',
@@ -95,15 +96,15 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
       event.preventDefault()
       setTableIncomes([
         ...tableIncomes,
-        { amount: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
+        { amount: '', categoryId: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
       ])
     }
   }
 
   const addRows = () => {
-    const newRows = Array(rowsToAdd)
+    const newRows: TableIncome[] = Array(rowsToAdd)
       .fill(null)
-      .map(() => ({ amount: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }))
+      .map(() => ({ amount: '', categoryId: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }))
     setTableIncomes([...tableIncomes, ...newRows])
   }
 
@@ -142,15 +143,15 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
                 </td>
                 <td className="border border-gray-200 p-1">
                   <Select
-                    value={income.category}
-                    onValueChange={(value) => handleTableInputChange(index, 'category', value)}
+                    value={income.categoryId}
+                    onValueChange={(value) => handleTableInputChange(index, 'categoryId', value)}
                   >
                     <SelectTrigger className="w-full h-full rounded-none">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {incomeCategories.map((category) => (
-                        <SelectItem key={category.title} value={category.title}>
+                      {incomeCategories.filter((category) => !category.isArchived).map((category) => (
+                        <SelectItem key={category.id} value={category.title}>
                           {category.title}
                         </SelectItem>
                       ))}

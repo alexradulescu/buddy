@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
-import { useCompletion, experimental_useObject as useObject } from 'ai/react'
+import { Expense, ExpenseCategory, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
+import { useCompletion, experimental_useObject as useObject } from '@ai-sdk/react'
 import { Loader2 } from 'lucide-react'
 import { ExpenseTable } from '@/components/expense-table'
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,14 @@ interface ExpenseAiConverterProps {
 
 export interface HistoricalExpense extends Omit<Expense, 'amount' | 'id' | 'date'> {}
 
+const getKvExpenseCategories = (expenseCategories: ExpenseCategory[]): Record<string, string> => {
+  const kvExpenseCategories: Record<string, string> = {}
+  expenseCategories.forEach((category) => {
+    kvExpenseCategories[category.id] = category.name
+  })
+  return kvExpenseCategories
+}
+
 export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpensesGenerated }) => {
   const { toast } = useToast()
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
@@ -36,9 +44,9 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
 
     const historicalExpenses: Record<string, string> = {}
 
-    expenses.forEach(({ description, category, date }) => {
+    expenses.forEach(({ description, categoryId, date }) => {
       if (new Date(date) >= threeMonthsAgo) {
-        historicalExpenses[description] = category
+        historicalExpenses[description] = categoryId
       }
     })
 
@@ -47,22 +55,37 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
 
   const { input, handleInputChange, handleSubmit, isLoading, error } = useCompletion({
     api: '/api/completion',
+    streamProtocol: 'text',
     body: {
-      expenseCategories: expenseCategories.map((category) => category.name),
+      expenseCategories: getKvExpenseCategories(expenseCategories),
       historicalExpenses
     },
     onFinish: (prompt: string, completion: string) => {
-      if (isJsonString(completion)) {
-        setAiGeneratedExpenses(
-          JSON.parse(completion).map((expense: Expense) => ({ ...expense, id: crypto.randomUUID() }))
-        )
+      try {
+        // The API returns an array of objects directly
+        const expenses = isJsonString(completion) ? JSON.parse(completion) : completion
+
+        const processedExpenses = Array.isArray(expenses)
+          ? expenses.map((expense: Expense) => ({ ...expense, id: crypto.randomUUID() }))
+          : []
+
+        setAiGeneratedExpenses(processedExpenses)
+
         toast({
           title: 'Expenses processed',
-          description: `${aiGeneratedExpenses.length} expenses have been processed and are ready for review.`
+          description: `${processedExpenses.length} expenses have been processed and are ready for review.`
+        })
+      } catch (error) {
+        console.error('Error processing completion:', error)
+        toast({
+          title: 'Error processing expenses',
+          description: 'Failed to process the AI response',
+          variant: 'destructive'
         })
       }
     },
     onError: (error: Error) => {
+      console.error('Error processing completion:', error)
       toast({
         title: 'Error',
         description: error.message,
@@ -73,7 +96,7 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
 
   const handleExpenseChange = (
     index: number,
-    field: 'amount' | 'category' | 'date' | 'description',
+    field: 'amount' | 'categoryId' | 'date' | 'description',
     value: string | number | Date
   ) => {
     const updatedExpenses = [...aiGeneratedExpenses]

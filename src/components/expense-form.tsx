@@ -92,6 +92,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
         id: crypto.randomUUID(),
         amount: 0,
         category: '',
+        categoryId: '',
         date: getDefaultDate(selectedYear, selectedMonth).toISOString().split('T')[0],
         description: '',
         createdAt: Date.now()
@@ -108,11 +109,14 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
   }
 
   return (
-    <Tabs defaultValue="table-form">
+    <Tabs defaultValue="ai-converter">
       <TabsList>
-        <TabsTrigger value="table-form">Table Entry</TabsTrigger>
         <TabsTrigger value="ai-converter">AI Converter</TabsTrigger>
+        <TabsTrigger value="table-form">Table Entry</TabsTrigger>
       </TabsList>
+      <TabsContent value="ai-converter">
+        <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
+      </TabsContent>
       <TabsContent value="table-form">
         <div className="space-y-4">
           <ExpenseTable
@@ -133,9 +137,6 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
           </div>
           <Button onClick={handleAddExpenses}>Save Expenses</Button>
         </div>
-      </TabsContent>
-      <TabsContent value="ai-converter">
-        <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
       </TabsContent>
     </Tabs>
   )
