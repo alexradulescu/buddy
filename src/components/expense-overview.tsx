@@ -1,12 +1,11 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useCallback, useMemo } from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { useCallback, useMemo } from 'react'
-
-import { Badge } from '@/components/ui/badge'
 
 // Utility functions moved outside component to prevent recreation
 const formatCurrency = (amount: number | undefined): string => {
@@ -31,84 +30,77 @@ interface ExpenseOverviewProps {
 }
 
 export function ExpenseOverview({ expenses, expenseCategories, selectedYear, selectedMonth }: ExpenseOverviewProps) {
-  const calculateCategoryAmount = useCallback((
-    items: Expense[],
-    categoryId: string,
-    isAnnual: boolean = false,
-    isYearToDate: boolean = false
-  ): number => {
-    return items
-      .filter((item) => {
-        const itemDate = new Date(item.date)
-        if (isAnnual) {
-          return itemDate.getFullYear() === selectedYear && item.categoryId === categoryId
-        }
-        if (isYearToDate) {
+  const calculateCategoryAmount = useCallback(
+    (items: Expense[], categoryId: string, isAnnual: boolean = false, isYearToDate: boolean = false): number => {
+      return items
+        .filter((item) => {
+          const itemDate = new Date(item.date)
+          if (isAnnual) {
+            return itemDate.getFullYear() === selectedYear && item.categoryId === categoryId
+          }
+          if (isYearToDate) {
+            return (
+              itemDate.getFullYear() === selectedYear &&
+              itemDate.getMonth() <= selectedMonth &&
+              item.categoryId === categoryId
+            )
+          }
           return (
             itemDate.getFullYear() === selectedYear &&
-            itemDate.getMonth() <= selectedMonth &&
+            itemDate.getMonth() === selectedMonth &&
             item.categoryId === categoryId
           )
-        }
-        return (
-          itemDate.getFullYear() === selectedYear &&
-          itemDate.getMonth() === selectedMonth &&
-          item.categoryId === categoryId
-        )
-      })
-      .reduce((total, item) => total + (item.amount || 0), 0)
-  }, [selectedYear, selectedMonth])
-
-  const calculateAnnualBudget = useCallback((
-    maxBudget: number | undefined,
-    maxAnnualBudget: number | undefined
-  ): number | undefined => {
-    if (maxAnnualBudget !== undefined) return maxAnnualBudget
-    if (maxBudget !== undefined) return maxBudget * 12
-    return undefined
-  }, [])
-
-  const calculateYearToDateBudget = useCallback((maxBudget: number | undefined): number | undefined => {
-    if (maxBudget === undefined) return undefined
-    return maxBudget * (selectedMonth + 1)
-  }, [selectedMonth])
-
-  const expenseCategoriesData = useMemo(() => 
-    expenseCategories.map((category) => {
-      const currentMonthlyExpense = calculateCategoryAmount(expenses, category.id)
-      const currentAnnualExpense = calculateCategoryAmount(expenses, category.id, true)
-      const currentYearToDateExpense = calculateCategoryAmount(expenses, category.id, false, true)
-      const annualBudget = calculateAnnualBudget(category.maxBudget, category.maxAnnualBudget)
-      const yearToDateBudget = calculateYearToDateBudget(category.maxBudget)
-      
-      return {
-        category,
-        currentMonthlyExpense,
-        currentAnnualExpense,
-        currentYearToDateExpense,
-        annualBudget,
-        yearToDateBudget,
-        monthlyDifference: category.maxBudget !== undefined 
-          ? category.maxBudget - currentMonthlyExpense 
-          : undefined,
-        annualDifference: annualBudget !== undefined 
-          ? annualBudget - currentAnnualExpense 
-          : undefined,
-        yearToDateDifference: yearToDateBudget !== undefined 
-          ? yearToDateBudget - currentYearToDateExpense 
-          : undefined,
-        rowColor: getRowBackgroundColor(currentMonthlyExpense, category.maxBudget)
-      }
-    }),
-    [
-      expenseCategories,
-      expenses,
-      calculateCategoryAmount,
-      calculateAnnualBudget,
-      calculateYearToDateBudget
-    ]
+        })
+        .reduce((total, item) => total + (item.amount || 0), 0)
+    },
+    [selectedYear, selectedMonth]
   )
 
+  const calculateAnnualBudget = useCallback(
+    (maxBudget: number | undefined, maxAnnualBudget: number | undefined): number | undefined => {
+      if (maxAnnualBudget !== undefined) return maxAnnualBudget
+      if (maxBudget !== undefined) return maxBudget * 12
+      return undefined
+    },
+    []
+  )
+
+  const calculateYearToDateBudget = useCallback(
+    (maxBudget: number | undefined): number | undefined => {
+      if (maxBudget === undefined) return undefined
+      return maxBudget * (selectedMonth + 1)
+    },
+    [selectedMonth]
+  )
+
+  const expenseCategoriesData = useMemo(
+    () =>
+      expenseCategories
+        .filter((expense) => !expense.isArchived)
+        .map((category) => {
+          const currentMonthlyExpense = calculateCategoryAmount(expenses, category.id)
+          const currentAnnualExpense = calculateCategoryAmount(expenses, category.id, true)
+          const currentYearToDateExpense = calculateCategoryAmount(expenses, category.id, false, true)
+          const annualBudget = calculateAnnualBudget(category.maxBudget, category.maxAnnualBudget)
+          const yearToDateBudget = calculateYearToDateBudget(category.maxBudget)
+
+          return {
+            category,
+            currentMonthlyExpense,
+            currentAnnualExpense,
+            currentYearToDateExpense,
+            annualBudget,
+            yearToDateBudget,
+            monthlyDifference:
+              category.maxBudget !== undefined ? category.maxBudget - currentMonthlyExpense : undefined,
+            annualDifference: annualBudget !== undefined ? annualBudget - currentAnnualExpense : undefined,
+            yearToDateDifference:
+              yearToDateBudget !== undefined ? yearToDateBudget - currentYearToDateExpense : undefined,
+            rowColor: getRowBackgroundColor(currentMonthlyExpense, category.maxBudget)
+          }
+        }),
+    [expenseCategories, expenses, calculateCategoryAmount, calculateAnnualBudget, calculateYearToDateBudget]
+  )
 
   return (
     <Card>
@@ -211,32 +203,33 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
             })}
           </TableBody> */}
 
-<TableBody>
-            {expenseCategoriesData.map(({
-              category,
-              currentMonthlyExpense,
-              currentYearToDateExpense,
-              yearToDateBudget,
-              annualBudget,
-              monthlyDifference,
-              yearToDateDifference,
-              annualDifference,
-              rowColor
-            }) => (
-              <TableRow key={category.id} className={rowColor}>
-                <TableCell className="font-medium">{category.name}</TableCell>
-                <TableCell className="text-right">{formatCurrency(currentMonthlyExpense)}</TableCell>
-                <TableCell className="text-right">
-                  {monthlyDifference !== undefined && (
-                    <Badge variant={monthlyDifference >= 0 ? 'outline' : 'destructive'}>
-                      {monthlyDifference >= 0 ? '+' : '-'}
-                      {formatCurrency(Math.abs(monthlyDifference))}
-                    </Badge>
-                  )}
-                  {formatCurrency(category.maxBudget)}
-                </TableCell>
-                
-                <TableCell className="text-right">{formatCurrency(currentYearToDateExpense)}</TableCell>
+          <TableBody>
+            {expenseCategoriesData.map(
+              ({
+                category,
+                currentMonthlyExpense,
+                currentYearToDateExpense,
+                yearToDateBudget,
+                annualBudget,
+                monthlyDifference,
+                yearToDateDifference,
+                annualDifference,
+                rowColor
+              }) => (
+                <TableRow key={category.id} className={rowColor}>
+                  <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(currentMonthlyExpense)}</TableCell>
+                  <TableCell className="text-right">
+                    {monthlyDifference !== undefined && (
+                      <Badge variant={monthlyDifference >= 0 ? 'outline' : 'destructive'}>
+                        {monthlyDifference >= 0 ? '+' : '-'}
+                        {formatCurrency(Math.abs(monthlyDifference))}
+                      </Badge>
+                    )}
+                    {formatCurrency(category.maxBudget)}
+                  </TableCell>
+
+                  <TableCell className="text-right">{formatCurrency(currentYearToDateExpense)}</TableCell>
                   <TableCell className="text-right">
                     {yearToDateDifference !== undefined && (
                       <Badge variant={yearToDateDifference >= 0 ? 'outline' : 'destructive'}>
@@ -255,10 +248,9 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                     )}
                     {formatCurrency(annualBudget)}
                   </TableCell>
-
-
-              </TableRow>
-            ))}
+                </TableRow>
+              )
+            )}
           </TableBody>
         </Table>
       </CardContent>
