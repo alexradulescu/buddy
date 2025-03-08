@@ -1,60 +1,58 @@
-import { id, init } from '@instantdb/react'
+import { i, id, init, InstaQLEntity } from '@instantdb/react'
 
-export interface AccountBalance {
-  id: string
-  title: string
-  amount: number
-  year: number
-  month: number
-  createdAt: number
-}
+const schema = i.schema({
+  entities: {
+    accountBalances: i.entity({
+      id: i.string(),
+      title: i.string(),
+      amount: i.number(),
+      year: i.number(),
+      month: i.number(),
+      createdAt: i.number()
+    }),
+    expenses: i.entity({
+      id: i.string(),
+      date: i.string(),
+      amount: i.number(),
+      description: i.string(),
+      category: i.string(),
+      categoryId: i.string(),
+      createdAt: i.number()
+    }),
+    expenseCategories: i.entity({
+      id: i.string(),
+      name: i.string(),
+      maxBudget: i.number(),
+      maxAnnualBudget: i.number(),
+      isArchived: i.boolean()
+    }),
+    incomes: i.entity({
+      id: i.string(),
+      date: i.string(),
+      amount: i.number(),
+      description: i.string(),
+      category: i.string(),
+      categoryId: i.string(),
+      createdAt: i.number()
+    }),
+    incomeCategories: i.entity({
+      id: i.string(),
+      title: i.string(),
+      targetAmount: i.number(),
+      isArchived: i.boolean()
+    })
+  }
+})
 
-export interface Expense {
-  id: string
-  date: string
-  amount: number
-  description: string
-  category: string
-  categoryId: string
-  createdAt: number
-}
+export type Income = InstaQLEntity<typeof schema, 'incomes'>
+export type Expense = InstaQLEntity<typeof schema, 'expenses'>
+export type ExpenseCategory = InstaQLEntity<typeof schema, 'expenseCategories'>
+export type AccountBalance = InstaQLEntity<typeof schema, 'accountBalances'>
+export type IncomeCategory = InstaQLEntity<typeof schema, 'incomeCategories'>
 
-export interface ExpenseCategory {
-  id: string
-  name: string
-  maxBudget?: number
-  maxAnnualBudget?: number
-  isArchived?: boolean
-}
-
-export interface Income {
-  id: string
-  date: string
-  amount: number
-  description: string
-  category?: string
-  categoryId: string
-  createdAt: number
-}
-
-export interface IncomeCategory {
-  id: string
-  title: string
-  targetAmount?: number
-  isArchived?: boolean
-}
-
-export interface Schema {
-  accountBalances: AccountBalance
-  expenses: Expense
-  expenseCategories: ExpenseCategory
-  incomes: Income
-  incomeCategories: IncomeCategory
-}
-
-console.info(process.env.NEXT_PUBLIC_INSTANTDB_APP_ID)
-export const db = init<Schema>({
-  appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID || ''
+export const db = init({
+  appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID || '',
+  schema
 })
 
 export const { useQuery, transact, tx } = db
@@ -107,8 +105,7 @@ export function useCategoryStore() {
   const addExpenseCategory = async (category: Partial<ExpenseCategory>) => {
     await db.transact([
       db.tx.expenseCategories[id()].update({
-        ...category,
-        createdAt: Date.now()
+        ...category
       })
     ])
   }
@@ -116,8 +113,7 @@ export function useCategoryStore() {
   const addIncomeCategory = async (category: Partial<IncomeCategory>) => {
     await db.transact([
       db.tx.incomeCategories[id()].update({
-        ...category,
-        createdAt: Date.now()
+        ...category
       })
     ])
   }

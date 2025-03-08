@@ -1,5 +1,8 @@
 'use client'
 
+import React, { useEffect, useState } from 'react'
+import { ExpenseCategory, IncomeCategory } from '@/stores/instantdb'
+import { Plus, Save, Trash2 } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,16 +13,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ExpenseCategory, IncomeCategory, Schema } from '@/stores/instantdb'
-import { Plus, Save, Trash2 } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
 import { Button } from '@/components/ui/button'
-import { Checkbox } from './ui/checkbox'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/hooks/use-toast'
+import { Checkbox } from './ui/checkbox'
 
 type EditableExpenseCategory = Partial<ExpenseCategory> & {
   id?: string
@@ -310,27 +309,27 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
                   </>
                 ) : (
                   <>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      value={(category as EditableIncomeCategory).targetAmount || ''}
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          handleInputChange(index, 'targetAmount', parseFloat(e.target.value))
-                        }
-                      }}
-                      placeholder="Target amount"
-                      step="0.01"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Checkbox
-                      checked={(category as EditableIncomeCategory).isArchived}
-                      onCheckedChange={(checked) => {
-                        handleInputChange(index, 'isArchived', checked)
-                      }}
-                    />
-                  </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={(category as EditableIncomeCategory).targetAmount || ''}
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleInputChange(index, 'targetAmount', parseFloat(e.target.value))
+                          }
+                        }}
+                        placeholder="Target amount"
+                        step="0.01"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Checkbox
+                        checked={(category as EditableIncomeCategory).isArchived}
+                        onCheckedChange={(checked) => {
+                          handleInputChange(index, 'isArchived', checked)
+                        }}
+                      />
+                    </TableCell>
                   </>
                 )}
                 <TableCell>
