@@ -8,6 +8,7 @@ import { IncomeOverview } from '@/components/income-overview'
 import { PageHeader } from '@/components/page-header'
 import React from 'react'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
+import { Stack } from '@mantine/core'
 
 export default function HomePage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
@@ -33,7 +34,7 @@ export default function HomePage() {
   const netIncome = totalMonthlyIncomes - totalMonthlyExpenses
 
   return (
-    <div className="space-y-8">
+    <Stack gap="lg">
       <PageHeader title="Budget Overview" />
       
       <HomeOverview
@@ -55,6 +56,6 @@ export default function HomePage() {
         selectedYear={selectedYear}
         selectedMonth={selectedMonth}
       />
-    </div>
+    </Stack>
   )
 }

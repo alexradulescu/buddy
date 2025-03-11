@@ -2,10 +2,7 @@
 
 import { useCallback, useMemo } from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Card, Table, Text, Badge, Group, Tooltip } from '@mantine/core'
 
 // Utility functions moved outside component to prevent recreation
 const formatCurrency = (amount: number | undefined): string => {
@@ -17,9 +14,9 @@ const getRowBackgroundColor = (currentAmount: number, budget: number | undefined
   const difference = budget - currentAmount
   const percentageDifference = (difference / budget) * 100
 
-  if (percentageDifference > 20) return 'bg-green-100 dark:bg-green-950'
-  if (percentageDifference >= 0) return 'bg-orange-100 dark:bg-orange-950'
-  return 'bg-red-100 dark:bg-red-950'
+  if (percentageDifference > 20) return 'green.1'
+  if (percentageDifference >= 0) return 'orange.1'
+  return 'red.1'
 }
 
 interface ExpenseOverviewProps {
@@ -35,225 +32,200 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
       return items
         .filter((item) => {
           const itemDate = new Date(item.date)
+          const itemYear = itemDate.getFullYear()
+          const itemMonth = itemDate.getMonth()
+
           if (isAnnual) {
-            return itemDate.getFullYear() === selectedYear && item.categoryId === categoryId
+            return item.categoryId === categoryId && itemYear === selectedYear
           }
+
           if (isYearToDate) {
             return (
-              itemDate.getFullYear() === selectedYear &&
-              itemDate.getMonth() <= selectedMonth &&
-              item.categoryId === categoryId
+              item.categoryId === categoryId &&
+              itemYear === selectedYear &&
+              itemMonth <= selectedMonth
             )
           }
+
           return (
-            itemDate.getFullYear() === selectedYear &&
-            itemDate.getMonth() === selectedMonth &&
-            item.categoryId === categoryId
+            item.categoryId === categoryId &&
+            itemYear === selectedYear &&
+            itemMonth === selectedMonth
           )
         })
-        .reduce((total, item) => total + (item.amount || 0), 0)
+        .reduce((total, item) => total + item.amount, 0)
     },
     [selectedYear, selectedMonth]
   )
 
-  const calculateAnnualBudget = useCallback(
-    (maxBudget: number | undefined, maxAnnualBudget: number | undefined): number | undefined => {
-      if (maxAnnualBudget !== undefined) return maxAnnualBudget
-      if (maxBudget !== undefined) return maxBudget * 12
-      return undefined
-    },
-    []
+  const categoryData = useMemo(() => {
+    return expenseCategories.map((category) => {
+      const currentMonthlyExpense = calculateCategoryAmount(expenses, category.id)
+      const currentYearToDateExpense = calculateCategoryAmount(expenses, category.id, false, true)
+      const currentAnnualExpense = calculateCategoryAmount(expenses, category.id, true)
+
+      const monthlyBudget = category.maxBudget
+      const yearToDateBudget = monthlyBudget ? monthlyBudget * (selectedMonth + 1) : undefined
+      const annualBudget = monthlyBudget ? monthlyBudget * 12 : undefined
+
+      const monthlyDifference = monthlyBudget ? monthlyBudget - currentMonthlyExpense : undefined
+      const yearToDateDifference = yearToDateBudget
+        ? yearToDateBudget - currentYearToDateExpense
+        : undefined
+      const annualDifference = annualBudget ? annualBudget - currentAnnualExpense : undefined
+
+      const rowColor = getRowBackgroundColor(currentMonthlyExpense, monthlyBudget)
+
+      return {
+        category,
+        currentMonthlyExpense,
+        currentYearToDateExpense,
+        currentAnnualExpense,
+        monthlyBudget,
+        yearToDateBudget,
+        annualBudget,
+        monthlyDifference,
+        yearToDateDifference,
+        annualDifference,
+        rowColor
+      }
+    })
+  }, [expenses, expenseCategories, calculateCategoryAmount, selectedMonth])
+
+  const totalMonthlyExpense = useMemo(
+    () => expenses
+      .filter((expense) => {
+        const expenseDate = new Date(expense.date)
+        return (
+          expenseDate.getFullYear() === selectedYear &&
+          expenseDate.getMonth() === selectedMonth
+        )
+      })
+      .reduce((total, expense) => total + expense.amount, 0),
+    [expenses, selectedYear, selectedMonth]
   )
 
-  const calculateYearToDateBudget = useCallback(
-    (maxBudget: number | undefined): number | undefined => {
-      if (maxBudget === undefined) return undefined
-      return maxBudget * (selectedMonth + 1)
-    },
-    [selectedMonth]
+  const totalYearToDateExpense = useMemo(
+    () => expenses
+      .filter((expense) => {
+        const expenseDate = new Date(expense.date)
+        return (
+          expenseDate.getFullYear() === selectedYear &&
+          expenseDate.getMonth() <= selectedMonth
+        )
+      })
+      .reduce((total, expense) => total + expense.amount, 0),
+    [expenses, selectedYear, selectedMonth]
   )
 
-  const expenseCategoriesData = useMemo(
-    () =>
-      expenseCategories
-        .filter((expense) => !expense.isArchived)
-        .map((category) => {
-          const currentMonthlyExpense = calculateCategoryAmount(expenses, category.id)
-          const currentAnnualExpense = calculateCategoryAmount(expenses, category.id, true)
-          const currentYearToDateExpense = calculateCategoryAmount(expenses, category.id, false, true)
-          const annualBudget = calculateAnnualBudget(category.maxBudget, category.maxAnnualBudget)
-          const yearToDateBudget = calculateYearToDateBudget(category.maxBudget)
-
-          return {
-            category,
-            currentMonthlyExpense,
-            currentAnnualExpense,
-            currentYearToDateExpense,
-            annualBudget,
-            yearToDateBudget,
-            monthlyDifference:
-              category.maxBudget !== undefined ? category.maxBudget - currentMonthlyExpense : undefined,
-            annualDifference: annualBudget !== undefined ? annualBudget - currentAnnualExpense : undefined,
-            yearToDateDifference:
-              yearToDateBudget !== undefined ? yearToDateBudget - currentYearToDateExpense : undefined,
-            rowColor: getRowBackgroundColor(currentMonthlyExpense, category.maxBudget)
-          }
-        }),
-    [expenseCategories, expenses, calculateCategoryAmount, calculateAnnualBudget, calculateYearToDateBudget]
+  const totalAnnualExpense = useMemo(
+    () => expenses
+      .filter((expense) => {
+        const expenseDate = new Date(expense.date)
+        return expenseDate.getFullYear() === selectedYear
+      })
+      .reduce((total, expense) => total + expense.amount, 0),
+    [expenses, selectedYear]
   )
+
+  const totalMonthlyBudget = useMemo(
+    () => expenseCategories.reduce((total, category) => total + (category.maxBudget || 0), 0),
+    [expenseCategories]
+  )
+
+  const totalYearToDateBudget = totalMonthlyBudget * (selectedMonth + 1)
+  const totalAnnualBudget = totalMonthlyBudget * 12
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Expense Categories</CardTitle>
-        <CardDescription>Overview of your expense categories for the selected month</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead>Category</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Category of the expense</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead className="text-right">Current Expense</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Current expenses for this month.</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead className="text-right">Monthly Budget</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Monthly budget set for this category.</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead className="text-right">Year-to-Date Expense</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Expenses for this category, so far this year.</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead className="text-right">Year-to-Date Budget</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Year to date budget for this category.</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead className="text-right">Annual Budget</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Annual budget for this category.</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </TableRow>
-          </TableHeader>
-          {/* <TableBody>
-            {expenseCategories.map((category) => {
-              const currentMonthlyExpense = calculateCategoryAmount(expenses, category.id)
-              const currentAnnualExpense = calculateCategoryAmount(expenses, category.id, true)
-              const currentYearToDateExpense = calculateCategoryAmount(expenses, category.id, false, true)
-              const annualBudget = calculateAnnualBudget(category.maxBudget, category.maxAnnualBudget)
-              const yearToDateBudget = calculateYearToDateBudget(category.maxBudget)
-              const monthlyDifference =
-                category.maxBudget !== undefined ? category.maxBudget - currentMonthlyExpense : undefined
-              const annualDifference = annualBudget !== undefined ? annualBudget - currentAnnualExpense : undefined
-              const yearToDateDifference =
-                yearToDateBudget !== undefined ? yearToDateBudget - currentYearToDateExpense : undefined
-              const rowColor = getRowBackgroundColor(currentMonthlyExpense, category.maxBudget)
-
-              return (
-                <TableRow key={category.id} className={rowColor}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentMonthlyExpense)}</TableCell>
-                  <TableCell className="text-right">
-                    {monthlyDifference !== undefined && (
-                      <Badge variant={monthlyDifference >= 0 ? 'outline' : 'destructive'}>
+    <Card shadow="sm" padding="lg" radius="md" withBorder>
+      <Card.Section p="md" bg="gray.1">
+        <Text fw={500} size="lg">Expense Overview</Text>
+      </Card.Section>
+      <Table striped highlightOnHover>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Category</Table.Th>
+            <Table.Th ta="right">Monthly</Table.Th>
+            <Table.Th ta="right">Budget</Table.Th>
+            <Table.Th ta="right">YTD</Table.Th>
+            <Table.Th ta="right">YTD Budget</Table.Th>
+            <Table.Th ta="right">Annual</Table.Th>
+            <Table.Th ta="right">Annual Budget</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {categoryData.map(({ 
+              category, 
+              currentMonthlyExpense, 
+              currentYearToDateExpense, 
+              currentAnnualExpense, 
+              monthlyBudget, 
+              yearToDateBudget,
+              annualBudget,
+              monthlyDifference,
+              yearToDateDifference,
+              annualDifference,
+              rowColor
+            }) => (
+              <Table.Tr key={category.id} bg={rowColor}>
+                <Table.Td fw={500}>{category.name}</Table.Td>
+                <Table.Td ta="right">
+                  <Text data-numeric={true}>{formatCurrency(currentMonthlyExpense)}</Text>
+                </Table.Td>
+                <Table.Td ta="right">
+                  {monthlyDifference !== undefined && (
+                    <Badge color={monthlyDifference >= 0 ? 'gray' : 'red'} variant="outline" mr="xs">
+                      <Text data-numeric={true} span>
                         {monthlyDifference >= 0 ? '+' : '-'}
                         {formatCurrency(Math.abs(monthlyDifference))}
-                      </Badge>
-                    )}
-                    {formatCurrency(category.maxBudget)}
-                  </TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentYearToDateExpense)}</TableCell>
-                  <TableCell className="text-right">
-                    {yearToDateDifference !== undefined && (
-                      <Badge variant={yearToDateDifference >= 0 ? 'outline' : 'destructive'}>
+                      </Text>
+                    </Badge>
+                  )}
+                  <Text data-numeric={true} span>{formatCurrency(category.maxBudget)}</Text>
+                </Table.Td>
+
+                <Table.Td ta="right">
+                  <Text data-numeric={true}>{formatCurrency(currentYearToDateExpense)}</Text>
+                </Table.Td>
+                <Table.Td ta="right">
+                  {yearToDateDifference !== undefined && (
+                    <Badge color={yearToDateDifference >= 0 ? 'gray' : 'red'} variant="outline" mr="xs">
+                      <Text data-numeric={true} span>
                         {yearToDateDifference >= 0 ? '+' : '-'}
                         {formatCurrency(Math.abs(yearToDateDifference))}
-                      </Badge>
-                    )}
-                    {formatCurrency(yearToDateBudget)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {annualDifference !== undefined && (
-                      <Badge variant={annualDifference >= 0 ? 'outline' : 'destructive'}>
+                      </Text>
+                    </Badge>
+                  )}
+                  <Text data-numeric={true} span>{formatCurrency(yearToDateBudget)}</Text>
+                </Table.Td>
+
+                <Table.Td ta="right">
+                  <Text data-numeric={true}>{formatCurrency(currentAnnualExpense)}</Text>
+                </Table.Td>
+                <Table.Td ta="right">
+                  {annualDifference !== undefined && (
+                    <Badge color={annualDifference >= 0 ? 'gray' : 'red'} variant="outline" mr="xs">
+                      <Text data-numeric={true} span>
                         {annualDifference >= 0 ? '+' : '-'}
                         {formatCurrency(Math.abs(annualDifference))}
-                      </Badge>
-                    )}
-                    {formatCurrency(annualBudget)}
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody> */}
-
-          <TableBody>
-            {expenseCategoriesData.map(
-              ({
-                category,
-                currentMonthlyExpense,
-                currentYearToDateExpense,
-                yearToDateBudget,
-                annualBudget,
-                monthlyDifference,
-                yearToDateDifference,
-                annualDifference,
-                rowColor
-              }) => (
-                <TableRow key={category.id} className={rowColor}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentMonthlyExpense)}</TableCell>
-                  <TableCell className="text-right">
-                    {monthlyDifference !== undefined && (
-                      <Badge variant={monthlyDifference >= 0 ? 'outline' : 'destructive'}>
-                        {monthlyDifference >= 0 ? '+' : '-'}
-                        {formatCurrency(Math.abs(monthlyDifference))}
-                      </Badge>
-                    )}
-                    {formatCurrency(category.maxBudget)}
-                  </TableCell>
-
-                  <TableCell className="text-right">{formatCurrency(currentYearToDateExpense)}</TableCell>
-                  <TableCell className="text-right">
-                    {yearToDateDifference !== undefined && (
-                      <Badge variant={yearToDateDifference >= 0 ? 'outline' : 'destructive'}>
-                        {yearToDateDifference >= 0 ? '+' : '-'}
-                        {formatCurrency(Math.abs(yearToDateDifference))}
-                      </Badge>
-                    )}
-                    {formatCurrency(yearToDateBudget)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {annualDifference !== undefined && (
-                      <Badge variant={annualDifference >= 0 ? 'outline' : 'destructive'}>
-                        {annualDifference >= 0 ? '+' : '-'}
-                        {formatCurrency(Math.abs(annualDifference))}
-                      </Badge>
-                    )}
-                    {formatCurrency(annualBudget)}
-                  </TableCell>
-                </TableRow>
-              )
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
+                      </Text>
+                    </Badge>
+                  )}
+                  <Text data-numeric={true} span>{formatCurrency(annualBudget)}</Text>
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          <Table.Tr fw={700}>
+            <Table.Td>Total</Table.Td>
+            <Table.Td ta="right"><Text data-numeric={true}>{formatCurrency(totalMonthlyExpense)}</Text></Table.Td>
+            <Table.Td ta="right"><Text data-numeric={true}>{formatCurrency(totalMonthlyBudget)}</Text></Table.Td>
+            <Table.Td ta="right"><Text data-numeric={true}>{formatCurrency(totalYearToDateExpense)}</Text></Table.Td>
+            <Table.Td ta="right"><Text data-numeric={true}>{formatCurrency(totalYearToDateBudget)}</Text></Table.Td>
+            <Table.Td ta="right"><Text data-numeric={true}>{formatCurrency(totalAnnualExpense)}</Text></Table.Td>
+            <Table.Td ta="right"><Text data-numeric={true}>{formatCurrency(totalAnnualBudget)}</Text></Table.Td>
+          </Table.Tr>
+        </Table.Tbody>
+      </Table>
     </Card>
   )
 }

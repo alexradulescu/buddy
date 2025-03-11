@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import { Box, Button, Group, NumberInput, Tabs } from '@mantine/core'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
+import React, { useState } from 'react'
+
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'
 import { ExpenseTable } from '@/components/expense-table'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 
 interface ExpenseFormProps {
@@ -110,34 +109,38 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
 
   return (
     <Tabs defaultValue="ai-converter">
-      <TabsList>
-        <TabsTrigger value="ai-converter">AI Converter</TabsTrigger>
-        <TabsTrigger value="table-form">Table Entry</TabsTrigger>
-      </TabsList>
-      <TabsContent value="ai-converter">
+      <Tabs.List>
+        <Tabs.Tab value="ai-converter">AI Converter</Tabs.Tab>
+        <Tabs.Tab value="table-form">Table Entry</Tabs.Tab>
+      </Tabs.List>
+      
+      <Tabs.Panel value="ai-converter" pt="md">
         <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
-      </TabsContent>
-      <TabsContent value="table-form">
-        <div className="space-y-4">
+      </Tabs.Panel>
+      
+      <Tabs.Panel value="table-form" pt="md">
+        <Box mb="md">
           <ExpenseTable
             expenses={expenses}
             expenseCategories={expenseCategories}
             onInputChange={handleInputChange}
             onDeleteRow={deleteRow}
           />
-          <div className="flex items-center space-x-2">
-            <Input
-              type="number"
+          
+          <Group mt="md" mb="md">
+            <NumberInput
               value={rowsToAdd}
-              onChange={(e) => setRowsToAdd(Number(e.target.value))}
-              min="1"
-              className="w-20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              onChange={(value) => setRowsToAdd(Number(value) || 1)}
+              min={1}
+              style={{ width: 80 }}
+              hideControls
             />
             <Button onClick={addRows}>Add Rows</Button>
-          </div>
+          </Group>
+          
           <Button onClick={handleAddExpenses}>Save Expenses</Button>
-        </div>
-      </TabsContent>
+        </Box>
+      </Tabs.Panel>
     </Tabs>
   )
 }

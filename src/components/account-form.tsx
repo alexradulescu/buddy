@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
 import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
+import { Button, Group, NumberInput, Stack, TextInput } from '@mantine/core'
+import React, { useState } from 'react'
+
 import { useForm } from '@mantine/form'
-import { Button, TextInput, NumberInput, Group, Stack } from '@mantine/core'
 import { useToast } from '@/hooks/use-toast'
 
 interface AccountFormProps {

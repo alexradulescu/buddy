@@ -1,16 +1,14 @@
 import './globals.css'
-
-import { HydrationBoundary } from '@/components/hydration-boundary'
-import type { Metadata } from 'next'
-import { Navigation } from '@/components/navigation'
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
-import { Suspense } from 'react'
-import { ThemeProvider } from '@/components/theme-provider'
-import { Toaster } from '@/components/ui/toaster'
-import localFont from 'next/font/local'
-import { MantineProvider, createTheme } from '@mantine/core'
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
+import '@mantine/notifications/styles.css'
+
+import { ColorSchemeScript, MantineProvider, MantineTheme, createTheme } from '@mantine/core'
+
+import { AppLayout } from '@/components/app-shell'
+import type { Metadata } from 'next'
+import { Suspense } from 'react'
+import localFont from 'next/font/local'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -23,18 +21,6 @@ const geistMono = localFont({
   weight: '100 900'
 })
 
-const theme = createTheme({
-  fontFamily: 'var(--font-geist-sans)',
-  components: {
-    DatePicker: {
-      styles: {
-        calendar: { minWidth: 280 },
-        calendarHeader: { marginBottom: 10 },
-        day: { borderRadius: 4 }
-      }
-    }
-  }
-})
 
 export const metadata: Metadata = {
   title: 'Buddy App',
@@ -47,24 +33,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
+      <head>
+        <ColorSchemeScript />
+      </head>
+      <body style={{ 
+        fontFamily: `var(--font-geist-sans), sans-serif`,
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale'
+      }}>
         <Suspense fallback={"Loading"}>
-        <NuqsAdapter>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <MantineProvider theme={theme}>
-              <HydrationBoundary>
-                <div className="flex min-h-screen bg-background">
-                  <Navigation />
-                  <main className="flex-1 overflow-y-auto p-4 sm:pl-20 bg-stone-50 dark:bg-stone-950 m-1 rounded-sm border-gray-100 border-solid">
-                    {children}
-                  </main>
-                </div>
-                <Toaster />
-              </HydrationBoundary>
-            </MantineProvider>
-          </ThemeProvider>
-        </NuqsAdapter>
+          <AppLayout>{children}</AppLayout>
         </Suspense>
       </body>
     </html>

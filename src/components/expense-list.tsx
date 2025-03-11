@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import { ActionIcon, Box, Group, Table, Text, TextInput } from '@mantine/core'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
+import { IconSearch, IconTrash } from '@tabler/icons-react'
+import React, { useState } from 'react'
+
 import { format } from 'date-fns'
-import { Search, Trash } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/hooks/use-toast'
 
 interface ExpenseListProps {
@@ -46,50 +45,56 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
   }
 
   return (
-    <div className="space-y-4">
-      <label className="relative block">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
+    <Box>
+      <Group mb="md">
+        <TextInput
           placeholder="Search expenses..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
+          leftSection={<IconSearch size="1rem" />}
+          style={{ flexGrow: 1 }}
         />
-      </label>
+      </Group>
+      
       {filteredExpenses.length === 0 ? (
-        <p className="text-center text-muted-foreground py-4">No expenses found for this period.</p>
+        <Text ta="center" c="dimmed" py="md">No expenses found for this period.</Text>
       ) : (
-        <div className="border rounded-md overflow-hidden">
-          <div className="max-h-[60dvh] overflow-auto">
-            <Table>
-              <TableHeader className="sticky top-0 z-10">
-                <TableRow>
-                  <TableHead className="w-[120px]">Date</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right w-[100px]">Amount</TableHead>
-                  <TableHead className="w-[80px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+        <Box style={{ border: '1px solid var(--mantine-color-gray-3)', borderRadius: 'var(--mantine-radius-md)' }}>
+          <Box style={{ maxHeight: '60vh', overflow: 'auto' }}>
+            <Table withTableBorder withColumnBorders stickyHeader>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th style={{ width: 120 }}>Date</Table.Th>
+                  <Table.Th>Description</Table.Th>
+                  <Table.Th>Category</Table.Th>
+                  <Table.Th style={{ width: 100, textAlign: 'right' }}>Amount</Table.Th>
+                  <Table.Th style={{ width: 80 }}>Actions</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
                 {filteredExpenses.map((expense) => (
-                  <TableRow key={expense.id}>
-                    <TableCell>{format(new Date(expense.date), 'dd MMM yyyy')}</TableCell>
-                    <TableCell>{expense.description}</TableCell>
-                    <TableCell>{expense.category}</TableCell>
-                    <TableCell className="text-right">${Number(expense.amount).toFixed(2)}</TableCell>
-                    <TableCell>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(expense.id)}>
-                        <Trash size={14} />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                  <Table.Tr key={expense.id}>
+                    <Table.Td>{format(new Date(expense.date), 'dd MMM yyyy')}</Table.Td>
+                    <Table.Td>{expense.description}</Table.Td>
+                    <Table.Td>{expense.category}</Table.Td>
+                    <Table.Td ta="right">${Number(expense.amount).toFixed(2)}</Table.Td>
+                    <Table.Td>
+                      <ActionIcon 
+                        variant="filled" 
+                        color="red" 
+                        size="sm" 
+                        onClick={() => handleDelete(expense.id)}
+                      >
+                        <IconTrash size="1rem" />
+                      </ActionIcon>
+                    </Table.Td>
+                  </Table.Tr>
                 ))}
-              </TableBody>
+              </Table.Tbody>
             </Table>
-          </div>
-        </div>
+          </Box>
+        </Box>
       )}
-    </div>
+    </Box>
   )
 }

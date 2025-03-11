@@ -1,10 +1,7 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, Table, Text, Group } from '@mantine/core'
 import { Income, IncomeCategory } from '@/stores/instantdb'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
-import { Badge } from '@/components/ui/badge'
 
 interface IncomeOverviewProps {
   incomes: Income[]
@@ -47,39 +44,40 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Income Categories</CardTitle>
-        <CardDescription>Overview of your income categories for the selected month</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Current Income</TableHead>
-              <TableHead className="text-right">Year-to-Date Income</TableHead>
-              <TableHead className="text-right">Annual Income</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {incomeCategories.map((category) => {
-              const currentMonthlyIncome = calculateCategoryAmount(incomes, category.id)
-              const currentYearToDateIncome = calculateCategoryAmount(incomes, category.id, false, true)
-              const currentAnnualIncome = calculateCategoryAmount(incomes, category.id, true)
+    <Card shadow="sm" padding="lg" radius="md" withBorder>
+      <Group mb="md">
+        <div>
+          <Text fw={500} size="lg">Income Categories</Text>
+          <Text size="sm" c="dimmed">Overview of your income categories for the selected month</Text>
+        </div>
+      </Group>
+      
+      <Table withTableBorder withColumnBorders>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Category</Table.Th>
+            <Table.Th ta="right">Current Income</Table.Th>
+            <Table.Th ta="right">Year-to-Date Income</Table.Th>
+            <Table.Th ta="right">Annual Income</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {incomeCategories.map((category) => {
+            const currentMonthlyIncome = calculateCategoryAmount(incomes, category.id)
+            const currentYearToDateIncome = calculateCategoryAmount(incomes, category.id, false, true)
+            const currentAnnualIncome = calculateCategoryAmount(incomes, category.id, true)
 
-              return (
-                <TableRow key={category.id}>
-                  <TableCell className="font-medium">{category.title}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentMonthlyIncome)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentYearToDateIncome)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentAnnualIncome)}</TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-      </CardContent>
+            return (
+              <Table.Tr key={category.id}>
+                <Table.Td fw={500}>{category.title}</Table.Td>
+                <Table.Td ta="right">{formatCurrency(currentMonthlyIncome)}</Table.Td>
+                <Table.Td ta="right">{formatCurrency(currentYearToDateIncome)}</Table.Td>
+                <Table.Td ta="right">{formatCurrency(currentAnnualIncome)}</Table.Td>
+              </Table.Tr>
+            )
+          })}
+        </Table.Tbody>
+      </Table>
     </Card>
   )
 }

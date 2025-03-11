@@ -5,7 +5,6 @@ import { useAccountBalances, useExpenseStore, useIncomeStore } from '@/stores/in
 import { AccountForm } from '@/components/account-form'
 import { AccountList } from '@/components/account-list'
 import { PageHeader } from '@/components/page-header'
-import { cn } from '@/lib/utils'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { 
   Card, 
@@ -17,7 +16,8 @@ import {
   Modal,
   List,
   Divider,
-  Box
+  Box,
+  Container
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 
@@ -76,7 +76,7 @@ export default function OverviewPage() {
   const discrepancy = realAccountsTotal - expectedAccountsTotal
 
   return (
-    <div className="space-y-8">
+    <Stack gap="xl">
       <PageHeader title="Accounts" />
 
       <Grid gutter="lg">
@@ -155,6 +155,6 @@ export default function OverviewPage() {
           selectedMonth={selectedMonth}
         />
       </Modal>
-    </div>
+    </Stack>
   )
 }

@@ -1,13 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCategoryStore, useIncomeStore } from '@/stores/instantdb'
-
-import { Button } from '@/components/ui/button'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Input } from '@/components/ui/input'
-import { TrashIcon } from 'lucide-react'
+import { Button, TextInput, NumberInput, Table, Group, Select, ActionIcon } from '@mantine/core'
+import { DatePickerInput } from '@mantine/dates'
+import { IconTrash } from '@tabler/icons-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface IncomeFormProps {
@@ -113,93 +110,93 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
     setTableIncomes(updatedIncomes)
   }
 
+  const categoryOptions = incomeCategories
+    .filter((category) => !category.isArchived)
+    .map((category) => ({
+      value: category.title,
+      label: category.title
+    }))
+
   return (
-    <div className="space-y-4">
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-200">
-          <thead>
-            <tr>
-              <th className="border border-gray-200 p-2 w-[110px]">Amount</th>
-              <th className="border border-gray-200 p-2 w-[130px]">Category</th>
-              <th className="border border-gray-200 p-2 w-[130px]">Date</th>
-              <th className="border border-gray-200 p-2 w-[150px]">Description</th>
-              <th className="border border-gray-200 p-2 w-[50px]"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableIncomes.map((income, index) => (
-              <tr key={index}>
-                <td className="border border-gray-200 p-1">
-                  <Input
-                    type="number"
-                    value={income.amount}
-                    onChange={(e) => handleTableInputChange(index, 'amount', e.target.value)}
-                    onKeyDown={(e) => handleTableKeyDown(e, index)}
-                    step="0.01"
-                    min="0"
-                    required
-                    className="w-full h-full rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none py-2"
-                  />
-                </td>
-                <td className="border border-gray-200 p-1">
-                  <Select
-                    value={income.categoryId}
-                    onValueChange={(value) => handleTableInputChange(index, 'categoryId', value)}
-                  >
-                    <SelectTrigger className="w-full h-full rounded-none">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {incomeCategories.filter((category) => !category.isArchived).map((category) => (
-                        <SelectItem key={category.id} value={category.title}>
-                          {category.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </td>
-                <td className="border border-gray-200 p-1">
-                  <DatePicker
-                    date={income.date}
-                    onDateChange={(date) => handleTableInputChange(index, 'date', date!)}
-                    className="w-full h-full rounded-none"
-                  />
-                </td>
-                <td className="border border-gray-200 p-1">
-                  <Input
-                    type="text"
-                    value={income.description}
-                    onChange={(e) => handleTableInputChange(index, 'description', e.target.value)}
-                    onKeyDown={(e) => handleTableKeyDown(e, index)}
-                    className="w-full h-full rounded-none py-2"
-                  />
-                </td>
-                <td className="border border-gray-200 p-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteRow(index)}
-                    className="w-full h-full rounded-none"
-                  >
-                    <TrashIcon className="h-7 w-4" />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="flex items-center space-x-2">
-        <Input
-          type="number"
-          value={rowsToAdd}
-          onChange={(e) => setRowsToAdd(Number(e.target.value))}
-          min="1"
-          className="w-20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-        />
-        <Button onClick={addRows}>Add Rows</Button>
-      </div>
-      <Button onClick={handleTableAddIncomes}>Save Incomes</Button>
+    <div>
+      <Table withTableBorder withColumnBorders>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th style={{ width: 110 }}>Amount</Table.Th>
+            <Table.Th style={{ width: 130 }}>Category</Table.Th>
+            <Table.Th style={{ width: 130 }}>Date</Table.Th>
+            <Table.Th style={{ width: 150 }}>Description</Table.Th>
+            <Table.Th style={{ width: 50 }}></Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {tableIncomes.map((income, index) => (
+            <Table.Tr key={index}>
+              <Table.Td>
+                <NumberInput
+                  value={income.amount ? parseFloat(income.amount) : ''}
+                  onChange={(value) => handleTableInputChange(index, 'amount', value ? value.toString() : '')}
+                  onKeyDown={(e) => handleTableKeyDown(e, index)}
+                  step={0.01}
+                  min={0}
+                  placeholder="0.00"
+                  hideControls
+                  required
+                />
+              </Table.Td>
+              <Table.Td>
+                <Select
+                  value={income.categoryId}
+                  onChange={(value) => handleTableInputChange(index, 'categoryId', value || '')}
+                  data={categoryOptions}
+                  placeholder="Select category"
+                  clearable
+                />
+              </Table.Td>
+              <Table.Td>
+                <DatePickerInput
+                  value={income.date}
+                  onChange={(date) => handleTableInputChange(index, 'date', date || getDefaultDate(selectedYear, selectedMonth))}
+                  valueFormat="YYYY-MM-DD"
+                />
+              </Table.Td>
+              <Table.Td>
+                <TextInput
+                  value={income.description}
+                  onChange={(e) => handleTableInputChange(index, 'description', e.target.value)}
+                  onKeyDown={(e) => handleTableKeyDown(e, index)}
+                  placeholder="Description"
+                />
+              </Table.Td>
+              <Table.Td>
+                <ActionIcon
+                  variant="subtle"
+                  color="red"
+                  onClick={() => deleteRow(index)}
+                  disabled={tableIncomes.length === 1}
+                >
+                  <IconTrash size="1rem" />
+                </ActionIcon>
+              </Table.Td>
+            </Table.Tr>
+          ))}
+        </Table.Tbody>
+      </Table>
+      
+      <Group mt="md" justify="space-between">
+        <Group>
+          <NumberInput
+            value={rowsToAdd}
+            onChange={(value) => setRowsToAdd(Number(value || 1))}
+            min={1}
+            max={10}
+            w={80}
+            hideControls={false}
+          />
+          <Button variant="outline" onClick={addRows}>Add Rows</Button>
+        </Group>
+        <Button onClick={handleTableAddIncomes}>Save Incomes</Button>
+      </Group>
     </div>
   )
 }

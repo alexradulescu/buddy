@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import { Box, Button, Group, Loader, Text, Textarea } from '@mantine/core'
 import { Expense, ExpenseCategory, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
-import { useCompletion, experimental_useObject as useObject } from '@ai-sdk/react'
-import { Loader2 } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
+
 import { ExpenseTable } from '@/components/expense-table'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
+import { useCompletion } from '@ai-sdk/react'
 import { useToast } from '@/hooks/use-toast'
 
 function isJsonString(input: string): boolean {
@@ -127,43 +126,46 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
   }
 
   return (
-    <div className="space-y-4">
-      {error && <div className="text-red-500 mt-4">Error: {error.message}</div>}
+    <Box>
+      {error && <Text c="red" mt="md">Error: {error.message}</Text>}
       {aiGeneratedExpenses.length > 0 ? (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">AI Generated Expenses</h3>
+        <Box>
+          <Text fw={600} size="md" mb="md">AI Generated Expenses</Text>
           <ExpenseTable
             expenses={aiGeneratedExpenses}
             expenseCategories={expenseCategories}
             onInputChange={handleExpenseChange}
             onDeleteRow={handleDeleteExpense}
           />
-          <Button onClick={handleSaveExpenses}>Save Processed Expenses</Button>
-          <Button variant={'destructive'} onClick={handleReset}>
-            Reset
-          </Button>
-        </div>
+          <Group mt="md">
+            <Button onClick={handleSaveExpenses}>Save Processed Expenses</Button>
+            <Button variant="filled" color="red" onClick={handleReset}>Reset</Button>
+          </Group>
+        </Box>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit}>
           <Textarea
             value={input}
             onChange={handleInputChange}
             placeholder="Enter your expense details here..."
-            className="min-h-[100px] max-h-96 overflow-auto"
+            minRows={4}
+            maxRows={12}
+            style={{ overflow: 'auto' }}
             readOnly={isLoading}
+            mb="md"
           />
-          <Button type="submit" disabled={isLoading} className="w-full">
+          <Button type="submit" disabled={isLoading} fullWidth>
             {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Converting...
-              </>
+              <Group gap="xs" justify="center">
+                <Loader size="xs" color="white" />
+                <span>Converting...</span>
+              </Group>
             ) : (
               'Convert'
             )}
           </Button>
         </form>
       )}
-    </div>
+    </Box>
   )
 }

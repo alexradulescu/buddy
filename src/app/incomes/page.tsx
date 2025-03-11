@@ -4,7 +4,7 @@ import React from 'react'
 import { IncomeForm } from '@/components/income-form'
 import { IncomeList } from '@/components/income-list'
 import { PageHeader } from '@/components/page-header'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, Text, Group, SimpleGrid } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function IncomesPage() {
@@ -13,24 +13,20 @@ export default function IncomesPage() {
   return (
     <>
       <PageHeader title="Incomes" />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Add Income</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <IncomeForm selectedYear={selectedYear} selectedMonth={selectedMonth} />
-          </CardContent>
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Group mb="md">
+            <Text fw={500} size="lg">Add Income</Text>
+          </Group>
+          <IncomeForm selectedYear={selectedYear} selectedMonth={selectedMonth} />
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Income List</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <IncomeList selectedYear={selectedYear} selectedMonth={selectedMonth} />
-          </CardContent>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Group mb="md">
+            <Text fw={500} size="lg">Income List</Text>
+          </Group>
+          <IncomeList selectedYear={selectedYear} selectedMonth={selectedMonth} />
         </Card>
-      </div>
+      </SimpleGrid>
     </>
   )
 }

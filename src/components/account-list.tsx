@@ -1,20 +1,21 @@
 'use client'
 
-import React, { useState } from 'react'
 import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
-import { Edit2, Trash2 } from 'lucide-react'
-import { AccountForm } from '@/components/account-form'
-import { 
-  Table, 
-  ActionIcon, 
-  Group, 
-  Text, 
-  Paper, 
-  Stack,
-  Modal,
+import {
+  ActionIcon,
   Button,
-  Divider
+  Divider,
+  Group,
+  Modal,
+  Paper,
+  Stack,
+  Table,
+  Text
 } from '@mantine/core'
+import { Edit2, Trash2 } from 'lucide-react'
+import React, { useState } from 'react'
+
+import { AccountForm } from '@/components/account-form'
 import { useDisclosure } from '@mantine/hooks'
 import { useToast } from '@/hooks/use-toast'
 

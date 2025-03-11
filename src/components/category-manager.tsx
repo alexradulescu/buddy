@@ -1,19 +1,20 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { ExpenseCategory, IncomeCategory } from '@/stores/instantdb'
-import { IconPlus, IconDeviceFloppy, IconTrash } from '@tabler/icons-react'
 import {
-  Modal,
   Button,
   Card,
-  Text,
+  Checkbox,
   Group,
-  Table,
-  TextInput,
+  Modal,
   NumberInput,
-  Checkbox
+  Table,
+  Text,
+  TextInput
 } from '@mantine/core'
+import { ExpenseCategory, IncomeCategory } from '@/stores/instantdb'
+import { IconDeviceFloppy, IconPlus, IconTrash } from '@tabler/icons-react'
+import React, { useEffect, useState } from 'react'
+
 import { useDisclosure } from '@mantine/hooks'
 import { useToast } from '@/hooks/use-toast'
 

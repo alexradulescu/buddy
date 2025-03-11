@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, Group, SimpleGrid, Text } from '@mantine/core'
 
 import { ExpenseForm } from '@/components/expense-form'
 import { ExpenseList } from '@/components/expense-list'
@@ -15,24 +15,20 @@ export default function ExpensesPage() {
   return (
     <>
       <PageHeader title="Expenses" />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Add Expenses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ExpenseForm selectedYear={selectedYear} selectedMonth={selectedMonth} initialExpenses={[]} />
-          </CardContent>
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Group mb="md">
+            <Text fw={500} size="lg">Add Expenses</Text>
+          </Group>
+          <ExpenseForm selectedYear={selectedYear} selectedMonth={selectedMonth} initialExpenses={[]} />
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Expense List</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ExpenseList selectedYear={selectedYear} selectedMonth={selectedMonth} />
-          </CardContent>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Group mb="md">
+            <Text fw={500} size="lg">Expense List</Text>
+          </Group>
+          <ExpenseList selectedYear={selectedYear} selectedMonth={selectedMonth} />
         </Card>
-      </div>
+      </SimpleGrid>
     </>
   )
 }
