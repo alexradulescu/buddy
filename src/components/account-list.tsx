@@ -2,22 +2,20 @@
 
 import React, { useState } from 'react'
 import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
-import { Edit2, MoreVertical, Trash2 } from 'lucide-react'
+import { Edit2, Trash2 } from 'lucide-react'
 import { AccountForm } from '@/components/account-form'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Separator } from '@/components/ui/separator'
+import { 
+  Table, 
+  ActionIcon, 
+  Group, 
+  Text, 
+  Paper, 
+  Stack,
+  Modal,
+  Button,
+  Divider
+} from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import { useToast } from '@/hooks/use-toast'
 
 interface AccountListProps {
@@ -29,16 +27,18 @@ export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selected
   const { data: { accountBalances = [] } = {}, removeAccountBalance } = useAccountBalances(selectedYear, selectedMonth)
   const { toast } = useToast()
   const [editingAccount, setEditingAccount] = useState<AccountBalance | null>(null)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [accountToDelete, setAccountToDelete] = useState<AccountBalance | null>(null)
+  const [editModalOpened, { open: openEditModal, close: closeEditModal }] = useDisclosure(false)
+  const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] = useDisclosure(false)
 
   const handleEdit = (account: AccountBalance) => {
     setEditingAccount(account)
+    openEditModal()
   }
 
   const handleDelete = (account: AccountBalance) => {
     setAccountToDelete(account)
-    setIsDeleteDialogOpen(true)
+    openDeleteModal()
   }
 
   const confirmDelete = () => {
@@ -48,84 +48,75 @@ export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selected
         title: 'Account balance deleted',
         description: `Deleted balance for ${accountToDelete.title}`
       })
-      setIsDeleteDialogOpen(false)
+      closeDeleteModal()
       setAccountToDelete(null)
     }
   }
 
   return (
     <>
-      <div className="p-6">
-        {accountBalances.length === 0 ? (
-          <p className="text-center text-muted-foreground py-4">No account balances for this month.</p>
-        ) : (
-          <ul className="space-y-4">
+      {accountBalances.length === 0 ? (
+        <Text c="dimmed" ta="center" py="md">
+          No account balances for this month.
+        </Text>
+      ) : (
+        <Table striped highlightOnHover>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Account</Table.Th>
+              <Table.Th style={{ textAlign: 'right' }}>Balance</Table.Th>
+              <Table.Th style={{ textAlign: 'right' }}>Actions</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
             {accountBalances.map((balance) => (
-              <li key={balance.id}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold">{balance.title}</h3>
-                    <p className="text-sm text-muted-foreground">ID: {balance.id}</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="text-right font-semibold">${balance.amount.toFixed(2)}</div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                          <span className="sr-only">Actions</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(balance)}>
-                          <Edit2 className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(balance)}>
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-                <Separator className="my-2" />
-              </li>
+              <Table.Tr key={balance.id}>
+                <Table.Td>
+                  <Stack gap={2}>
+                    <Text fw={500}>{balance.title}</Text>
+                    <Text size="xs" c="dimmed">ID: {balance.id}</Text>
+                  </Stack>
+                </Table.Td>
+                <Table.Td style={{ textAlign: 'right' }}>
+                  <Text fw={500}>${balance.amount.toFixed(2)}</Text>
+                </Table.Td>
+                <Table.Td style={{ textAlign: 'right' }}>
+                  <Group gap="xs" justify="flex-end">
+                    <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(balance)}>
+                      <Edit2 size={16} />
+                    </ActionIcon>
+                    <ActionIcon variant="subtle" color="red" onClick={() => handleDelete(balance)}>
+                      <Trash2 size={16} />
+                    </ActionIcon>
+                  </Group>
+                </Table.Td>
+              </Table.Tr>
             ))}
-          </ul>
+          </Table.Tbody>
+        </Table>
+      )}
+
+      <Modal opened={editModalOpened} onClose={closeEditModal} title="Edit Account Balance">
+        {editingAccount && (
+          <AccountForm
+            initialData={editingAccount}
+            onSubmit={closeEditModal}
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+          />
         )}
-      </div>
+      </Modal>
 
-      <Dialog open={editingAccount !== null} onOpenChange={(open) => !open && setEditingAccount(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Account Balance</DialogTitle>
-          </DialogHeader>
-          {editingAccount && (
-            <AccountForm
-              initialData={editingAccount}
-              onSubmit={() => setEditingAccount(null)}
-              selectedYear={selectedYear}
-              selectedMonth={selectedMonth}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the account balance.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Modal opened={deleteModalOpened} onClose={closeDeleteModal} title="Confirm Deletion">
+        <Text size="sm" mb="lg">
+          Are you sure you want to delete this account balance? This action cannot be undone.
+        </Text>
+        <Divider my="md" />
+        <Group justify="flex-end">
+          <Button variant="outline" onClick={closeDeleteModal}>Cancel</Button>
+          <Button color="red" onClick={confirmDelete}>Delete</Button>
+        </Group>
+      </Modal>
     </>
   )
 }

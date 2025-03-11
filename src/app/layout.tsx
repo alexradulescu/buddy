@@ -8,6 +8,8 @@ import { Suspense } from 'react'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import localFont from 'next/font/local'
+import { MantineProvider } from '@mantine/core'
+import '@mantine/core/styles.css'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -36,15 +38,17 @@ export default function RootLayout({
         <Suspense fallback={"Loading"}>
         <NuqsAdapter>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <HydrationBoundary>
-              <div className="flex min-h-screen bg-background">
-                <Navigation />
-                <main className="flex-1 overflow-y-auto p-4 sm:pl-20 bg-stone-50 dark:bg-stone-950 m-1 rounded-sm border-gray-100 border-solid">
-                  {children}
-                </main>
-              </div>
-              <Toaster />
-            </HydrationBoundary>
+            <MantineProvider>
+              <HydrationBoundary>
+                <div className="flex min-h-screen bg-background">
+                  <Navigation />
+                  <main className="flex-1 overflow-y-auto p-4 sm:pl-20 bg-stone-50 dark:bg-stone-950 m-1 rounded-sm border-gray-100 border-solid">
+                    {children}
+                  </main>
+                </div>
+                <Toaster />
+              </HydrationBoundary>
+            </MantineProvider>
           </ThemeProvider>
         </NuqsAdapter>
         </Suspense>
