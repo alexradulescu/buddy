@@ -4,6 +4,7 @@ import React from 'react'
 import { useCategoryStore } from '@/stores/instantdb'
 import { CategoryManager } from '@/components/category-manager'
 import { PageHeader } from '@/components/page-header'
+import { Stack } from '@mantine/core'
 
 export default function SettingsPage() {
   const {
@@ -19,7 +20,7 @@ export default function SettingsPage() {
   return (
     <>
       <PageHeader title="Settings" />
-      <div className="space-y-8">
+      <Stack gap="lg">
         <CategoryManager
           type="expense"
           categories={expenseCategories}
@@ -35,7 +36,7 @@ export default function SettingsPage() {
           onDelete={removeIncomeCategory}
         />
         {/* <BackupRestore /> */}
-      </div>
+      </Stack>
     </>
   )
 }

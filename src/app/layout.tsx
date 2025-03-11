@@ -8,8 +8,9 @@ import { Suspense } from 'react'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import localFont from 'next/font/local'
-import { MantineProvider } from '@mantine/core'
+import { MantineProvider, createTheme } from '@mantine/core'
 import '@mantine/core/styles.css'
+import '@mantine/dates/styles.css'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -20,6 +21,19 @@ const geistMono = localFont({
   src: './fonts/GeistMonoVF.woff',
   variable: '--font-geist-mono',
   weight: '100 900'
+})
+
+const theme = createTheme({
+  fontFamily: 'var(--font-geist-sans)',
+  components: {
+    DatePicker: {
+      styles: {
+        calendar: { minWidth: 280 },
+        calendarHeader: { marginBottom: 10 },
+        day: { borderRadius: 4 }
+      }
+    }
+  }
 })
 
 export const metadata: Metadata = {
@@ -38,7 +52,7 @@ export default function RootLayout({
         <Suspense fallback={"Loading"}>
         <NuqsAdapter>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <MantineProvider>
+            <MantineProvider theme={theme}>
               <HydrationBoundary>
                 <div className="flex min-h-screen bg-background">
                   <Navigation />

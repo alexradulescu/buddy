@@ -2,23 +2,20 @@
 
 import React, { useEffect, useState } from 'react'
 import { ExpenseCategory, IncomeCategory } from '@/stores/instantdb'
-import { Plus, Save, Trash2 } from 'lucide-react'
+import { IconPlus, IconDeviceFloppy, IconTrash } from '@tabler/icons-react'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+  Modal,
+  Button,
+  Card,
+  Text,
+  Group,
+  Table,
+  TextInput,
+  NumberInput,
+  Checkbox
+} from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import { useToast } from '@/hooks/use-toast'
-import { Checkbox } from './ui/checkbox'
 
 type EditableExpenseCategory = Partial<ExpenseCategory> & {
   id?: string
@@ -48,7 +45,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
       isNew: false
     }))
   )
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [opened, { open, close }] = useDisclosure(false)
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | undefined>()
   const [hasChanges, setHasChanges] = useState(false)
 
@@ -140,7 +137,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
 
   const handleDelete = (categoryId: string) => {
     setDeletingCategoryId(categoryId)
-    setIsDeleteDialogOpen(true)
+    open()
   }
 
   const confirmDelete = async () => {
@@ -160,7 +157,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
         })
       }
     }
-    setIsDeleteDialogOpen(false)
+    close()
     setDeletingCategoryId(undefined)
   }
 
@@ -223,146 +220,140 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-2xl font-bold">
+    <Card withBorder shadow="sm" padding="lg" radius="md">
+      <Group justify="space-between" mb="md">
+        <Text fw={700} size="xl">
           {type === 'expense' ? 'Expense Categories' : 'Income Categories'}
-        </CardTitle>
-        <div className="space-x-2">
-          <Button variant="outline" onClick={handleAddRow}>
-            <Plus className="h-4 w-4 mr-2" />
+        </Text>
+        <Group>
+          <Button variant="outline" leftSection={<IconPlus size={16} />} onClick={handleAddRow}>
             Add Row
           </Button>
-          <Button onClick={handleSaveChanges} disabled={!hasChanges}>
-            <Save className="h-4 w-4 mr-2" />
+          <Button 
+            leftSection={<IconDeviceFloppy size={16} />} 
+            onClick={handleSaveChanges} 
+            disabled={!hasChanges}
+          >
             Save Changes
           </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{type === 'expense' ? 'Name' : 'Title'}</TableHead>
+        </Group>
+      </Group>
+      
+      <Table striped highlightOnHover>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>{type === 'expense' ? 'Name' : 'Title'}</Table.Th>
+            {type === 'expense' ? (
+              <>
+                <Table.Th>Monthly Budget</Table.Th>
+                <Table.Th>Annual Budget</Table.Th>
+              </>
+            ) : (
+              <Table.Th>Target Amount</Table.Th>
+            )}
+            <Table.Th>Archived</Table.Th>
+            <Table.Th style={{ width: 100 }}>Actions</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {editableCategories.map((category, index) => (
+            <Table.Tr key={category.id || `new-${index}`}>
+              <Table.Td>
+                <TextInput
+                  value={
+                    type === 'expense'
+                      ? (category as EditableExpenseCategory).name
+                      : (category as EditableIncomeCategory).title
+                  }
+                  onChange={(e) => handleInputChange(index, type === 'expense' ? 'name' : 'title', e.target.value)}
+                  placeholder={`Enter category ${type === 'expense' ? 'name' : 'title'}`}
+                />
+              </Table.Td>
               {type === 'expense' ? (
                 <>
-                  <TableHead>Monthly Budget</TableHead>
-                  <TableHead>Annual Budget</TableHead>
+                  <Table.Td>
+                    <NumberInput
+                      value={(category as EditableExpenseCategory).maxBudget || undefined}
+                      onChange={(value) => {
+                        if (value !== '') {
+                          handleInputChange(index, 'maxBudget', value)
+                        }
+                      }}
+                      placeholder="Monthly budget"
+                      step={0.01}
+                      min={0}
+                    />
+                  </Table.Td>
+                  <Table.Td>
+                    <NumberInput
+                      value={(category as EditableExpenseCategory).maxAnnualBudget || undefined}
+                      onChange={(value) => {
+                        if (value !== '') {
+                          handleInputChange(index, 'maxAnnualBudget', value)
+                        }
+                      }}
+                      placeholder="Annual budget"
+                      step={0.01}
+                      min={0}
+                    />
+                  </Table.Td>
+                  <Table.Td>
+                    <Checkbox
+                      checked={(category as EditableExpenseCategory).isArchived || false}
+                      onChange={(event) => {
+                        handleInputChange(index, 'isArchived', event.currentTarget.checked)
+                      }}
+                    />
+                  </Table.Td>
                 </>
               ) : (
-                <TableHead>Target Amount</TableHead>
+                <>
+                  <Table.Td>
+                    <NumberInput
+                      value={(category as EditableIncomeCategory).targetAmount || undefined}
+                      onChange={(value) => {
+                        if (value !== '') {
+                          handleInputChange(index, 'targetAmount', value)
+                        }
+                      }}
+                      placeholder="Target amount"
+                      step={0.01}
+                      min={0}
+                    />
+                  </Table.Td>
+                  <Table.Td>
+                    <Checkbox
+                      checked={(category as EditableIncomeCategory).isArchived || false}
+                      onChange={(event) => {
+                        handleInputChange(index, 'isArchived', event.currentTarget.checked)
+                      }}
+                    />
+                  </Table.Td>
+                </>
               )}
-              <TableHead>Archived</TableHead>
-              <TableHead className="w-[100px]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {editableCategories.map((category, index) => (
-              <TableRow key={category.id || `new-${index}`}>
-                <TableCell>
-                  <Input
-                    value={
-                      type === 'expense'
-                        ? (category as EditableExpenseCategory).name
-                        : (category as EditableIncomeCategory).title
-                    }
-                    onChange={(e) => handleInputChange(index, type === 'expense' ? 'name' : 'title', e.target.value)}
-                    placeholder={`Enter category ${type === 'expense' ? 'name' : 'title'}`}
-                  />
-                </TableCell>
-                {type === 'expense' ? (
-                  <>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={(category as EditableExpenseCategory).maxBudget || ''}
-                        onChange={(e) => {
-                          if (e.target.value) {
-                            handleInputChange(index, 'maxBudget', parseFloat(e.target.value))
-                          }
-                        }}
-                        placeholder="Monthly budget"
-                        step="0.01"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={(category as EditableExpenseCategory).maxAnnualBudget || ''}
-                        onChange={(e) => {
-                          if (e.target.value) {
-                            handleInputChange(index, 'maxAnnualBudget', parseFloat(e.target.value))
-                          }
-                        }}
-                        placeholder="Annual budget"
-                        step="0.01"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={(category as EditableExpenseCategory).isArchived}
-                        onCheckedChange={(checked) => {
-                          handleInputChange(index, 'isArchived', checked)
-                        }}
-                      />
-                    </TableCell>
-                  </>
-                ) : (
-                  <>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={(category as EditableIncomeCategory).targetAmount || ''}
-                        onChange={(e) => {
-                          if (e.target.value) {
-                            handleInputChange(index, 'targetAmount', parseFloat(e.target.value))
-                          }
-                        }}
-                        placeholder="Target amount"
-                        step="0.01"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={(category as EditableIncomeCategory).isArchived}
-                        onCheckedChange={(checked) => {
-                          handleInputChange(index, 'isArchived', checked)
-                        }}
-                      />
-                    </TableCell>
-                  </>
+              <Table.Td>
+                {category.id && (
+                  <Button
+                    variant="subtle"
+                    color="red"
+                    onClick={() => handleDelete(category.id!)}
+                  >
+                    <IconTrash size={16} />
+                  </Button>
                 )}
-                <TableCell>
-                  {category.id && (
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleDelete(category.id!)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
+              </Table.Td>
+            </Table.Tr>
+          ))}
+        </Table.Tbody>
+      </Table>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the category.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Modal opened={opened} onClose={close} title="Confirm Deletion" centered>
+        <Text mb="lg">Are you absolutely sure? This action cannot be undone. This will permanently delete the category.</Text>
+        <Group justify="flex-end">
+          <Button variant="outline" onClick={close}>Cancel</Button>
+          <Button color="red" onClick={confirmDelete}>Delete</Button>
+        </Group>
+      </Modal>
     </Card>
   )
 }
