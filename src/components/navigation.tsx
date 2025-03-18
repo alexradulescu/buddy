@@ -13,10 +13,10 @@ interface NavItem {
   icon: React.ReactNode
 }
 
-export function Navigation() {
+const useNavItems = () => {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
   const pathname = usePathname()
-
+  
   const navItems: NavItem[] = [
     { href: '/', label: 'Home', icon: <IconHome size="1.2rem" /> },
     { href: '/expenses', label: 'Expenses', icon: <IconCreditCard size="1.2rem" /> },
@@ -24,6 +24,12 @@ export function Navigation() {
     { href: '/accounts', label: 'Accounts', icon: <IconChartBar size="1.2rem" /> },
     { href: '/settings', label: 'Settings', icon: <IconSettings size="1.2rem" /> }
   ]
+  
+  return { navItems, pathname, selectedYear, selectedMonth }
+}
+
+export function DesktopNavigation() {
+  const { navItems, pathname, selectedYear, selectedMonth } = useNavItems()
 
   return (
     <Box h="100%" w="100%" bg="var(--mantine-color-gray-1)">
@@ -61,42 +67,58 @@ export function Navigation() {
           ))}
         </Stack>
       </Stack>
-
-      {/* Mobile navigation */}
-      <Box 
-        display={{ base: 'block', sm: 'none' }}
-        pos="fixed" 
-        bottom={0} 
-        left={0} 
-        right={0} 
-        py="xs"
-        style={{ 
-          borderTop: '1px solid var(--mantine-color-gray-3)',
-          backgroundColor: 'var(--mantine-color-body)'
-        }}
-      >
-        <Group justify="space-around" align="center">
-          {navItems.map((item) => (
-            <Box 
-              key={item.href} 
-              component={Link}
-              href={{
-                pathname: item.href,
-                query: { month: selectedMonth, year: selectedYear }
-              }}
-              style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center',
-                color: pathname === item.href ? 'var(--mantine-color-blue-6)' : 'var(--mantine-color-dimmed)'
-              }}
-            >
-              {item.icon}
-              <Box fz="xs" mt={4}>{item.label}</Box>
-            </Box>
-          ))}
-        </Group>
-      </Box>
     </Box>
+  )
+}
+
+export function MobileNavigation() {
+  const { navItems, pathname, selectedYear, selectedMonth } = useNavItems()
+
+  return (
+    <Box 
+      display={{ base: 'block', sm: 'none' }}
+      pos="fixed" 
+      bottom={0} 
+      left={0} 
+      right={0} 
+      py="xs"
+      style={{ 
+        borderTop: '1px solid var(--mantine-color-gray-3)',
+        backgroundColor: 'var(--mantine-color-body)',
+        zIndex: 1000
+      }}
+    >
+      <Group justify="space-around" align="center">
+        {navItems.map((item) => (
+          <Box 
+            key={item.href} 
+            component={Link}
+            href={{
+              pathname: item.href,
+              query: { month: selectedMonth, year: selectedYear }
+            }}
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center',
+              color: pathname === item.href ? 'var(--mantine-color-blue-6)' : 'var(--mantine-color-dimmed)'
+            }}
+          >
+            {item.icon}
+            <Box fz="xs" mt={4}>{item.label}</Box>
+          </Box>
+        ))}
+      </Group>
+    </Box>
+  )
+}
+
+// Keep the original Navigation component for backward compatibility
+export function Navigation() {
+  return (
+    <>
+      <DesktopNavigation />
+      <MobileNavigation />
+    </>
   )
 }

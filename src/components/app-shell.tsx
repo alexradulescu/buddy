@@ -3,7 +3,7 @@
 import { MantineProvider, MantineTheme, createTheme } from '@mantine/core'
 
 import { AppShell } from '@mantine/core'
-import { Navigation } from '@/components/navigation'
+import { DesktopNavigation, MobileNavigation } from '@/components/navigation'
 import { Notifications } from '@mantine/notifications'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
@@ -47,8 +47,8 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
             breakpoint: 'sm'
         }}
         >
-        <AppShell.Navbar w='64px' >
-            <Navigation />
+        <AppShell.Navbar w='64px' display={{ base: 'none', sm: 'block' }} >
+            <DesktopNavigation />
         </AppShell.Navbar>
         <AppShell.Main
             style={{
@@ -57,11 +57,19 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
             margin: '4px',
             border: '1px solid var(--mantine-color-gray-2)'
             }}
+            styles={{
+              main: () => ({
+                '@media (max-width: 48em)': {
+                  paddingBottom: 'calc(var(--mantine-spacing-xl) * 2)'
+                }
+              })
+            }}
         >
             {children}
         </AppShell.Main>
         </AppShell>
             <Notifications position="top-right" zIndex={1000} />
+            <MobileNavigation />
         </MantineProvider>
       </NuqsAdapter>
     )

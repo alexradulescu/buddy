@@ -12,7 +12,7 @@ import {
   Table,
   Text
 } from '@mantine/core'
-import { Edit2, Trash2 } from 'lucide-react'
+import { IconEdit, IconTrash } from '@tabler/icons-react'
 import React, { useState } from 'react'
 
 import { AccountForm } from '@/components/account-form'
@@ -84,10 +84,10 @@ export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selected
                 <Table.Td style={{ textAlign: 'right' }}>
                   <Group gap="xs" justify="flex-end">
                     <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(balance)}>
-                      <Edit2 size={16} />
+                      <IconEdit size={16} />
                     </ActionIcon>
                     <ActionIcon variant="subtle" color="red" onClick={() => handleDelete(balance)}>
-                      <Trash2 size={16} />
+                      <IconTrash size={16} />
                     </ActionIcon>
                   </Group>
                 </Table.Td>

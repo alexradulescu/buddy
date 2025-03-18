@@ -3,7 +3,6 @@ import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 
-import { ColorSchemeScript, MantineProvider, MantineTheme, createTheme } from '@mantine/core'
 
 import { AppLayout } from '@/components/app-shell'
 import type { Metadata } from 'next'
@@ -35,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
-        <ColorSchemeScript />
+        
       </head>
       <body style={{ 
         fontFamily: `var(--font-geist-sans), sans-serif`,
