@@ -1,5 +1,8 @@
 'use client'
 
+import { useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Income, IncomeCategory } from '@/stores/instantdb'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -14,6 +17,13 @@ interface IncomeOverviewProps {
 }
 
 export function IncomeOverview({ incomes, incomeCategories, selectedYear, selectedMonth }: IncomeOverviewProps) {
+  const router = useRouter()
+
+  const handleCategoryClick = useCallback((categoryId: string) => {
+    const params = new URLSearchParams()
+    params.set('categoryIncome', categoryId)
+    router.push(`/incomes?${params.toString()}`)
+  }, [router])
   const calculateCategoryAmount = (
     items: Income[],
     categoryId: string,
@@ -70,7 +80,18 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
 
               return (
                 <TableRow key={category.id}>
-                  <TableCell className="font-medium">{category.title}</TableCell>
+                  <TableCell className="font-medium">
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto font-medium"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handleCategoryClick(category.id)
+                      }}
+                    >
+                      {category.title}
+                    </Button>
+                  </TableCell>
                   <TableCell className="text-right">{formatCurrency(currentMonthlyIncome)}</TableCell>
                   <TableCell className="text-right">{formatCurrency(currentYearToDateIncome)}</TableCell>
                   <TableCell className="text-right">{formatCurrency(currentAnnualIncome)}</TableCell>
