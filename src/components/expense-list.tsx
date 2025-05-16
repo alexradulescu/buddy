@@ -74,16 +74,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
     setEditingExpense(null)
   }
 
-  // Get unique categories for the filter dropdown
-  const uniqueCategories = React.useMemo(() => {
-    const categoryMap = new Map<string, string>()
-    expenseCategories.forEach((cat: { id: string; name: string }) => {
-      if (!categoryMap.has(cat.id)) {
-        categoryMap.set(cat.id, cat.name)
-      }
-    })
-    return Array.from(categoryMap.entries()).map(([id, name]) => ({ id, name }))
-  }, [expenseCategories])
+  const uniqueCategories = expenseCategories.map(({ id, name }) => ({ id, name }))
 
   return (
     <div className="space-y-4">
