@@ -1,10 +1,11 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useCallback, useMemo } from 'react'
 import { Income, IncomeCategory } from '@/stores/instantdb'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
-import { Badge } from '@/components/ui/badge'
 
 interface IncomeOverviewProps {
   incomes: Income[]
@@ -13,37 +14,74 @@ interface IncomeOverviewProps {
   selectedMonth: number
 }
 
-export function IncomeOverview({ incomes, incomeCategories, selectedYear, selectedMonth }: IncomeOverviewProps) {
-  const calculateCategoryAmount = (
-    items: Income[],
-    categoryId: string,
-    isAnnual: boolean = false,
-    isYearToDate: boolean = false
-  ): number => {
-    return items
-      .filter((item) => {
-        const itemDate = new Date(item.date)
-        if (isAnnual) {
-          return itemDate.getFullYear() === selectedYear && item.categoryId === categoryId
-        }
-        if (isYearToDate) {
-          return (
-            itemDate.getFullYear() === selectedYear &&
-            itemDate.getMonth() <= selectedMonth &&
-            item.categoryId === categoryId
-          )
-        }
-        return (
-          itemDate.getFullYear() === selectedYear &&
-          itemDate.getMonth() === selectedMonth &&
-          item.categoryId === categoryId
-        )
-      })
-      .reduce((total, item) => total + (item.amount || 0), 0)
-  }
+type CategorySummary = {
+  monthlyIncome: number
+  yearToDateIncome: number
+  annualIncome: number
+}
 
-  const formatCurrency = (amount: number | undefined): string => {
-    return amount !== undefined ? `$${amount.toFixed(2)}` : 'N/A'
+type CategoryData = Record<string, CategorySummary>
+
+export function IncomeOverview({ incomes, incomeCategories, selectedYear, selectedMonth }: IncomeOverviewProps) {
+  const router = useRouter()
+
+  // Preprocess all data in a single pass
+  const categoryData = useMemo(() => {
+    // Initialize data structure for all categories
+    const data: CategoryData = {}
+
+    // Initialize with zero values for all categories
+    incomeCategories.forEach((category) => {
+      data[category.id] = {
+        monthlyIncome: 0,
+        yearToDateIncome: 0,
+        annualIncome: 0
+      }
+    })
+
+    // Process all incomes in a single loop
+    incomes.forEach((income) => {
+      const categoryId = income.categoryId
+      const amount = income.amount || 0
+
+      // Skip if category doesn't exist in our data structure
+      if (!data[categoryId]) return
+
+      const itemDate = new Date(income.date)
+      const itemYear = itemDate.getUTCFullYear()
+      const itemMonth = itemDate.getUTCMonth()
+
+      // Only process if it's in the selected year
+      if (itemYear === selectedYear) {
+        // Add to annual income for this category
+        data[categoryId].annualIncome += amount
+
+        // If month is <= selected month, add to year-to-date
+        if (itemMonth <= selectedMonth) {
+          data[categoryId].yearToDateIncome += amount
+
+          // If it's the exact month, add to monthly income
+          if (itemMonth === selectedMonth) {
+            data[categoryId].monthlyIncome += amount
+          }
+        }
+      }
+    })
+
+    return data
+  }, [incomes, incomeCategories, selectedYear, selectedMonth])
+
+  const handleCategoryClick = useCallback(
+    (categoryId: string) => {
+      const params = new URLSearchParams()
+      params.set('categoryIncome', categoryId)
+      router.push(`/incomes?${params.toString()}`)
+    },
+    [router]
+  )
+
+  const formatCurrency = (amount: number): string => {
+    return `$${amount.toFixed(2)}`
   }
 
   return (
@@ -64,16 +102,25 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
           </TableHeader>
           <TableBody>
             {incomeCategories.map((category) => {
-              const currentMonthlyIncome = calculateCategoryAmount(incomes, category.id)
-              const currentYearToDateIncome = calculateCategoryAmount(incomes, category.id, false, true)
-              const currentAnnualIncome = calculateCategoryAmount(incomes, category.id, true)
+              const data = categoryData[category.id] || { monthlyIncome: 0, yearToDateIncome: 0, annualIncome: 0 }
 
               return (
                 <TableRow key={category.id}>
-                  <TableCell className="font-medium">{category.title}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentMonthlyIncome)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentYearToDateIncome)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentAnnualIncome)}</TableCell>
+                  <TableCell className="font-medium">
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto font-medium"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handleCategoryClick(category.id)
+                      }}
+                    >
+                      {category.title}
+                    </Button>
+                  </TableCell>
+                  <TableCell className="text-right">{formatCurrency(data.monthlyIncome)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(data.yearToDateIncome)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(data.annualIncome)}</TableCell>
                 </TableRow>
               )
             })}

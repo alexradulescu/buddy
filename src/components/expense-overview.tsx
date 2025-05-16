@@ -1,8 +1,10 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -30,31 +32,36 @@ interface ExpenseOverviewProps {
 }
 
 export function ExpenseOverview({ expenses, expenseCategories, selectedYear, selectedMonth }: ExpenseOverviewProps) {
-  const calculateCategoryAmount = useCallback(
-    (items: Expense[], categoryId: string, isAnnual: boolean = false, isYearToDate: boolean = false): number => {
-      return items
-        .filter((item) => {
-          const itemDate = new Date(item.date)
-          if (isAnnual) {
-            return itemDate.getFullYear() === selectedYear && item.categoryId === categoryId
-          }
-          if (isYearToDate) {
-            return (
-              itemDate.getFullYear() === selectedYear &&
-              itemDate.getMonth() <= selectedMonth &&
-              item.categoryId === categoryId
-            )
-          }
+  const router = useRouter()
+
+  const handleCategoryClick = useCallback((categoryId: string) => {
+    const params = new URLSearchParams()
+    params.set('categoryExpense', categoryId)
+    router.push(`/expenses?${params.toString()}`)
+  }, [router])
+
+  const calculateCategoryAmount = useCallback((items: Expense[], categoryId: string, isAnnual: boolean = false, isYearToDate: boolean = false): number => {
+    return items
+      .filter((item) => {
+        const itemDate = new Date(item.date)
+        if (isAnnual) {
+          return itemDate.getFullYear() === selectedYear && item.categoryId === categoryId
+        }
+        if (isYearToDate) {
           return (
             itemDate.getFullYear() === selectedYear &&
-            itemDate.getMonth() === selectedMonth &&
+            itemDate.getMonth() <= selectedMonth &&
             item.categoryId === categoryId
           )
-        })
-        .reduce((total, item) => total + (item.amount || 0), 0)
-    },
-    [selectedYear, selectedMonth]
-  )
+        }
+        return (
+          itemDate.getFullYear() === selectedYear &&
+          itemDate.getMonth() === selectedMonth &&
+          item.categoryId === categoryId
+        )
+      })
+      .reduce((total, item) => total + (item.amount || 0), 0)
+  }, [selectedYear, selectedMonth])
 
   const calculateAnnualBudget = useCallback(
     (maxBudget: number | undefined, maxAnnualBudget: number | undefined): number | undefined => {
@@ -152,56 +159,6 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
               </TooltipProvider>
             </TableRow>
           </TableHeader>
-          {/* <TableBody>
-            {expenseCategories.map((category) => {
-              const currentMonthlyExpense = calculateCategoryAmount(expenses, category.id)
-              const currentAnnualExpense = calculateCategoryAmount(expenses, category.id, true)
-              const currentYearToDateExpense = calculateCategoryAmount(expenses, category.id, false, true)
-              const annualBudget = calculateAnnualBudget(category.maxBudget, category.maxAnnualBudget)
-              const yearToDateBudget = calculateYearToDateBudget(category.maxBudget)
-              const monthlyDifference =
-                category.maxBudget !== undefined ? category.maxBudget - currentMonthlyExpense : undefined
-              const annualDifference = annualBudget !== undefined ? annualBudget - currentAnnualExpense : undefined
-              const yearToDateDifference =
-                yearToDateBudget !== undefined ? yearToDateBudget - currentYearToDateExpense : undefined
-              const rowColor = getRowBackgroundColor(currentMonthlyExpense, category.maxBudget)
-
-              return (
-                <TableRow key={category.id} className={rowColor}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentMonthlyExpense)}</TableCell>
-                  <TableCell className="text-right">
-                    {monthlyDifference !== undefined && (
-                      <Badge variant={monthlyDifference >= 0 ? 'outline' : 'destructive'}>
-                        {monthlyDifference >= 0 ? '+' : '-'}
-                        {formatCurrency(Math.abs(monthlyDifference))}
-                      </Badge>
-                    )}
-                    {formatCurrency(category.maxBudget)}
-                  </TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentYearToDateExpense)}</TableCell>
-                  <TableCell className="text-right">
-                    {yearToDateDifference !== undefined && (
-                      <Badge variant={yearToDateDifference >= 0 ? 'outline' : 'destructive'}>
-                        {yearToDateDifference >= 0 ? '+' : '-'}
-                        {formatCurrency(Math.abs(yearToDateDifference))}
-                      </Badge>
-                    )}
-                    {formatCurrency(yearToDateBudget)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {annualDifference !== undefined && (
-                      <Badge variant={annualDifference >= 0 ? 'outline' : 'destructive'}>
-                        {annualDifference >= 0 ? '+' : '-'}
-                        {formatCurrency(Math.abs(annualDifference))}
-                      </Badge>
-                    )}
-                    {formatCurrency(annualBudget)}
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody> */}
 
           <TableBody>
             {expenseCategoriesData.map(
@@ -217,7 +174,18 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                 rowColor
               }) => (
                 <TableRow key={category.id} className={rowColor}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto font-medium"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handleCategoryClick(category.id)
+                      }}
+                    >
+                      {category.name}
+                    </Button>
+                  </TableCell>
                   <TableCell className="text-right">{formatCurrency(currentMonthlyExpense)}</TableCell>
                   <TableCell className="text-right">
                     {monthlyDifference !== undefined && (
