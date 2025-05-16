@@ -1,10 +1,12 @@
+import { lazy } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
-import AccountsPage from './accounts-page'
-import ExpensesPage from './expenses-page'
-import HomePage from './home-page'
-import IncomesPage from './incomes-page'
-import RootLayout from './layout'
-import SettingsPage from './settings-page'
+
+const AccountsPage = lazy(() => import('./accounts-page'))
+const ExpensesPage = lazy(() => import('./expenses-page'))
+const HomePage = lazy(() => import('./home-page'))
+const IncomesPage = lazy(() => import('./incomes-page'))
+const RootLayout = lazy(() => import('./layout'))
+const SettingsPage = lazy(() => import('./settings-page'))
 
 export default function App() {
   return (

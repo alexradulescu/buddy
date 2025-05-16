@@ -27,21 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Suspense fallback={'Loading'}>
-          {/*  <NuqsAdapter>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <HydrationBoundary>
-              <div className="flex min-h-screen bg-background">
-                <Navigation />
-                <main className="flex-1 overflow-y-auto p-4 sm:pl-20 bg-stone-50 dark:bg-stone-950 m-1 rounded-sm border-gray-100 border-solid"> */}
-          {children}
-          {/* </main>
-              </div>
-              <Toaster />
-            </HydrationBoundary>
-          </ThemeProvider>
-        </NuqsAdapter>*/}
-        </Suspense>
+        <Suspense fallback={'Loading'}>{children}</Suspense>
       </body>
     </html>
   )
