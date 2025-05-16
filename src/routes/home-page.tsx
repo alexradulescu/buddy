@@ -1,12 +1,11 @@
 'use client'
 
+import React from 'react'
 import { useCategoryStore, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
-
 import { ExpenseOverview } from '@/components/expense-overview'
 import { HomeOverview } from '@/components/home-overview'
 import { IncomeOverview } from '@/components/income-overview'
 import { PageHeader } from '@/components/page-header'
-import React from 'react'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function HomePage() {
@@ -33,9 +32,9 @@ export default function HomePage() {
   const netIncome = totalMonthlyIncomes - totalMonthlyExpenses
 
   return (
-    <div className="space-y-8">
+    <div className="d-flex flex-col space-y-8 gap-4">
       <PageHeader title="Budget Overview" />
-      
+
       <HomeOverview
         totalMonthlyIncomes={totalMonthlyIncomes}
         totalMonthlyExpenses={totalMonthlyExpenses}

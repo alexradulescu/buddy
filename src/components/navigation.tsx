@@ -28,7 +28,7 @@ export function Navigation() {
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen flex-col bg-muted/40">
+      <div className="flex flex-col bg-muted/40 w-0 sm:w-14 h-auto">
         {/* Sidebar for larger screens */}
         <aside className="fixed inset-y-0 left-0 z-20 hidden w-14 flex-col border-r bg-background sm:flex">
           <nav className="flex flex-col items-center gap-4 px-2 py-4">
