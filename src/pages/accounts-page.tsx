@@ -1,15 +1,14 @@
 'use client'
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import React, { useState } from 'react'
+import { cn } from '@/lib/utils'
 import { useAccountBalances, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
-
 import { AccountForm } from '@/components/account-form'
 import { AccountList } from '@/components/account-list'
-import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/page-header'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 const getPreviousMonthYear = (year: number, month: number) => {
@@ -19,7 +18,7 @@ const getPreviousMonthYear = (year: number, month: number) => {
   return { year, month: month - 1 }
 }
 
-export default function OverviewPage() {
+export default function AccountsPage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
   const { year: prevYear, month: prevMonth } = getPreviousMonthYear(selectedYear, selectedMonth)
   const { data: { accountBalances = [] } = {} } = useAccountBalances(selectedYear, selectedMonth)
@@ -55,8 +54,6 @@ export default function OverviewPage() {
       })
       .reduce((total, income) => total + income.amount, 0)
   }
-
-
 
   const currentMonthBalance = calculateTotalBalance()
   const currentMonthExpenses = calculateTotalExpenses(selectedYear, selectedMonth)
