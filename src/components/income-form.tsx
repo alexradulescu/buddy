@@ -18,13 +18,14 @@ interface IncomeFormProps {
 interface TableIncome {
   amount: string
   categoryId: string
+  category: string
   date: Date
   description: string
 }
 
 export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMonth }) => {
   const [tableIncomes, setTableIncomes] = useState<TableIncome[]>([
-    { amount: '', categoryId: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
+    { amount: '', categoryId: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
   ])
   const [rowsToAdd, setRowsToAdd] = useState(1)
   const { addIncome } = useIncomeStore()
@@ -66,6 +67,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
       return {
         amount: Number(income.amount),
         categoryId: income.categoryId || '',
+        category: income.category || '',
         date: income.date.toISOString().split('T')[0],
         description: income.description
       }
@@ -76,7 +78,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
         if (income) addIncome(income)
       })
       setTableIncomes([
-        { amount: '', categoryId: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
+        { amount: '', categoryId: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
       ])
       toast({
         title: 'Incomes added',
@@ -86,9 +88,10 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
   }
 
   const handleTableInputChange = (index: number, field: keyof TableIncome, value: string | Date) => {
-    const updatedIncomes = [...tableIncomes]
-    updatedIncomes[index] = { ...updatedIncomes[index], [field]: value }
-    setTableIncomes(updatedIncomes)
+    console.log(`Updating field '${field}' with value:`, value);
+    const updatedIncomes = [...tableIncomes];
+    updatedIncomes[index] = { ...updatedIncomes[index], [field]: value };
+    setTableIncomes(updatedIncomes);
   }
 
   const handleTableKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -96,7 +99,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
       event.preventDefault()
       setTableIncomes([
         ...tableIncomes,
-        { amount: '', categoryId: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
+        { amount: '', categoryId: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
       ])
     }
   }
@@ -104,7 +107,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
   const addRows = () => {
     const newRows: TableIncome[] = Array(rowsToAdd)
       .fill(null)
-      .map(() => ({ amount: '', categoryId: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }))
+      .map(() => ({ amount: '', categoryId: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }))
     setTableIncomes([...tableIncomes, ...newRows])
   }
 
@@ -143,15 +146,34 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
                 </td>
                 <td className="border border-gray-200 p-1">
                   <Select
-                    value={income.categoryId}
-                    onValueChange={(value) => handleTableInputChange(index, 'categoryId', value)}
+                    value={income.categoryId || ''}
+                    onValueChange={(value) => {
+                      // Log for debugging
+                      console.log('Selected category ID:', value);
+                      
+                      // First update the category ID
+                      const updatedIncomes = [...tableIncomes];
+                      updatedIncomes[index] = { ...updatedIncomes[index], categoryId: value };
+                      
+                      // Then find the category to get its title
+                      const selectedCategory = incomeCategories.find(cat => cat.id === value);
+                      console.log('Found category:', selectedCategory);
+                      
+                      // If we found the category, update the category name field as well
+                      if (selectedCategory) {
+                        updatedIncomes[index].category = selectedCategory.title;
+                      }
+                      
+                      // Update state with both changes at once
+                      setTableIncomes(updatedIncomes);
+                    }}
                   >
                     <SelectTrigger className="w-full h-full rounded-none">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
                       {incomeCategories.filter((category) => !category.isArchived).map((category) => (
-                        <SelectItem key={category.id} value={category.title}>
+                        <SelectItem key={category.id} value={category.id}>
                           {category.title}
                         </SelectItem>
                       ))}
