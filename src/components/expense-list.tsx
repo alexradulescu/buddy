@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { format } from 'date-fns'
 import { Search, Trash } from 'lucide-react'
+import { DeleteConfirmation } from './delete-confirmation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -20,6 +21,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
 
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState('')
+  const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null)
 
   const filteredExpenses = expenses
     .filter((expense: Expense) => {
@@ -37,8 +39,16 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
       category: expenseCategories.find((expenseCategory) => expenseCategory.id === expense.categoryId)?.name
     }))
 
-  const handleDelete = (id: string) => {
-    removeExpense(id)
+  const handleDeleteClick = (expense: Expense) => {
+    setExpenseToDelete(expense)
+  }
+
+  const handleConfirmDelete = () => {
+    if (!expenseToDelete?.id) return
+    
+    removeExpense(expenseToDelete.id)
+    setExpenseToDelete(null)
+    
     toast({
       title: 'Expense deleted',
       description: 'The expense has been successfully removed.'
@@ -79,7 +89,11 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
                     <TableCell>{expense.category}</TableCell>
                     <TableCell className="text-right">${Number(expense.amount).toFixed(2)}</TableCell>
                     <TableCell>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(expense.id)}>
+                      <Button 
+                        size="sm" 
+                        variant="destructive" 
+                        onClick={() => handleDeleteClick(expense)}
+                      >
                         <Trash size={14} />
                       </Button>
                     </TableCell>
@@ -90,6 +104,20 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
           </div>
         </div>
       )}
+      
+      <DeleteConfirmation
+        isOpen={!!expenseToDelete}
+        onClose={() => setExpenseToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Expense"
+        description="Are you sure you want to delete this expense? This action cannot be undone."
+        recordDetails={expenseToDelete ? {
+          date: expenseToDelete.date ? format(new Date(expenseToDelete.date), 'dd MMM yyyy') : '',
+          description: expenseToDelete.description,
+          amount: `$${Number(expenseToDelete.amount).toFixed(2)}`,
+          category: expenseToDelete.category || 'Uncategorized',
+        } : undefined}
+      />
     </div>
   )
 }

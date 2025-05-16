@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { useIncomeStore } from '@/stores/instantdb'
+import { Income, useIncomeStore } from '@/stores/instantdb'
 import { format } from 'date-fns'
 import { Search } from 'lucide-react'
+import { DeleteConfirmation } from './delete-confirmation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -18,6 +19,7 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
   const { data: { incomes = [] } = {}, removeIncome } = useIncomeStore()
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState('')
+  const [incomeToDelete, setIncomeToDelete] = useState<Income | null>(null)
 
   const filteredAndSortedIncomes = useMemo(() => {
     return incomes
@@ -33,8 +35,16 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
   }, [incomes, selectedYear, selectedMonth, searchTerm])
 
-  const handleDelete = (id: string) => {
-    removeIncome(id)
+  const handleDeleteClick = (income: Income) => {
+    setIncomeToDelete(income)
+  }
+
+  const handleConfirmDelete = () => {
+    if (!incomeToDelete?.id) return
+    
+    removeIncome(incomeToDelete.id)
+    setIncomeToDelete(null)
+    
     toast({
       title: 'Income deleted',
       description: 'The income has been successfully removed.',
@@ -76,7 +86,7 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDelete(income.id)}
+                      onClick={() => handleDeleteClick(income)}
                       className="text-red-500 hover:text-red-700"
                     >
                       Delete
@@ -88,6 +98,20 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
           </CardContent>
         </Card>
       )}
+      
+      <DeleteConfirmation
+        isOpen={!!incomeToDelete}
+        onClose={() => setIncomeToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Income"
+        description="Are you sure you want to delete this income? This action cannot be undone."
+        recordDetails={incomeToDelete ? {
+          date: incomeToDelete.date ? format(new Date(incomeToDelete.date), 'dd MMM yyyy') : '',
+          description: incomeToDelete.description,
+          amount: `$${Number(incomeToDelete.amount).toFixed(2)}`,
+          category: incomeToDelete.category || 'Uncategorized',
+        } : undefined}
+      />
     </div>
   )
 }
