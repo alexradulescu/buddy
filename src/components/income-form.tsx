@@ -1,13 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCategoryStore, useIncomeStore } from '@/stores/instantdb'
-
+import { TrashIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
-import { TrashIcon } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 
 interface IncomeFormProps {
@@ -88,10 +87,9 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
   }
 
   const handleTableInputChange = (index: number, field: keyof TableIncome, value: string | Date) => {
-    console.log(`Updating field '${field}' with value:`, value);
-    const updatedIncomes = [...tableIncomes];
-    updatedIncomes[index] = { ...updatedIncomes[index], [field]: value };
-    setTableIncomes(updatedIncomes);
+    const updatedIncomes = [...tableIncomes]
+    updatedIncomes[index] = { ...updatedIncomes[index], [field]: value }
+    setTableIncomes(updatedIncomes)
   }
 
   const handleTableKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -107,7 +105,13 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
   const addRows = () => {
     const newRows: TableIncome[] = Array(rowsToAdd)
       .fill(null)
-      .map(() => ({ amount: '', categoryId: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }))
+      .map(() => ({
+        amount: '',
+        categoryId: '',
+        category: '',
+        date: getDefaultDate(selectedYear, selectedMonth),
+        description: ''
+      }))
     setTableIncomes([...tableIncomes, ...newRows])
   }
 
@@ -148,35 +152,29 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
                   <Select
                     value={income.categoryId || ''}
                     onValueChange={(value) => {
-                      // Log for debugging
-                      console.log('Selected category ID:', value);
-                      
-                      // First update the category ID
-                      const updatedIncomes = [...tableIncomes];
-                      updatedIncomes[index] = { ...updatedIncomes[index], categoryId: value };
-                      
-                      // Then find the category to get its title
-                      const selectedCategory = incomeCategories.find(cat => cat.id === value);
-                      console.log('Found category:', selectedCategory);
-                      
-                      // If we found the category, update the category name field as well
+                      const updatedIncomes = [...tableIncomes]
+                      updatedIncomes[index] = { ...updatedIncomes[index], categoryId: value }
+
+                      const selectedCategory = incomeCategories.find((cat) => cat.id === value)
+
                       if (selectedCategory) {
-                        updatedIncomes[index].category = selectedCategory.title;
+                        updatedIncomes[index].category = selectedCategory.title
                       }
-                      
-                      // Update state with both changes at once
-                      setTableIncomes(updatedIncomes);
+
+                      setTableIncomes(updatedIncomes)
                     }}
                   >
                     <SelectTrigger className="w-full h-full rounded-none">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {incomeCategories.filter((category) => !category.isArchived).map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.title}
-                        </SelectItem>
-                      ))}
+                      {incomeCategories
+                        .filter((category) => !category.isArchived)
+                        .map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.title}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </td>
