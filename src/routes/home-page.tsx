@@ -2,9 +2,11 @@
 
 import React from 'react'
 import { useCategoryStore, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
+import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { ExpenseOverview } from '@/components/expense-overview'
 import { HomeOverview } from '@/components/home-overview'
 import { IncomeOverview } from '@/components/income-overview'
+import { InvestmentOverview } from '@/components/investment/investment-overview'
 import { PageHeader } from '@/components/page-header'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
@@ -14,6 +16,7 @@ export default function HomePage() {
   const { data: { expenseCategories = [], incomeCategories = [] } = {} } = useCategoryStore()
   const { data: { expenses = [] } = {} } = useExpenseStore()
   const { data: { incomes = [] } = {} } = useIncomeStore()
+  const { investments, getLatestValue } = useInvestmentStore()
 
   const totalMonthlyExpenses = expenses
     .filter((expense) => {
@@ -31,6 +34,14 @@ export default function HomePage() {
 
   const netIncome = totalMonthlyIncomes - totalMonthlyExpenses
 
+  // Calculate total investment value from active investments
+  const totalInvestmentValue = investments
+    .filter(investment => investment.isActive)
+    .reduce((total, investment) => {
+      const latestValue = getLatestValue(investment.id)
+      return total + (latestValue || 0)
+    }, 0)
+
   return (
     <div className="d-flex flex-col space-y-8 gap-4">
       <PageHeader title="Budget Overview" />
@@ -39,6 +50,7 @@ export default function HomePage() {
         totalMonthlyIncomes={totalMonthlyIncomes}
         totalMonthlyExpenses={totalMonthlyExpenses}
         netIncome={netIncome}
+        totalInvestmentValue={totalInvestmentValue}
       />
 
       <ExpenseOverview
@@ -54,6 +66,8 @@ export default function HomePage() {
         selectedYear={selectedYear}
         selectedMonth={selectedMonth}
       />
+
+      <InvestmentOverview />
     </div>
   )
 }

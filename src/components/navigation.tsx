@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { BarChart2, CreditCard, Home, LucideIcon, Package2, PiggyBank, Settings } from 'lucide-react'
+import { BarChart2, CreditCard, Home, LucideIcon, Package2, PiggyBank, Settings, TrendingUp } from 'lucide-react'
 import { NavLink, useLocation } from 'react-router'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -17,6 +17,7 @@ const navItems: NavItem[] = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/expenses', label: 'Expenses', icon: CreditCard },
   { href: '/incomes', label: 'Incomes', icon: PiggyBank },
+  { href: '/investments', label: 'Investments', icon: TrendingUp },
   { href: '/accounts', label: 'Accounts', icon: BarChart2 },
   { href: '/settings', label: 'Settings', icon: Settings }
 ]

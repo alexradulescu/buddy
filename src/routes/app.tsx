@@ -5,6 +5,10 @@ const AccountsPage = lazy(() => import('./accounts-page'))
 const ExpensesPage = lazy(() => import('./expenses-page'))
 const HomePage = lazy(() => import('./home-page'))
 const IncomesPage = lazy(() => import('./incomes-page'))
+const InvestmentsPage = lazy(() => import('./investments-page'))
+const InvestmentDetailPage = lazy(() => import('./investment-detail-page'))
+const NewInvestmentPage = lazy(() => import('./new-investment-page'))
+const EditInvestmentPage = lazy(() => import('./edit-investment-page'))
 const RootLayout = lazy(() => import('./layout'))
 const SettingsPage = lazy(() => import('./settings-page'))
 
@@ -49,6 +53,38 @@ export default function App() {
           element={
             <RootLayout>
               <SettingsPage />
+            </RootLayout>
+          }
+        />
+        <Route
+          path="/investments"
+          element={
+            <RootLayout>
+              <InvestmentsPage />
+            </RootLayout>
+          }
+        />
+        <Route
+          path="/investments/new"
+          element={
+            <RootLayout>
+              <NewInvestmentPage />
+            </RootLayout>
+          }
+        />
+        <Route
+          path="/investments/:id"
+          element={
+            <RootLayout>
+              <InvestmentDetailPage />
+            </RootLayout>
+          }
+        />
+        <Route
+          path="/investments/:id/edit"
+          element={
+            <RootLayout>
+              <EditInvestmentPage />
             </RootLayout>
           }
         />

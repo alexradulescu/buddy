@@ -1,6 +1,6 @@
 import { i, id, init, InstaQLEntity } from '@instantdb/react'
 
-const schema = i.schema({
+export const schema = i.schema({
   entities: {
     accountBalances: i.entity({
       id: i.string(),
@@ -40,6 +40,27 @@ const schema = i.schema({
       title: i.string(),
       targetAmount: i.number(),
       isArchived: i.boolean()
+    }),
+    investments: i.entity({
+      id: i.string(),
+      name: i.string(),
+      description: i.string().optional(),
+      createdDate: i.string(),
+      isActive: i.boolean()
+    }),
+    investmentContributions: i.entity({
+      id: i.string(),
+      investmentId: i.string(),
+      amount: i.number(),
+      date: i.string(),
+      description: i.string().optional()
+    }),
+    investmentValues: i.entity({
+      id: i.string(),
+      investmentId: i.string(),
+      value: i.number(),
+      date: i.string(),
+      description: i.string().optional()
     })
   }
 })
