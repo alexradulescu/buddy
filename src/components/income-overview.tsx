@@ -1,9 +1,8 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Income, IncomeCategory } from '@/stores/instantdb'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { NavLink } from 'react-router'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
@@ -23,8 +22,6 @@ type CategorySummary = {
 type CategoryData = Record<string, CategorySummary>
 
 export function IncomeOverview({ incomes, incomeCategories, selectedYear, selectedMonth }: IncomeOverviewProps) {
-  const router = useRouter()
-
   // Preprocess all data in a single pass
   const categoryData = useMemo(() => {
     // Initialize data structure for all categories
@@ -71,15 +68,6 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
     return data
   }, [incomes, incomeCategories, selectedYear, selectedMonth])
 
-  const handleCategoryClick = useCallback(
-    (categoryId: string) => {
-      const params = new URLSearchParams()
-      params.set('categoryIncome', categoryId)
-      router.push(`/incomes?${params.toString()}`)
-    },
-    [router]
-  )
-
   const formatCurrency = (amount: number): string => {
     return `$${amount.toFixed(2)}`
   }
@@ -107,16 +95,16 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
               return (
                 <TableRow key={category.id}>
                   <TableCell className="font-medium">
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto font-medium"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        handleCategoryClick(category.id)
+                    <NavLink
+                      to={{
+                        pathname: '/incomes',
+                        search: `?month=${selectedMonth}&year=${selectedYear}&categoryIncome=${category.id}`
                       }}
+                      prefetch="intent"
+                      className="text-green-600 hover:underline"
                     >
                       {category.title}
-                    </Button>
+                    </NavLink>
                   </TableCell>
                   <TableCell className="text-right">{formatCurrency(data.monthlyIncome)}</TableCell>
                   <TableCell className="text-right">{formatCurrency(data.yearToDateIncome)}</TableCell>

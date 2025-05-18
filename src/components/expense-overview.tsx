@@ -1,10 +1,9 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
+import { NavLink } from 'react-router'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -32,36 +31,31 @@ interface ExpenseOverviewProps {
 }
 
 export function ExpenseOverview({ expenses, expenseCategories, selectedYear, selectedMonth }: ExpenseOverviewProps) {
-  const router = useRouter()
-
-  const handleCategoryClick = useCallback((categoryId: string) => {
-    const params = new URLSearchParams()
-    params.set('categoryExpense', categoryId)
-    router.push(`/expenses?${params.toString()}`)
-  }, [router])
-
-  const calculateCategoryAmount = useCallback((items: Expense[], categoryId: string, isAnnual: boolean = false, isYearToDate: boolean = false): number => {
-    return items
-      .filter((item) => {
-        const itemDate = new Date(item.date)
-        if (isAnnual) {
-          return itemDate.getFullYear() === selectedYear && item.categoryId === categoryId
-        }
-        if (isYearToDate) {
+  const calculateCategoryAmount = useCallback(
+    (items: Expense[], categoryId: string, isAnnual: boolean = false, isYearToDate: boolean = false): number => {
+      return items
+        .filter((item) => {
+          const itemDate = new Date(item.date)
+          if (isAnnual) {
+            return itemDate.getFullYear() === selectedYear && item.categoryId === categoryId
+          }
+          if (isYearToDate) {
+            return (
+              itemDate.getFullYear() === selectedYear &&
+              itemDate.getMonth() <= selectedMonth &&
+              item.categoryId === categoryId
+            )
+          }
           return (
             itemDate.getFullYear() === selectedYear &&
-            itemDate.getMonth() <= selectedMonth &&
+            itemDate.getMonth() === selectedMonth &&
             item.categoryId === categoryId
           )
-        }
-        return (
-          itemDate.getFullYear() === selectedYear &&
-          itemDate.getMonth() === selectedMonth &&
-          item.categoryId === categoryId
-        )
-      })
-      .reduce((total, item) => total + (item.amount || 0), 0)
-  }, [selectedYear, selectedMonth])
+        })
+        .reduce((total, item) => total + (item.amount || 0), 0)
+    },
+    [selectedYear, selectedMonth]
+  )
 
   const calculateAnnualBudget = useCallback(
     (maxBudget: number | undefined, maxAnnualBudget: number | undefined): number | undefined => {
@@ -175,16 +169,16 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
               }) => (
                 <TableRow key={category.id} className={rowColor}>
                   <TableCell className="font-medium">
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto font-medium"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        handleCategoryClick(category.id)
+                    <NavLink
+                      to={{
+                        pathname: '/expenses',
+                        search: `?month=${selectedMonth}&year=${selectedYear}&categoryExpense=${category.id}`
                       }}
+                      prefetch="intent"
+                      className="text-green-600 hover:underline"
                     >
                       {category.name}
-                    </Button>
+                    </NavLink>
                   </TableCell>
                   <TableCell className="text-right">{formatCurrency(currentMonthlyExpense)}</TableCell>
                   <TableCell className="text-right">
