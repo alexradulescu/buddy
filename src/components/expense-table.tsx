@@ -29,10 +29,14 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
 }) => {
   return (
     <div className="overflow-x-auto">
+      <div className="mb-2 text-sm text-muted-foreground">
+        Total: {expenses.length} item{expenses.length !== 1 ? 's' : ''}
+      </div>
       <div className="max-h-[50vh] overflow-y-auto">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[50px]">#</TableHead>
               <TableHead className="w-[80px]">Amount</TableHead>
               <TableHead className="w-[130px]">Category</TableHead>
               <TableHead className="w-[130px]">Date</TableHead>
@@ -43,6 +47,9 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
           <TableBody>
             {expenses.map((expense, index) => (
               <TableRow key={expense.id}>
+                <TableCell className="p-1 text-center text-sm text-muted-foreground">
+                  {index + 1}
+                </TableCell>
                 <TableCell className="p-1">
                   <Input
                     type="number"
