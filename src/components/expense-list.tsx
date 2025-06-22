@@ -111,11 +111,16 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
       {filteredExpenses.length === 0 ? (
         <p className="text-center text-muted-foreground py-4">No expenses found for this period.</p>
       ) : (
-        <div className="border rounded-md overflow-hidden">
-          <div className="max-h-[60dvh] overflow-auto">
+        <div className="space-y-2">
+          <div className="text-sm text-muted-foreground">
+            Total: {filteredExpenses.length} item{filteredExpenses.length !== 1 ? 's' : ''}
+          </div>
+          <div className="border rounded-md overflow-hidden">
+            <div className="max-h-[60dvh] overflow-auto">
             <Table>
               <TableHeader className="sticky top-0 z-10">
                 <TableRow>
+                  <TableHead className="w-[50px]">#</TableHead>
                   <TableHead className="w-[120px]">Date</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Category</TableHead>
@@ -124,8 +129,11 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredExpenses.map((expense) => (
+                {filteredExpenses.map((expense, index) => (
                   <TableRow key={expense.id}>
+                    <TableCell className="text-center text-sm text-muted-foreground">
+                      {index + 1}
+                    </TableCell>
                     <TableCell>{format(new Date(expense.date), 'dd MMM yyyy')}</TableCell>
                     <TableCell>{expense.description}</TableCell>
                     <TableCell>{expense.category}</TableCell>
@@ -142,6 +150,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
                 ))}
               </TableBody>
             </Table>
+            </div>
           </div>
         </div>
       )}
