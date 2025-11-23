@@ -3,7 +3,6 @@
 import { cn } from '@/lib/utils'
 import { BarChart2, CreditCard, Home, LucideIcon, Package2, PiggyBank, Settings, TrendingUp } from 'lucide-react'
 import { NavLink, useLocation } from 'react-router'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
@@ -65,9 +64,6 @@ export function Navigation() {
                 <TooltipContent side="right">{item.label}</TooltipContent>
               </Tooltip>
             ))}
-            <div className="mt-auto mb-4">
-              <ThemeToggle />
-            </div>
           </nav>
         </aside>
 
@@ -90,9 +86,6 @@ export function Navigation() {
               {item.label}
             </NavLink>
           ))}
-          <div className="flex flex-col items-center justify-center px-2 py-1">
-            <ThemeToggle />
-          </div>
         </nav>
       </div>
     </TooltipProvider>
