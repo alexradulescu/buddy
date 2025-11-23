@@ -2,10 +2,9 @@
 
 import React, { FC } from 'react'
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button, Popover } from '@mantine/core'
+import { MonthPickerInput } from '@mantine/dates'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 interface Props {
@@ -33,44 +32,36 @@ export const PageHeader: FC<Props> = ({ title, description, action }) => {
     setSelectedYear(newYear)
   }
 
+  const selectedDate = new Date(selectedYear, selectedMonth)
+
   return (
-    <div className="space-y-2 mb-6">
-      <div className="flex items-center justify-between">
+    <div style={{ marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-          {description && <p className="text-muted-foreground">{description}</p>}
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>{title}</h1>
+          {description && <p style={{ color: 'var(--mantine-color-dimmed)' }}>{description}</p>}
         </div>
         {action ? (
           <div>{action}</div>
         ) : (
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" onClick={() => handleMonthChange(-1)} aria-label="Previous month">
-              <ChevronLeft className="h-4 w-4" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Button variant="outline" onClick={() => handleMonthChange(-1)} aria-label="Previous month">
+              <ChevronLeft size={16} />
             </Button>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {format(new Date(selectedYear, selectedMonth), 'MMMM yyyy')}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  onSelect={(date) => {
-                    if (date) {
-                      setSelectedMonth(date.getMonth())
-                      setSelectedYear(date.getFullYear())
-                    }
-                  }}
-                  initialFocus
-                  month={new Date(selectedYear, selectedMonth)}
-                  defaultMonth={new Date(selectedYear, selectedMonth)}
-                />
-              </PopoverContent>
-            </Popover>
-            <Button variant="outline" size="icon" onClick={() => handleMonthChange(1)} aria-label="Next month">
-              <ChevronRight className="h-4 w-4" />
+            <MonthPickerInput
+              value={selectedDate}
+              onChange={(value) => {
+                if (value) {
+                  const date = new Date(value)
+                  setSelectedMonth(date.getMonth())
+                  setSelectedYear(date.getFullYear())
+                }
+              }}
+              valueFormat="MMMM YYYY"
+              style={{ width: '240px' }}
+            />
+            <Button variant="outline" onClick={() => handleMonthChange(1)} aria-label="Next month">
+              <ChevronRight size={16} />
             </Button>
           </div>
         )}

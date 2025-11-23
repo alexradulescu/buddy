@@ -1,9 +1,12 @@
 import '@mantine/core/styles.css'
+import '@mantine/dates/styles.css'
+import '@mantine/notifications/styles.css'
 import './globals.css'
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core'
+import { Notifications } from '@mantine/notifications'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -33,6 +36,7 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <MantineProvider defaultColorScheme="light">
+          <Notifications />
           <Suspense fallback={'Loading'}>{children}</Suspense>
         </MantineProvider>
       </body>
