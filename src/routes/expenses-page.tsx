@@ -5,14 +5,14 @@ import { ExpenseAiConverter } from '@/components/expense-ai-converter'
 import { ExpenseForm } from '@/components/expense-form'
 import { ExpenseList } from '@/components/expense-list'
 import { PageHeader } from '@/components/page-header'
-import { Card, Tabs } from '@mantine/core'
+import { Card, Stack, Tabs } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function ExpensesPage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <Stack gap="xl">
       <PageHeader title="Expenses" />
 
       <Tabs defaultValue="list">
@@ -40,6 +40,6 @@ export default function ExpensesPage() {
           </Card>
         </Tabs.Panel>
       </Tabs>
-    </div>
+    </Stack>
   )
 }

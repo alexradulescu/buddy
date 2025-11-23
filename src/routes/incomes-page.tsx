@@ -4,19 +4,19 @@ import React from 'react'
 import { IncomeForm } from '@/components/income-form'
 import { IncomeList } from '@/components/income-list'
 import { PageHeader } from '@/components/page-header'
-import { Card } from '@mantine/core'
+import { Card, Stack, SimpleGrid, Title } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 export default function IncomesPage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <Stack gap="xl">
       <PageHeader title="Incomes" />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Card.Section withBorder inheritPadding py="md">
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Add Income</h2>
+            <Title order={2} size="h4">Add Income</Title>
           </Card.Section>
           <Card.Section inheritPadding py="md">
             <IncomeForm selectedYear={selectedYear} selectedMonth={selectedMonth} />
@@ -24,13 +24,13 @@ export default function IncomesPage() {
         </Card>
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Card.Section withBorder inheritPadding py="md">
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Income List</h2>
+            <Title order={2} size="h4">Income List</Title>
           </Card.Section>
           <Card.Section inheritPadding py="md">
             <IncomeList selectedYear={selectedYear} selectedMonth={selectedMonth} />
           </Card.Section>
         </Card>
-      </div>
-    </div>
+      </SimpleGrid>
+    </Stack>
   )
 }

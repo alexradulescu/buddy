@@ -5,13 +5,13 @@ import { Plus } from 'lucide-react'
 import { Link } from 'react-router'
 import InvestmentCard from '@/components/investment/investment-card'
 import { PageHeader } from '@/components/page-header'
-import { Button } from '@mantine/core'
+import { Button, Stack, Title, Text, Card, SimpleGrid, Center } from '@mantine/core'
 
 export default function InvestmentsPage() {
   const { investments } = useInvestmentStore()
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <Stack gap="xl">
       <PageHeader
         title="Investments"
         description="Track and manage your investments"
@@ -23,30 +23,24 @@ export default function InvestmentsPage() {
       />
 
       {investments.length === 0 ? (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '3rem 2rem',
-          textAlign: 'center',
-          backgroundColor: 'var(--mantine-color-white)',
-          borderRadius: 'var(--mantine-radius-md)',
-          border: '1px solid var(--mantine-color-gray-3)'
-        }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 500, margin: '0 0 0.25rem 0' }}>No investments yet</h3>
-          <p style={{ color: 'var(--mantine-color-dimmed)', marginBottom: '1rem' }}>Get started by adding your first investment</p>
-          <Button component={Link} to="/investments/new" leftSection={<Plus size={16} />}>
-            Add Investment
-          </Button>
-        </div>
+        <Card withBorder shadow="sm" radius="md" p="xl">
+          <Center>
+            <Stack align="center" gap="md">
+              <Title order={3} size="h4">No investments yet</Title>
+              <Text c="dimmed">Get started by adding your first investment</Text>
+              <Button component={Link} to="/investments/new" leftSection={<Plus size={16} />}>
+                Add Investment
+              </Button>
+            </Stack>
+          </Center>
+        </Card>
       ) : (
-        <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
           {investments.map((investment) => (
             <InvestmentCard key={investment.id} investment={investment} />
           ))}
-        </div>
+        </SimpleGrid>
       )}
-    </div>
+    </Stack>
   )
 }

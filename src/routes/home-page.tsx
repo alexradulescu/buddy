@@ -9,6 +9,7 @@ import { IncomeOverview } from '@/components/income-overview'
 import { InvestmentOverview } from '@/components/investment/investment-overview'
 import { PageHeader } from '@/components/page-header'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
+import { Stack } from '@mantine/core'
 
 export default function HomePage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
@@ -43,7 +44,7 @@ export default function HomePage() {
     }, 0)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <Stack gap="xl">
       <PageHeader title="Budget Overview" />
 
       <HomeOverview
@@ -68,6 +69,6 @@ export default function HomePage() {
       />
 
       <InvestmentOverview />
-    </div>
+    </Stack>
   )
 }

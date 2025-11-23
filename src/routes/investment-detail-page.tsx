@@ -8,7 +8,7 @@ import ContributionTable from '@/components/investment/contribution-table'
 import PerformanceGraph from '@/components/investment/performance-graph'
 import ValueTable from '@/components/investment/value-table'
 import { PageHeader } from '@/components/page-header'
-import { Button, Card, Tabs, Modal } from '@mantine/core'
+import { Button, Card, Tabs, Modal, Stack, Group, Title, Text, SimpleGrid, Center } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 
 export default function InvestmentDetailPage() {
@@ -32,13 +32,15 @@ export default function InvestmentDetailPage() {
 
   if (!investment || !id) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '16rem' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 500, margin: '0 0 0.5rem 0' }}>Investment not found</h2>
-        <p style={{ color: 'var(--mantine-color-dimmed)', marginBottom: '1rem' }}>The investment you're looking for doesn't exist.</p>
-        <Button component={Link} to="/investments" leftSection={<ArrowLeft size={16} />}>
-          Back to Investments
-        </Button>
-      </div>
+      <Center mih="16rem">
+        <Stack align="center" gap="md">
+          <Title order={2} size="h3">Investment not found</Title>
+          <Text c="dimmed">The investment you're looking for doesn't exist.</Text>
+          <Button component={Link} to="/investments" leftSection={<ArrowLeft size={16} />}>
+            Back to Investments
+          </Button>
+        </Stack>
+      </Center>
     )
   }
 
@@ -118,69 +120,61 @@ export default function InvestmentDetailPage() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <Stack gap="xl">
+      <Group justify="space-between">
         <Button variant="subtle" size="sm" component={Link} to="/investments" leftSection={<ArrowLeft size={16} />}>
           Back to Investments
         </Button>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <Group gap="xs">
           <Button variant="outline" size="sm" component={Link} to={`/investments/${id}/edit`} leftSection={<Edit size={16} />}>
             Edit
           </Button>
           <Button variant="filled" color="red" size="sm" onClick={() => setDeleteModalOpen(true)} leftSection={<Trash2 size={16} />}>
             Delete
           </Button>
-        </div>
-      </div>
+        </Group>
+      </Group>
 
       <PageHeader title={investment.name} description={investment.description || 'No description provided'} />
 
-      <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Card.Section withBorder inheritPadding py="xs">
-            <h4 style={{ fontSize: '0.875rem', fontWeight: 500, margin: 0 }}>Total Contributions</h4>
+            <Text size="sm" fw={500}>Total Contributions</Text>
           </Card.Section>
           <Card.Section inheritPadding py="md">
-            <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{formatCurrency(totalContributions)}</div>
+            <Text size="xl" fw={700}>{formatCurrency(totalContributions)}</Text>
           </Card.Section>
         </Card>
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Card.Section withBorder inheritPadding py="xs">
-            <h4 style={{ fontSize: '0.875rem', fontWeight: 500, margin: 0 }}>Current Value</h4>
+            <Text size="sm" fw={500}>Current Value</Text>
           </Card.Section>
           <Card.Section inheritPadding py="md">
-            <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{formatCurrency(currentValue)}</div>
+            <Text size="xl" fw={700}>{formatCurrency(currentValue)}</Text>
           </Card.Section>
         </Card>
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Card.Section withBorder inheritPadding py="xs">
-            <h4 style={{ fontSize: '0.875rem', fontWeight: 500, margin: 0 }}>Profit/Loss</h4>
+            <Text size="sm" fw={500}>Profit/Loss</Text>
           </Card.Section>
           <Card.Section inheritPadding py="md">
-            <div style={{
-              fontSize: '1.5rem',
-              fontWeight: 700,
-              color: profit >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
-            }}>
+            <Text size="xl" fw={700} c={profit >= 0 ? 'green.6' : 'red.6'}>
               {formatCurrency(profit)}
-            </div>
+            </Text>
           </Card.Section>
         </Card>
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Card.Section withBorder inheritPadding py="xs">
-            <h4 style={{ fontSize: '0.875rem', fontWeight: 500, margin: 0 }}>Return</h4>
+            <Text size="sm" fw={500}>Return</Text>
           </Card.Section>
           <Card.Section inheritPadding py="md">
-            <div style={{
-              fontSize: '1.5rem',
-              fontWeight: 700,
-              color: profitPercentage >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
-            }}>
+            <Text size="xl" fw={700} c={profitPercentage >= 0 ? 'green.6' : 'red.6'}>
               {currentValue === null ? 'N/A' : `${profitPercentage.toFixed(2)}%`}
-            </div>
+            </Text>
           </Card.Section>
         </Card>
-      </div>
+      </SimpleGrid>
 
       <PerformanceGraph contributions={contributions} values={values} />
 
@@ -204,20 +198,20 @@ export default function InvestmentDetailPage() {
         title="Delete Investment"
         centered
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <p style={{ margin: 0 }}>
+        <Stack gap="md">
+          <Text>
             Are you sure you want to delete this investment? This action cannot be undone.
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+          </Text>
+          <Group justify="flex-end" gap="xs">
             <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
               Cancel
             </Button>
             <Button color="red" onClick={handleDeleteInvestment}>
               Delete
             </Button>
-          </div>
-        </div>
+          </Group>
+        </Stack>
       </Modal>
-    </div>
+    </Stack>
   )
 }

@@ -3,7 +3,7 @@
 import React, { FC } from 'react'
 import { format } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button, Popover } from '@mantine/core'
+import { Button, Group, Stack, Title, Text } from '@mantine/core'
 import { MonthPickerInput } from '@mantine/dates'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
@@ -35,16 +35,14 @@ export const PageHeader: FC<Props> = ({ title, description, action }) => {
   const selectedDate = new Date(selectedYear, selectedMonth)
 
   return (
-    <div style={{ marginBottom: '1.5rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>{title}</h1>
-          {description && <p style={{ color: 'var(--mantine-color-dimmed)' }}>{description}</p>}
-        </div>
-        {action ? (
-          <div>{action}</div>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <Stack mb="xl">
+      <Group justify="space-between" align="center">
+        <Stack gap={0}>
+          <Title order={1} size="h2">{title}</Title>
+          {description && <Text c="dimmed">{description}</Text>}
+        </Stack>
+        {action || (
+          <Group gap="xs">
             <Button variant="outline" onClick={() => handleMonthChange(-1)} aria-label="Previous month">
               <ChevronLeft size={16} />
             </Button>
@@ -63,9 +61,9 @@ export const PageHeader: FC<Props> = ({ title, description, action }) => {
             <Button variant="outline" onClick={() => handleMonthChange(1)} aria-label="Next month">
               <ChevronRight size={16} />
             </Button>
-          </div>
+          </Group>
         )}
-      </div>
-    </div>
+      </Group>
+    </Stack>
   )
 }

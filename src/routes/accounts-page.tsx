@@ -5,7 +5,7 @@ import { useAccountBalances, useExpenseStore, useIncomeStore } from '@/stores/in
 import { AccountForm } from '@/components/account-form'
 import { AccountList } from '@/components/account-list'
 import { PageHeader } from '@/components/page-header'
-import { Button, Card, Modal } from '@mantine/core'
+import { Button, Card, Modal, Stack, SimpleGrid, Group, Text, Title } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 const getPreviousMonthYear = (year: number, month: number) => {
@@ -63,87 +63,60 @@ export default function AccountsPage() {
   const discrepancy = realAccountsTotal - expectedAccountsTotal
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <Stack gap="xl">
       <PageHeader title="Accounts" />
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '2rem'
-        }}
-      >
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
         <Card shadow="sm" padding="0" radius="md" withBorder>
-          <Card.Section withBorder inheritPadding py="xs" style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, margin: 0 }}>Summary</h3>
+          <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+            <Title order={3} size="h5">Summary</Title>
           </Card.Section>
           <Card.Section inheritPadding py="md">
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', listStyle: 'none', padding: 0 }}>
-              <li style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--mantine-color-dimmed)' }}>Total Account Balances</span>
-                <span>${currentMonthBalance.toFixed(2)}</span>
-              </li>
-              <li style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--mantine-color-dimmed)' }}>Total Expenses</span>
-                <span>${currentMonthExpenses.toFixed(2)}</span>
-              </li>
-              <li style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--mantine-color-dimmed)' }}>Total Income</span>
-                <span>${currentMonthIncome.toFixed(2)}</span>
-              </li>
-              <li style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--mantine-color-dimmed)' }}>Expected Accounts Total</span>
-                <span>${expectedAccountsTotal.toFixed(2)}</span>
-              </li>
-              <li style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--mantine-color-dimmed)' }}>Real Accounts Total</span>
-                <span>${realAccountsTotal.toFixed(2)}</span>
-              </li>
-            </ul>
+            <Stack gap="sm">
+              <Group justify="space-between">
+                <Text c="dimmed">Total Account Balances</Text>
+                <Text>${currentMonthBalance.toFixed(2)}</Text>
+              </Group>
+              <Group justify="space-between">
+                <Text c="dimmed">Total Expenses</Text>
+                <Text>${currentMonthExpenses.toFixed(2)}</Text>
+              </Group>
+              <Group justify="space-between">
+                <Text c="dimmed">Total Income</Text>
+                <Text>${currentMonthIncome.toFixed(2)}</Text>
+              </Group>
+              <Group justify="space-between">
+                <Text c="dimmed">Expected Accounts Total</Text>
+                <Text>${expectedAccountsTotal.toFixed(2)}</Text>
+              </Group>
+              <Group justify="space-between">
+                <Text c="dimmed">Real Accounts Total</Text>
+                <Text>${realAccountsTotal.toFixed(2)}</Text>
+              </Group>
+            </Stack>
           </Card.Section>
-          <Card.Section
-            withBorder
-            inheritPadding
-            py="xs"
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              backgroundColor: 'var(--mantine-color-gray-0)'
-            }}
-          >
-            <span style={{ color: 'var(--mantine-color-dimmed)' }}>Discrepancy</span>
-            <span
-              style={{
-                color: discrepancy > 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)',
-                fontWeight: 600
-              }}
-            >
-              ${discrepancy.toFixed(2)}
-            </span>
+          <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+            <Group justify="space-between">
+              <Text c="dimmed">Discrepancy</Text>
+              <Text fw={600} c={discrepancy > 0 ? 'green.6' : 'red.6'}>
+                ${discrepancy.toFixed(2)}
+              </Text>
+            </Group>
           </Card.Section>
         </Card>
 
         <Card shadow="sm" padding="0" radius="md" withBorder>
-          <Card.Section
-            withBorder
-            inheritPadding
-            py="xs"
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              backgroundColor: 'var(--mantine-color-gray-0)'
-            }}
-          >
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>Account Balances</h3>
-            <Button size="sm" onClick={() => setIsAddAccountDialogOpen(true)}>
-              Add
-            </Button>
+          <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+            <Group justify="space-between">
+              <Title order={3} size="h5">Account Balances</Title>
+              <Button size="sm" onClick={() => setIsAddAccountDialogOpen(true)}>
+                Add
+              </Button>
+            </Group>
           </Card.Section>
           <AccountList selectedYear={selectedYear} selectedMonth={selectedMonth} />
         </Card>
-      </div>
+      </SimpleGrid>
 
       <Modal
         opened={isAddAccountDialogOpen}
@@ -157,6 +130,6 @@ export default function AccountsPage() {
           selectedMonth={selectedMonth}
         />
       </Modal>
-    </div>
+    </Stack>
   )
 }
