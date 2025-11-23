@@ -1,7 +1,9 @@
+import '@mantine/core/styles.css'
 import './globals.css'
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
+import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -25,9 +27,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" {...mantineHtmlProps}>
+      <head>
+        <ColorSchemeScript defaultColorScheme="light" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Suspense fallback={'Loading'}>{children}</Suspense>
+        <MantineProvider defaultColorScheme="light">
+          <Suspense fallback={'Loading'}>{children}</Suspense>
+        </MantineProvider>
       </body>
     </html>
   )
