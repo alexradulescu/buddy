@@ -81,7 +81,7 @@ export const maxDuration = 60
  */
 async function categorizeWithGemini(contextData: string, transactions: string, useTOON: boolean) {
   const result = await streamObject({
-    model: google('gemini-1.5-flash-latest') as AnyLanguageModel,
+    model: google('gemini-2.5-flash') as AnyLanguageModel,
     output: 'array',
     schema: expenseSchema,
     system: systemPrompt,
@@ -100,7 +100,7 @@ async function categorizeWithGemini(contextData: string, transactions: string, u
  */
 async function categorizeWithOpenAI(contextData: string, transactions: string, useTOON: boolean) {
   const result = await streamObject({
-    model: openai('gpt-4o'),
+    model: openai('gpt-4o') as AnyLanguageModel,
     output: 'array',
     schema: expenseSchema,
     system: systemPrompt,
