@@ -2,19 +2,26 @@ import { FC, PropsWithChildren } from 'react'
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { HydrationBoundary } from '@/components/hydration-boundary'
 import { Navigation } from '@/components/navigation'
-import { Toaster } from '@/components/ui/toaster'
 
 export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <NuqsAdapter>
       <HydrationBoundary>
-        <div className="flex min-h-screen bg-background">
+        <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--mantine-color-white)' }}>
           <Navigation />
-          <main className="flex-1 overflow-y-auto p-4 sm:pl-20 bg-stone-50 m-1 rounded-sm border-gray-100 border-solid">
+          <main style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '1rem',
+            paddingLeft: '5rem',
+            backgroundColor: '#fafaf9',
+            margin: '0.25rem',
+            borderRadius: '0.125rem',
+            border: '1px solid #f5f5f4'
+          }}>
             {children}
           </main>
         </div>
-        <Toaster />
       </HydrationBoundary>
     </NuqsAdapter>
   )

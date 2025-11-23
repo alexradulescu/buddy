@@ -1,9 +1,8 @@
 'use client'
 
-import { cn } from '@/lib/utils'
 import { BarChart2, CreditCard, Home, LucideIcon, Package2, PiggyBank, Settings, TrendingUp } from 'lucide-react'
 import { NavLink, useLocation } from 'react-router'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Tooltip } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 interface NavItem {
@@ -26,68 +25,112 @@ export function Navigation() {
   const location = useLocation()
   const pathname = location.pathname
 
-  return (
-    <TooltipProvider>
-      <div className="flex flex-col bg-muted/40 w-0 sm:w-14 h-auto">
-        {/* Sidebar for larger screens */}
-        <aside className="fixed inset-y-0 left-0 z-20 hidden w-14 flex-col border-r bg-background sm:flex">
-          <nav className="flex flex-col items-center gap-4 px-2 py-4">
-            <NavLink
-              to={{
-                pathname: '/',
-                search: `?month=${selectedMonth}&year=${selectedYear}`
-              }}
-              prefetch="intent"
-              className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
-            >
-              <Package2 className="h-4 w-4 transition-all group-hover:scale-110" />
-              <span className="sr-only">Buddy App</span>
-            </NavLink>
-            {navItems.map((item) => (
-              <Tooltip key={item.href}>
-                <TooltipTrigger asChild>
-                  <NavLink
-                    to={{
-                      pathname: item.href,
-                      search: `?month=${selectedMonth}&year=${selectedYear}`
-                    }}
-                    prefetch="intent"
-                    className={cn(
-                      'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground hover:bg-accent md:h-8 md:w-8',
-                      pathname === item.href && 'text-primary bg-accent'
-                    )}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span className="sr-only">{item.label}</span>
-                  </NavLink>
-                </TooltipTrigger>
-                <TooltipContent side="right">{item.label}</TooltipContent>
-              </Tooltip>
-            ))}
-          </nav>
-        </aside>
+  const getLinkStyle = (isActive: boolean) => ({
+    display: 'flex',
+    height: '2.25rem',
+    width: '2.25rem',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '0.5rem',
+    color: isActive ? 'var(--mantine-color-blue-6)' : 'var(--mantine-color-dimmed)',
+    backgroundColor: isActive ? 'var(--mantine-color-gray-1)' : 'transparent',
+    transition: 'all 0.2s',
+    textDecoration: 'none'
+  })
 
-        {/* Bottom navigation for mobile */}
-        <nav className="fixed bottom-0 left-0 right-0 z-20 flex h-16 items-center justify-around border-t bg-background sm:hidden">
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', width: 0, height: 'auto' }}>
+      {/* Sidebar for larger screens */}
+      <aside style={{
+        position: 'fixed',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        zIndex: 20,
+        display: 'none',
+        width: '3.5rem',
+        flexDirection: 'column',
+        borderRight: '1px solid var(--mantine-color-gray-3)',
+        backgroundColor: 'var(--mantine-color-white)'
+      }} className="sm:flex">
+        <nav style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '1rem 0.5rem' }}>
+          <NavLink
+            to={{
+              pathname: '/',
+              search: `?month=${selectedMonth}&year=${selectedYear}`
+            }}
+            style={{
+              display: 'flex',
+              height: '2.25rem',
+              width: '2.25rem',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              borderRadius: '9999px',
+              backgroundColor: 'var(--mantine-color-blue-6)',
+              color: 'white',
+              fontSize: '1.125rem',
+              fontWeight: 600,
+              textDecoration: 'none'
+            }}
+          >
+            <Package2 size={16} style={{ transition: 'all 0.2s' }} />
+            <span style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', borderWidth: 0 }}>Buddy App</span>
+          </NavLink>
           {navItems.map((item) => (
-            <NavLink
-              key={item.href}
-              to={{
-                pathname: item.href,
-                search: `?month=${selectedMonth}&year=${selectedYear}`
-              }}
-              prefetch="intent"
-              className={cn(
-                'flex flex-col items-center justify-center px-2 py-1 text-xs text-muted-foreground',
-                pathname === item.href && 'text-primary'
-              )}
-            >
-              <item.icon className="h-5 w-5 mb-1" />
-              {item.label}
-            </NavLink>
+            <Tooltip key={item.href} label={item.label} position="right">
+              <NavLink
+                to={{
+                  pathname: item.href,
+                  search: `?month=${selectedMonth}&year=${selectedYear}`
+                }}
+                style={getLinkStyle(pathname === item.href)}
+              >
+                <item.icon size={20} />
+                <span style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', borderWidth: 0 }}>{item.label}</span>
+              </NavLink>
+            </Tooltip>
           ))}
         </nav>
-      </div>
-    </TooltipProvider>
+      </aside>
+
+      {/* Bottom navigation for mobile */}
+      <nav style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 20,
+        display: 'flex',
+        height: '4rem',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        borderTop: '1px solid var(--mantine-color-gray-3)',
+        backgroundColor: 'var(--mantine-color-white)'
+      }} className="sm:hidden">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.href}
+            to={{
+              pathname: item.href,
+              search: `?month=${selectedMonth}&year=${selectedYear}`
+            }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0.5rem 0.5rem 0.25rem',
+              fontSize: '0.75rem',
+              color: pathname === item.href ? 'var(--mantine-color-blue-6)' : 'var(--mantine-color-dimmed)',
+              textDecoration: 'none'
+            }}
+          >
+            <item.icon size={20} style={{ marginBottom: '0.25rem' }} />
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+    </div>
   )
 }

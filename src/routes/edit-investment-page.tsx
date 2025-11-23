@@ -1,9 +1,11 @@
+'use client'
+
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { ArrowLeft } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router'
 import InvestmentForm from '@/components/investment/forms/investment-form'
 import { PageHeader } from '@/components/page-header'
-import { Button } from '@/components/ui/button'
+import { Button } from '@mantine/core'
 
 export default function EditInvestmentPage() {
   const { id } = useParams<{ id: string }>()
@@ -14,27 +16,21 @@ export default function EditInvestmentPage() {
 
   if (!investment) {
     return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <h2 className="text-xl font-medium">Investment not found</h2>
-        <p className="text-muted-foreground mb-4">The investment you're looking for doesn't exist.</p>
-        <Button asChild>
-          <Link to="/investments">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Investments
-          </Link>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '16rem' }}>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 500, margin: 0 }}>Investment not found</h2>
+        <p style={{ color: 'var(--mantine-color-dimmed)', marginBottom: '1rem' }}>The investment you're looking for doesn't exist.</p>
+        <Button component={Link} to="/investments" leftSection={<ArrowLeft size={16} />}>
+          Back to Investments
         </Button>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to={`/investments/${id}`}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Investment
-          </Link>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <Button variant="subtle" size="sm" component={Link} to={`/investments/${id}`} leftSection={<ArrowLeft size={16} />}>
+          Back to Investment
         </Button>
       </div>
 

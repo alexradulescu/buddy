@@ -3,12 +3,8 @@
 import React from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { TrashIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Textarea } from './ui/textarea'
+import { Button, NumberInput, Select, Table, Textarea } from '@mantine/core'
+import { DateInput } from '@mantine/dates'
 
 interface ExpenseTableProps {
   expenses: Expense[]
@@ -28,87 +24,78 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
   onDeleteRow
 }) => {
   return (
-    <div className="overflow-x-auto">
-      <div className="mb-2 text-sm text-muted-foreground">
+    <div style={{ overflowX: 'auto' }}>
+      <div style={{ marginBottom: '8px', fontSize: '14px', color: 'var(--mantine-color-dimmed)' }}>
         Total: {expenses.length} item{expenses.length !== 1 ? 's' : ''}
       </div>
-      <div className="max-h-[50vh] overflow-y-auto">
+      <div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">#</TableHead>
-              <TableHead className="w-[80px]">Amount</TableHead>
-              <TableHead className="w-[130px]">Category</TableHead>
-              <TableHead className="w-[130px]">Date</TableHead>
-              <TableHead className="w-[220px]">Description</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th style={{ width: '50px' }}>#</Table.Th>
+              <Table.Th style={{ width: '80px' }}>Amount</Table.Th>
+              <Table.Th style={{ width: '130px' }}>Category</Table.Th>
+              <Table.Th style={{ width: '130px' }}>Date</Table.Th>
+              <Table.Th style={{ width: '220px' }}>Description</Table.Th>
+              <Table.Th style={{ width: '50px' }}></Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
             {expenses.map((expense, index) => (
-              <TableRow key={expense.id}>
-                <TableCell className="p-1 text-center text-sm text-muted-foreground">
+              <Table.Tr key={expense.id}>
+                <Table.Td style={{ padding: '4px', textAlign: 'center', fontSize: '14px', color: 'var(--mantine-color-dimmed)' }}>
                   {index + 1}
-                </TableCell>
-                <TableCell className="p-1">
-                  <Input
-                    type="number"
+                </Table.Td>
+                <Table.Td style={{ padding: '4px' }}>
+                  <NumberInput
                     value={expense.amount}
-                    onChange={(e) => onInputChange(index, 'amount', Number(e.target.value))}
-                    step="0.01"
-                    min="0"
+                    onChange={(value) => onInputChange(index, 'amount', Number(value))}
+                    decimalScale={2}
+                    min={0}
                     required
-                    className="w-full h-full rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none py-2"
+                    styles={{ input: { borderRadius: 0, padding: '8px' } }}
                   />
-                </TableCell>
-                <TableCell className="p-1">
+                </Table.Td>
+                <Table.Td style={{ padding: '4px' }}>
                   <Select
                     value={expense.categoryId}
-                    onValueChange={(value) => onInputChange(index, 'categoryId', value)}
-                  >
-                    <SelectTrigger className="w-full h-full rounded-none">
-                      <div className="w-full flex items-center truncate max-w-[100px] overflow-hidden">
-                        <SelectValue placeholder={'Select Category'} className="truncate overflow-hidden" />
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {expenseCategories
-                        .filter((category) => !category.isArchived)
-                        .map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell className="p-1">
-                  <DatePicker
-                    date={new Date(expense.date)}
-                    onDateChange={(date) => onInputChange(index, 'date', date!)}
-                    className="w-full h-full rounded-none"
+                    onChange={(value) => onInputChange(index, 'categoryId', value || '')}
+                    placeholder="Select Category"
+                    data={expenseCategories
+                      .filter((category) => !category.isArchived)
+                      .map((category) => ({
+                        value: category.id,
+                        label: category.name
+                      }))}
+                    styles={{ input: { borderRadius: 0 } }}
                   />
-                </TableCell>
-                <TableCell className="p-1">
+                </Table.Td>
+                <Table.Td style={{ padding: '4px' }}>
+                  <DateInput
+                    value={new Date(expense.date)}
+                    onChange={(date) => onInputChange(index, 'date', date!)}
+                    styles={{ input: { borderRadius: 0 } }}
+                  />
+                </Table.Td>
+                <Table.Td style={{ padding: '4px' }}>
                   <Textarea
                     value={expense.description}
                     onChange={(e) => onInputChange(index, 'description', e.target.value)}
-                    className="w-full h-full rounded-none py-2"
+                    styles={{ input: { borderRadius: 0, padding: '8px' } }}
                   />
-                </TableCell>
-                <TableCell className="p-1">
+                </Table.Td>
+                <Table.Td style={{ padding: '4px' }}>
                   <Button
-                    variant="ghost"
-                    size="icon"
+                    variant="subtle"
                     onClick={() => onDeleteRow(expense.id)}
-                    className="w-full h-full rounded-none"
+                    styles={{ root: { borderRadius: 0, width: '100%', height: '100%' } }}
                   >
-                    <TrashIcon className="h-4 w-4" />
+                    <TrashIcon size={16} />
                   </Button>
-                </TableCell>
-              </TableRow>
+                </Table.Td>
+              </Table.Tr>
             ))}
-          </TableBody>
+          </Table.Tbody>
         </Table>
       </div>
     </div>

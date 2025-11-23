@@ -1,18 +1,17 @@
+'use client'
+
 import { ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router'
 import InvestmentForm from '@/components/investment/forms/investment-form'
 import { PageHeader } from '@/components/page-header'
-import { Button } from '@/components/ui/button'
+import { Button } from '@mantine/core'
 
 export default function NewInvestmentPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/investments">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Investments
-          </Link>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <Button variant="subtle" size="sm" component={Link} to="/investments" leftSection={<ArrowLeft size={16} />}>
+          Back to Investments
         </Button>
       </div>
 

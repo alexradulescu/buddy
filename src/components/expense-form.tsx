@@ -4,10 +4,8 @@ import React, { useState } from 'react'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'
 import { ExpenseTable } from '@/components/expense-table'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useToast } from '@/hooks/use-toast'
+import { Button, NumberInput, Tabs } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 
 interface ExpenseFormProps {
   selectedYear: number
@@ -21,7 +19,6 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
   const [rowsToAdd, setRowsToAdd] = useState(1)
   const { addExpense } = useExpenseStore()
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
-  const { toast } = useToast()
 
   function getDefaultDate(year: number, month: number): Date {
     const currentDate = new Date()
@@ -54,21 +51,22 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
     if (!hasError) {
       expenses.forEach((expense) => addExpense(expense))
       setExpenses([])
-      toast({
+      notifications.show({
         title: 'Expenses added',
-        description: `Added ${expenses.length} expense(s)`
+        message: `Added ${expenses.length} expense(s)`,
+        color: 'green'
       })
     } else {
-      toast({
+      notifications.show({
         title: 'Error adding expenses',
-        description: `Expense have not been added, there was an error, please check them again`,
-        variant: 'destructive'
+        message: `Expense have not been added, there was an error, please check them again`,
+        color: 'red'
       })
       errors.forEach((errorMesaage) => {
-        toast({
+        notifications.show({
           title: 'Error',
-          description: errorMesaage,
-          variant: 'destructive'
+          message: errorMesaage,
+          color: 'red'
         })
       })
       setErrors([])
@@ -110,34 +108,33 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
 
   return (
     <Tabs defaultValue="ai-converter">
-      <TabsList>
-        <TabsTrigger value="ai-converter">AI Converter</TabsTrigger>
-        <TabsTrigger value="table-form">Table Entry</TabsTrigger>
-      </TabsList>
-      <TabsContent value="ai-converter">
+      <Tabs.List>
+        <Tabs.Tab value="ai-converter">AI Converter</Tabs.Tab>
+        <Tabs.Tab value="table-form">Table Entry</Tabs.Tab>
+      </Tabs.List>
+      <Tabs.Panel value="ai-converter" pt="md">
         <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
-      </TabsContent>
-      <TabsContent value="table-form">
-        <div className="space-y-4">
+      </Tabs.Panel>
+      <Tabs.Panel value="table-form" pt="md">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <ExpenseTable
             expenses={expenses}
             expenseCategories={expenseCategories}
             onInputChange={handleInputChange}
             onDeleteRow={deleteRow}
           />
-          <div className="flex items-center space-x-2">
-            <Input
-              type="number"
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <NumberInput
               value={rowsToAdd}
-              onChange={(e) => setRowsToAdd(Number(e.target.value))}
-              min="1"
-              className="w-20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              onChange={(value) => setRowsToAdd(Number(value))}
+              min={1}
+              style={{ width: '80px' }}
             />
             <Button onClick={addRows}>Add Rows</Button>
           </div>
           <Button onClick={handleAddExpenses}>Save Expenses</Button>
         </div>
-      </TabsContent>
+      </Tabs.Panel>
     </Tabs>
   )
 }

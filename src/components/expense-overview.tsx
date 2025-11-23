@@ -3,24 +3,21 @@
 import { useCallback, useMemo } from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { NavLink } from 'react-router'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Badge, Card, Table, Tooltip } from '@mantine/core'
 
 // Utility functions moved outside component to prevent recreation
 const formatCurrency = (amount: number | undefined): string => {
   return amount !== undefined ? `$${amount.toFixed(2)}` : 'N/A'
 }
 
-const getRowBackgroundColor = (currentAmount: number, budget: number | undefined): string => {
-  if (!budget || !currentAmount) return ''
+const getRowBackgroundColor = (currentAmount: number, budget: number | undefined): React.CSSProperties => {
+  if (!budget || !currentAmount) return {}
   const difference = budget - currentAmount
   const percentageDifference = (difference / budget) * 100
 
-  if (percentageDifference > 20) return 'bg-green-100 dark:bg-green-950'
-  if (percentageDifference >= 0) return 'bg-orange-100 dark:bg-orange-950'
-  return 'bg-red-100 dark:bg-red-950'
+  if (percentageDifference > 20) return { backgroundColor: 'var(--mantine-color-green-1)' }
+  if (percentageDifference >= 0) return { backgroundColor: 'var(--mantine-color-orange-1)' }
+  return { backgroundColor: 'var(--mantine-color-red-1)' }
 }
 
 interface ExpenseOverviewProps {
@@ -104,57 +101,39 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
   )
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Expense Categories</CardTitle>
-        <CardDescription>Overview of your expense categories for the selected month</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Card withBorder>
+      <Card.Section withBorder inheritPadding py="md">
+        <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 600 }}>Expense Categories</h3>
+        <p style={{ margin: '4px 0 0', fontSize: '14px', color: 'var(--mantine-color-dimmed)' }}>
+          Overview of your expense categories for the selected month
+        </p>
+      </Card.Section>
+      <Card.Section>
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead>Category</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Category of the expense</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead className="text-right">Current Expense</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Current expenses for this month.</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead className="text-right">Monthly Budget</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Monthly budget set for this category.</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead className="text-right">Year-to-Date Expense</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Expenses for this category, so far this year.</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead className="text-right">Year-to-Date Budget</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Year to date budget for this category.</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TableHead className="text-right">Annual Budget</TableHead>
-                  </TooltipTrigger>
-                  <TooltipContent>Annual budget for this category.</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </TableRow>
-          </TableHeader>
+          <Table.Thead>
+            <Table.Tr>
+              <Tooltip label="Category of the expense">
+                <Table.Th>Category</Table.Th>
+              </Tooltip>
+              <Tooltip label="Current expenses for this month.">
+                <Table.Th style={{ textAlign: 'right' }}>Current Expense</Table.Th>
+              </Tooltip>
+              <Tooltip label="Monthly budget set for this category.">
+                <Table.Th style={{ textAlign: 'right' }}>Monthly Budget</Table.Th>
+              </Tooltip>
+              <Tooltip label="Expenses for this category, so far this year.">
+                <Table.Th style={{ textAlign: 'right' }}>Year-to-Date Expense</Table.Th>
+              </Tooltip>
+              <Tooltip label="Year to date budget for this category.">
+                <Table.Th style={{ textAlign: 'right' }}>Year-to-Date Budget</Table.Th>
+              </Tooltip>
+              <Tooltip label="Annual budget for this category.">
+                <Table.Th style={{ textAlign: 'right' }}>Annual Budget</Table.Th>
+              </Tooltip>
+            </Table.Tr>
+          </Table.Thead>
 
-          <TableBody>
+          <Table.Tbody>
             {expenseCategoriesData.map(
               ({
                 category,
@@ -167,55 +146,58 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                 annualDifference,
                 rowColor
               }) => (
-                <TableRow key={category.id} className={rowColor}>
-                  <TableCell className="font-medium">
+                <Table.Tr key={category.id} style={rowColor}>
+                  <Table.Td style={{ fontWeight: 500 }}>
                     <NavLink
                       to={{
                         pathname: '/expenses',
                         search: `?month=${selectedMonth}&year=${selectedYear}&categoryExpense=${category.id}`
                       }}
                       prefetch="intent"
-                      className="text-green-600 hover:underline"
+                      style={{ color: 'var(--mantine-color-green-filled)', textDecoration: 'none' }}
                     >
                       {category.name}
                     </NavLink>
-                  </TableCell>
-                  <TableCell className="text-right">{formatCurrency(currentMonthlyExpense)}</TableCell>
-                  <TableCell className="text-right">
+                  </Table.Td>
+                  <Table.Td style={{ textAlign: 'right' }}>{formatCurrency(currentMonthlyExpense)}</Table.Td>
+                  <Table.Td style={{ textAlign: 'right' }}>
                     {monthlyDifference !== undefined && (
-                      <Badge variant={monthlyDifference >= 0 ? 'outline' : 'destructive'}>
+                      <Badge color={monthlyDifference >= 0 ? 'gray' : 'red'} variant="light">
                         {monthlyDifference >= 0 ? '+' : '-'}
                         {formatCurrency(Math.abs(monthlyDifference))}
                       </Badge>
                     )}
+                    {' '}
                     {formatCurrency(category.maxBudget)}
-                  </TableCell>
+                  </Table.Td>
 
-                  <TableCell className="text-right">{formatCurrency(currentYearToDateExpense)}</TableCell>
-                  <TableCell className="text-right">
+                  <Table.Td style={{ textAlign: 'right' }}>{formatCurrency(currentYearToDateExpense)}</Table.Td>
+                  <Table.Td style={{ textAlign: 'right' }}>
                     {yearToDateDifference !== undefined && (
-                      <Badge variant={yearToDateDifference >= 0 ? 'outline' : 'destructive'}>
+                      <Badge color={yearToDateDifference >= 0 ? 'gray' : 'red'} variant="light">
                         {yearToDateDifference >= 0 ? '+' : '-'}
                         {formatCurrency(Math.abs(yearToDateDifference))}
                       </Badge>
                     )}
+                    {' '}
                     {formatCurrency(yearToDateBudget)}
-                  </TableCell>
-                  <TableCell className="text-right">
+                  </Table.Td>
+                  <Table.Td style={{ textAlign: 'right' }}>
                     {annualDifference !== undefined && (
-                      <Badge variant={annualDifference >= 0 ? 'outline' : 'destructive'}>
+                      <Badge color={annualDifference >= 0 ? 'gray' : 'red'} variant="light">
                         {annualDifference >= 0 ? '+' : '-'}
                         {formatCurrency(Math.abs(annualDifference))}
                       </Badge>
                     )}
+                    {' '}
                     {formatCurrency(annualBudget)}
-                  </TableCell>
-                </TableRow>
+                  </Table.Td>
+                </Table.Tr>
               )
             )}
-          </TableBody>
+          </Table.Tbody>
         </Table>
-      </CardContent>
+      </Card.Section>
     </Card>
   )
 }

@@ -5,9 +5,8 @@ import { Expense, ExpenseCategory, useCategoryStore, useExpenseStore } from '@/s
 import { useCompletion, experimental_useObject as useObject } from '@ai-sdk/react'
 import { Loader2 } from 'lucide-react'
 import { ExpenseTable } from '@/components/expense-table'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
+import { Button, Textarea } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 
 function isJsonString(input: string): boolean {
   try {
@@ -33,7 +32,6 @@ const getKvExpenseCategories = (expenseCategories: ExpenseCategory[]): Record<st
 }
 
 export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpensesGenerated }) => {
-  const { toast } = useToast()
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
   const { data: { expenses = [] } = {} } = useExpenseStore()
   const [aiGeneratedExpenses, setAiGeneratedExpenses] = useState<Expense[]>([])
@@ -71,25 +69,26 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
 
         setAiGeneratedExpenses(processedExpenses)
 
-        toast({
+        notifications.show({
           title: 'Expenses processed',
-          description: `${processedExpenses.length} expenses have been processed and are ready for review.`
+          message: `${processedExpenses.length} expenses have been processed and are ready for review.`,
+          color: 'green'
         })
       } catch (error) {
         console.error('Error processing completion:', error)
-        toast({
+        notifications.show({
           title: 'Error processing expenses',
-          description: 'Failed to process the AI response',
-          variant: 'destructive'
+          message: 'Failed to process the AI response',
+          color: 'red'
         })
       }
     },
     onError: (error: Error) => {
       console.error('Error processing completion:', error)
-      toast({
+      notifications.show({
         title: 'Error',
-        description: error.message,
-        variant: 'destructive'
+        message: error.message,
+        color: 'red'
       })
     }
   })
@@ -127,11 +126,11 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
   }
 
   return (
-    <div className="space-y-4">
-      {error && <div className="text-red-500 mt-4">Error: {error.message}</div>}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {error && <div style={{ color: 'var(--mantine-color-red-filled)', marginTop: '16px' }}>Error: {error.message}</div>}
       {aiGeneratedExpenses.length > 0 ? (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">AI Generated Expenses</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 600 }}>AI Generated Expenses</h3>
           <ExpenseTable
             expenses={aiGeneratedExpenses}
             expenseCategories={expenseCategories}
@@ -139,23 +138,24 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
             onDeleteRow={handleDeleteExpense}
           />
           <Button onClick={handleSaveExpenses}>Save Processed Expenses</Button>
-          <Button variant={'destructive'} onClick={handleReset}>
+          <Button color="red" onClick={handleReset}>
             Reset
           </Button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <Textarea
             value={input}
             onChange={handleInputChange}
             placeholder="Enter your expense details here..."
-            className="min-h-[100px] max-h-96 overflow-auto"
+            minRows={4}
+            maxRows={10}
             readOnly={isLoading}
           />
-          <Button type="submit" disabled={isLoading} className="w-full">
+          <Button type="submit" disabled={isLoading} fullWidth>
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 style={{ marginRight: '8px' }} size={16} className="animate-spin" />
                 Converting...
               </>
             ) : (
