@@ -3,11 +3,9 @@
 import React, { useState } from 'react'
 import { useCategoryStore, useIncomeStore } from '@/stores/instantdb'
 import { TrashIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useToast } from '@/hooks/use-toast'
+import { Button, TextInput, NumberInput, Select, Table } from '@mantine/core'
+import { DatePickerInput } from '@mantine/dates'
+import { notifications } from '@mantine/notifications'
 
 interface IncomeFormProps {
   selectedYear: number
@@ -29,7 +27,6 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
   const [rowsToAdd, setRowsToAdd] = useState(1)
   const { addIncome } = useIncomeStore()
   const { data: { incomeCategories = [] } = {} } = useCategoryStore()
-  const { toast } = useToast()
 
   function getDefaultDate(year: number, month: number): Date {
     const currentDate = new Date()
@@ -43,10 +40,10 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
     let hasError = false
     const newIncomes = tableIncomes.map((income, index) => {
       if (!income.amount || isNaN(Number(income.amount)) || Number(income.amount) <= 0) {
-        toast({
+        notifications.show({
           title: 'Invalid income',
-          description: `Invalid amount in row ${index + 1}`,
-          variant: 'destructive'
+          message: `Invalid amount in row ${index + 1}`,
+          color: 'red'
         })
         hasError = true
         return null
@@ -54,10 +51,10 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
 
       const incomeDate = new Date(income.date)
       if (incomeDate.getFullYear() !== selectedYear || incomeDate.getMonth() !== selectedMonth) {
-        toast({
+        notifications.show({
           title: 'Invalid date',
-          description: `Income in row ${index + 1} is not for the selected month and year`,
-          variant: 'destructive'
+          message: `Income in row ${index + 1} is not for the selected month and year`,
+          color: 'red'
         })
         hasError = true
         return null
@@ -79,14 +76,15 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
       setTableIncomes([
         { amount: '', categoryId: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
       ])
-      toast({
+      notifications.show({
         title: 'Incomes added',
-        description: `Added ${newIncomes.length} income(s)`
+        message: `Added ${newIncomes.length} income(s)`,
+        color: 'green'
       })
     }
   }
 
-  const handleTableInputChange = (index: number, field: keyof TableIncome, value: string | Date) => {
+  const handleTableInputChange = (index: number, field: keyof TableIncome, value: string | Date | null) => {
     const updatedIncomes = [...tableIncomes]
     updatedIncomes[index] = { ...updatedIncomes[index], [field]: value }
     setTableIncomes(updatedIncomes)
@@ -121,39 +119,38 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
   }
 
   return (
-    <div className="space-y-4">
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-200">
-          <thead>
-            <tr>
-              <th className="border border-gray-200 p-2 w-[110px]">Amount</th>
-              <th className="border border-gray-200 p-2 w-[130px]">Category</th>
-              <th className="border border-gray-200 p-2 w-[130px]">Date</th>
-              <th className="border border-gray-200 p-2 w-[150px]">Description</th>
-              <th className="border border-gray-200 p-2 w-[50px]"></th>
-            </tr>
-          </thead>
-          <tbody>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ overflowX: 'auto' }}>
+        <Table withTableBorder withColumnBorders>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th style={{ width: '110px' }}>Amount</Table.Th>
+              <Table.Th style={{ width: '130px' }}>Category</Table.Th>
+              <Table.Th style={{ width: '130px' }}>Date</Table.Th>
+              <Table.Th style={{ width: '150px' }}>Description</Table.Th>
+              <Table.Th style={{ width: '50px' }}></Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
             {tableIncomes.map((income, index) => (
-              <tr key={index}>
-                <td className="border border-gray-200 p-1">
-                  <Input
-                    type="number"
+              <Table.Tr key={index}>
+                <Table.Td p={4}>
+                  <NumberInput
                     value={income.amount}
-                    onChange={(e) => handleTableInputChange(index, 'amount', e.target.value)}
+                    onChange={(value) => handleTableInputChange(index, 'amount', value?.toString() || '')}
                     onKeyDown={(e) => handleTableKeyDown(e, index)}
-                    step="0.01"
-                    min="0"
+                    decimalScale={2}
+                    min={0}
                     required
-                    className="w-full h-full rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none py-2"
+                    styles={{ input: { borderRadius: 0 } }}
                   />
-                </td>
-                <td className="border border-gray-200 p-1">
+                </Table.Td>
+                <Table.Td p={4}>
                   <Select
-                    value={income.categoryId || ''}
-                    onValueChange={(value) => {
+                    value={income.categoryId || null}
+                    onChange={(value) => {
                       const updatedIncomes = [...tableIncomes]
-                      updatedIncomes[index] = { ...updatedIncomes[index], categoryId: value }
+                      updatedIncomes[index] = { ...updatedIncomes[index], categoryId: value || '' }
 
                       const selectedCategory = incomeCategories.find((cat) => cat.id === value)
 
@@ -163,59 +160,53 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
 
                       setTableIncomes(updatedIncomes)
                     }}
-                  >
-                    <SelectTrigger className="w-full h-full rounded-none">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {incomeCategories
-                        .filter((category) => !category.isArchived)
-                        .map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.title}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </td>
-                <td className="border border-gray-200 p-1">
-                  <DatePicker
-                    date={income.date}
-                    onDateChange={(date) => handleTableInputChange(index, 'date', date!)}
-                    className="w-full h-full rounded-none"
+                    placeholder="Select category"
+                    data={incomeCategories
+                      .filter((category) => !category.isArchived)
+                      .map((category) => ({
+                        value: category.id,
+                        label: category.title
+                      }))}
+                    styles={{ input: { borderRadius: 0 } }}
                   />
-                </td>
-                <td className="border border-gray-200 p-1">
-                  <Input
-                    type="text"
+                </Table.Td>
+                <Table.Td p={4}>
+                  <DatePickerInput
+                    value={income.date}
+                    onChange={(value) => handleTableInputChange(index, 'date', value)}
+                    valueFormat="YYYY-MM-DD"
+                    styles={{ input: { borderRadius: 0 } }}
+                  />
+                </Table.Td>
+                <Table.Td p={4}>
+                  <TextInput
                     value={income.description}
                     onChange={(e) => handleTableInputChange(index, 'description', e.target.value)}
                     onKeyDown={(e) => handleTableKeyDown(e, index)}
-                    className="w-full h-full rounded-none py-2"
+                    styles={{ input: { borderRadius: 0 } }}
                   />
-                </td>
-                <td className="border border-gray-200 p-1">
+                </Table.Td>
+                <Table.Td p={4}>
                   <Button
-                    variant="ghost"
-                    size="icon"
+                    variant="subtle"
                     onClick={() => deleteRow(index)}
-                    className="w-full h-full rounded-none"
+                    p={0}
+                    style={{ width: '100%', height: '100%' }}
                   >
-                    <TrashIcon className="h-7 w-4" />
+                    <TrashIcon size={16} />
                   </Button>
-                </td>
-              </tr>
+                </Table.Td>
+              </Table.Tr>
             ))}
-          </tbody>
-        </table>
+          </Table.Tbody>
+        </Table>
       </div>
-      <div className="flex items-center space-x-2">
-        <Input
-          type="number"
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <NumberInput
           value={rowsToAdd}
-          onChange={(e) => setRowsToAdd(Number(e.target.value))}
-          min="1"
-          className="w-20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          onChange={(value) => setRowsToAdd(Number(value) || 1)}
+          min={1}
+          style={{ width: '80px' }}
         />
         <Button onClick={addRows}>Add Rows</Button>
       </div>
