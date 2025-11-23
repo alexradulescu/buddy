@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { Income, IncomeCategory } from '@/stores/instantdb'
 import { NavLink } from 'react-router'
-import { Card, Table } from '@mantine/core'
+import { Card, Table, Title, Text, Anchor } from '@mantine/core'
 
 interface IncomeOverviewProps {
   incomes: Income[]
@@ -72,21 +72,21 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
   }
 
   return (
-    <Card withBorder>
+    <Card withBorder shadow="sm" radius="md">
       <Card.Section withBorder inheritPadding py="md">
-        <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 600 }}>Income Categories</h3>
-        <p style={{ margin: '4px 0 0', fontSize: '14px', color: 'var(--mantine-color-dimmed)' }}>
+        <Title order={3} size="h4" mb={4}>Income Categories</Title>
+        <Text size="sm" c="dimmed">
           Overview of your income categories for the selected month
-        </p>
+        </Text>
       </Card.Section>
       <Card.Section>
         <Table>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Category</Table.Th>
-              <Table.Th style={{ textAlign: 'right' }}>Current Income</Table.Th>
-              <Table.Th style={{ textAlign: 'right' }}>Year-to-Date Income</Table.Th>
-              <Table.Th style={{ textAlign: 'right' }}>Annual Income</Table.Th>
+              <Table.Th ta="right">Current Income</Table.Th>
+              <Table.Th ta="right">Year-to-Date Income</Table.Th>
+              <Table.Th ta="right">Annual Income</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -95,21 +95,22 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
 
               return (
                 <Table.Tr key={category.id}>
-                  <Table.Td style={{ fontWeight: 500 }}>
-                    <NavLink
+                  <Table.Td fw={500}>
+                    <Anchor
+                      component={NavLink}
                       to={{
                         pathname: '/incomes',
                         search: `?month=${selectedMonth}&year=${selectedYear}&categoryIncome=${category.id}`
                       }}
-                      prefetch="intent"
-                      style={{ color: 'var(--mantine-color-green-filled)', textDecoration: 'none' }}
+                      c="green.6"
+                      underline="hover"
                     >
                       {category.title}
-                    </NavLink>
+                    </Anchor>
                   </Table.Td>
-                  <Table.Td style={{ textAlign: 'right' }}>{formatCurrency(data.monthlyIncome)}</Table.Td>
-                  <Table.Td style={{ textAlign: 'right' }}>{formatCurrency(data.yearToDateIncome)}</Table.Td>
-                  <Table.Td style={{ textAlign: 'right' }}>{formatCurrency(data.annualIncome)}</Table.Td>
+                  <Table.Td ta="right">{formatCurrency(data.monthlyIncome)}</Table.Td>
+                  <Table.Td ta="right">{formatCurrency(data.yearToDateIncome)}</Table.Td>
+                  <Table.Td ta="right">{formatCurrency(data.annualIncome)}</Table.Td>
                 </Table.Tr>
               )
             })}

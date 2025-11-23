@@ -52,7 +52,7 @@ export function Navigation() {
         flexDirection: 'column',
         borderRight: '1px solid var(--mantine-color-gray-3)',
         backgroundColor: 'var(--mantine-color-white)'
-      }} className="sm:flex">
+      }} className="sidebar-desktop">
         <nav style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '1rem 0.5rem' }}>
           <NavLink
             to={{
@@ -107,7 +107,7 @@ export function Navigation() {
         justifyContent: 'space-around',
         borderTop: '1px solid var(--mantine-color-gray-3)',
         backgroundColor: 'var(--mantine-color-white)'
-      }} className="sm:hidden">
+      }} className="nav-mobile">
         {navItems.map((item) => (
           <NavLink
             key={item.href}

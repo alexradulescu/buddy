@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'
 import { ExpenseTable } from '@/components/expense-table'
-import { Button, NumberInput, Tabs } from '@mantine/core'
+import { Button, Group, NumberInput, Stack, Tabs } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 
 interface ExpenseFormProps {
@@ -116,14 +116,14 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
         <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
       </Tabs.Panel>
       <Tabs.Panel value="table-form" pt="md">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <Stack gap="md">
           <ExpenseTable
             expenses={expenses}
             expenseCategories={expenseCategories}
             onInputChange={handleInputChange}
             onDeleteRow={deleteRow}
           />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Group gap="xs">
             <NumberInput
               value={rowsToAdd}
               onChange={(value) => setRowsToAdd(Number(value))}
@@ -131,9 +131,9 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
               style={{ width: '80px' }}
             />
             <Button onClick={addRows}>Add Rows</Button>
-          </div>
+          </Group>
           <Button onClick={handleAddExpenses}>Save Expenses</Button>
-        </div>
+        </Stack>
       </Tabs.Panel>
     </Tabs>
   )

@@ -3,9 +3,8 @@
 import React, { useMemo, useState } from 'react'
 import { Expense, ExpenseCategory, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { useCompletion, experimental_useObject as useObject } from '@ai-sdk/react'
-import { Loader2 } from 'lucide-react'
 import { ExpenseTable } from '@/components/expense-table'
-import { Button, Textarea } from '@mantine/core'
+import { Button, Stack, Text, Textarea, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 
 function isJsonString(input: string): boolean {
@@ -126,11 +125,11 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      {error && <div style={{ color: 'var(--mantine-color-red-filled)', marginTop: '16px' }}>Error: {error.message}</div>}
+    <Stack gap="md">
+      {error && <Text c="red" mt="md">Error: {error.message}</Text>}
       {aiGeneratedExpenses.length > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 600 }}>AI Generated Expenses</h3>
+        <Stack gap="md">
+          <Title order={3} size="h5">AI Generated Expenses</Title>
           <ExpenseTable
             expenses={aiGeneratedExpenses}
             expenseCategories={expenseCategories}
@@ -141,9 +140,9 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
           <Button color="red" onClick={handleReset}>
             Reset
           </Button>
-        </div>
+        </Stack>
       ) : (
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <Stack component="form" onSubmit={handleSubmit} gap="md">
           <Textarea
             value={input}
             onChange={handleInputChange}
@@ -152,18 +151,11 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
             maxRows={10}
             readOnly={isLoading}
           />
-          <Button type="submit" disabled={isLoading} fullWidth>
-            {isLoading ? (
-              <>
-                <Loader2 style={{ marginRight: '8px' }} size={16} className="animate-spin" />
-                Converting...
-              </>
-            ) : (
-              'Convert'
-            )}
+          <Button type="submit" disabled={isLoading} fullWidth loading={isLoading}>
+            {isLoading ? 'Converting...' : 'Convert'}
           </Button>
-        </form>
+        </Stack>
       )}
-    </div>
+    </Stack>
   )
 }

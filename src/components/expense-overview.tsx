@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { NavLink } from 'react-router'
-import { Badge, Card, Table, Tooltip } from '@mantine/core'
+import { Anchor, Badge, Card, Table, Title, Text, Tooltip } from '@mantine/core'
 
 // Utility functions moved outside component to prevent recreation
 const formatCurrency = (amount: number | undefined): string => {
@@ -103,10 +103,10 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
   return (
     <Card withBorder>
       <Card.Section withBorder inheritPadding py="md">
-        <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 600 }}>Expense Categories</h3>
-        <p style={{ margin: '4px 0 0', fontSize: '14px', color: 'var(--mantine-color-dimmed)' }}>
+        <Title order={3} size="h4" mb={4}>Expense Categories</Title>
+        <Text size="sm" c="dimmed">
           Overview of your expense categories for the selected month
-        </p>
+        </Text>
       </Card.Section>
       <Card.Section>
         <Table>
@@ -116,19 +116,19 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                 <Table.Th>Category</Table.Th>
               </Tooltip>
               <Tooltip label="Current expenses for this month.">
-                <Table.Th style={{ textAlign: 'right' }}>Current Expense</Table.Th>
+                <Table.Th ta="right">Current Expense</Table.Th>
               </Tooltip>
               <Tooltip label="Monthly budget set for this category.">
-                <Table.Th style={{ textAlign: 'right' }}>Monthly Budget</Table.Th>
+                <Table.Th ta="right">Monthly Budget</Table.Th>
               </Tooltip>
               <Tooltip label="Expenses for this category, so far this year.">
-                <Table.Th style={{ textAlign: 'right' }}>Year-to-Date Expense</Table.Th>
+                <Table.Th ta="right">Year-to-Date Expense</Table.Th>
               </Tooltip>
               <Tooltip label="Year to date budget for this category.">
-                <Table.Th style={{ textAlign: 'right' }}>Year-to-Date Budget</Table.Th>
+                <Table.Th ta="right">Year-to-Date Budget</Table.Th>
               </Tooltip>
               <Tooltip label="Annual budget for this category.">
-                <Table.Th style={{ textAlign: 'right' }}>Annual Budget</Table.Th>
+                <Table.Th ta="right">Annual Budget</Table.Th>
               </Tooltip>
             </Table.Tr>
           </Table.Thead>
@@ -147,20 +147,21 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                 rowColor
               }) => (
                 <Table.Tr key={category.id} style={rowColor}>
-                  <Table.Td style={{ fontWeight: 500 }}>
-                    <NavLink
+                  <Table.Td fw={500}>
+                    <Anchor
+                      component={NavLink}
                       to={{
                         pathname: '/expenses',
                         search: `?month=${selectedMonth}&year=${selectedYear}&categoryExpense=${category.id}`
                       }}
-                      prefetch="intent"
-                      style={{ color: 'var(--mantine-color-green-filled)', textDecoration: 'none' }}
+                      c="green.6"
+                      underline="hover"
                     >
                       {category.name}
-                    </NavLink>
+                    </Anchor>
                   </Table.Td>
-                  <Table.Td style={{ textAlign: 'right' }}>{formatCurrency(currentMonthlyExpense)}</Table.Td>
-                  <Table.Td style={{ textAlign: 'right' }}>
+                  <Table.Td ta="right">{formatCurrency(currentMonthlyExpense)}</Table.Td>
+                  <Table.Td ta="right">
                     {monthlyDifference !== undefined && (
                       <Badge color={monthlyDifference >= 0 ? 'gray' : 'red'} variant="light">
                         {monthlyDifference >= 0 ? '+' : '-'}
@@ -171,8 +172,8 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                     {formatCurrency(category.maxBudget)}
                   </Table.Td>
 
-                  <Table.Td style={{ textAlign: 'right' }}>{formatCurrency(currentYearToDateExpense)}</Table.Td>
-                  <Table.Td style={{ textAlign: 'right' }}>
+                  <Table.Td ta="right">{formatCurrency(currentYearToDateExpense)}</Table.Td>
+                  <Table.Td ta="right">
                     {yearToDateDifference !== undefined && (
                       <Badge color={yearToDateDifference >= 0 ? 'gray' : 'red'} variant="light">
                         {yearToDateDifference >= 0 ? '+' : '-'}
@@ -182,7 +183,7 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                     {' '}
                     {formatCurrency(yearToDateBudget)}
                   </Table.Td>
-                  <Table.Td style={{ textAlign: 'right' }}>
+                  <Table.Td ta="right">
                     {annualDifference !== undefined && (
                       <Badge color={annualDifference >= 0 ? 'gray' : 'red'} variant="light">
                         {annualDifference >= 0 ? '+' : '-'}

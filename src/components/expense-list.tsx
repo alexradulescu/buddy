@@ -5,7 +5,7 @@ import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { format } from 'date-fns'
 import { Edit, Search, Trash } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Button, TextInput, Select, Table } from '@mantine/core'
+import { Button, Group, Stack, Text, TextInput, Select, Table } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { DeleteConfirmation } from './delete-confirmation'
 import { TransactionForm } from './transaction-form'
@@ -75,16 +75,16 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
   const uniqueCategories = expenseCategories.map(({ id, name }) => ({ id, name }))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <Stack gap="md">
+      <Stack gap="xs">
         <TextInput
           placeholder="Search expenses..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           leftSection={<Search size={16} />}
         />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '14px', color: 'var(--mantine-color-dimmed)', whiteSpace: 'nowrap' }}>Filter by category:</span>
+        <Group gap="xs">
+          <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>Filter by category:</Text>
           <Select
             placeholder="All categories"
             value={selectedCategoryId || 'all'}
@@ -98,15 +98,15 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
             ]}
             style={{ flex: 1 }}
           />
-        </div>
-      </div>
+        </Group>
+      </Stack>
       {filteredExpenses.length === 0 ? (
-        <p style={{ textAlign: 'center', color: 'var(--mantine-color-dimmed)', padding: '16px 0' }}>No expenses found for this period.</p>
+        <Text ta="center" c="dimmed" py="md">No expenses found for this period.</Text>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div style={{ fontSize: '14px', color: 'var(--mantine-color-dimmed)' }}>
+        <Stack gap="xs">
+          <Text size="sm" c="dimmed">
             Total: {filteredExpenses.length} item{filteredExpenses.length !== 1 ? 's' : ''}
-          </div>
+          </Text>
           <div style={{ border: '1px solid var(--mantine-color-default-border)', borderRadius: '8px', overflow: 'hidden' }}>
             <div style={{ maxHeight: '60dvh', overflow: 'auto' }}>
             <Table highlightOnHover>
@@ -116,29 +116,29 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
                   <Table.Th style={{ width: '120px' }}>Date</Table.Th>
                   <Table.Th>Description</Table.Th>
                   <Table.Th>Category</Table.Th>
-                  <Table.Th style={{ textAlign: 'right', width: '100px' }}>Amount</Table.Th>
+                  <Table.Th ta="right" style={{ width: '100px' }}>Amount</Table.Th>
                   <Table.Th style={{ width: '80px' }}>Actions</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {filteredExpenses.map((expense, index) => (
                   <Table.Tr key={expense.id}>
-                    <Table.Td style={{ textAlign: 'center', fontSize: '14px', color: 'var(--mantine-color-dimmed)' }}>
+                    <Table.Td ta="center" c="dimmed">
                       {index + 1}
                     </Table.Td>
                     <Table.Td>{format(new Date(expense.date), 'dd MMM yyyy')}</Table.Td>
                     <Table.Td>{expense.description}</Table.Td>
                     <Table.Td>{expense.category}</Table.Td>
-                    <Table.Td style={{ textAlign: 'right' }}>${Number(expense.amount).toFixed(2)}</Table.Td>
+                    <Table.Td ta="right">${Number(expense.amount).toFixed(2)}</Table.Td>
                     <Table.Td>
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                      <Group gap="xs">
                         <Button size="xs" variant="default" onClick={() => setEditingExpense(expense)}>
                           <Edit size={14} />
                         </Button>
                         <Button size="xs" color="red" onClick={() => handleDeleteClick(expense)}>
                           <Trash size={14} />
                         </Button>
-                      </div>
+                      </Group>
                     </Table.Td>
                   </Table.Tr>
                 ))}
@@ -146,7 +146,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
             </Table>
             </div>
           </div>
-        </div>
+        </Stack>
       )}
 
       <DeleteConfirmation
@@ -174,6 +174,6 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
         categories={expenseCategories}
         initialData={editingExpense || undefined}
       />
-    </div>
+    </Stack>
   )
 }
