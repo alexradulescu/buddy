@@ -1,57 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Buddy - Personal Finance Manager
 
-## TODO
+A local-first personal finance application with AI-powered expense categorization, built with Next.js and InstantDB.
 
-- [] Fix edge cases
-- [] Improve performance
-- [] Maybe move to Dexie.js
-- [] Flag if expenses seem to be the same
-- [] Add incomes
-- [] Add current account values
-- [] Add monthly report with categories report + total
-- [] Flag if there are discrepancies between expencted total minus real total
-- [] Test the AI converter with DBS and UOB setups
-- [] Add links for DBS and UOB
-- [] Add categories with annual budgets
-- [] Add categories with no budget
-- [] Add annual report + 3, 6, 9, and annualised calculations
-- [] Add export and import functionality in case things break for backup
-- [] Add main overview/dashboard
-- [] Sync to the cloud
-- [] Add authentication
-- [] Make it prettier
+## Features
+
+- 📊 **Dashboard** - Monthly overview of income, expenses, and investments
+- 💳 **Expense Tracking** - AI-powered categorization from bank statements
+- 💰 **Income Management** - Track income sources by category
+- 🏦 **Account Balances** - Monthly snapshots with reconciliation
+- 📈 **Investments** - Track portfolio performance with contributions and values
+- ⚙️ **Budget Management** - Set monthly/annual budgets per category
+
+## Tech Stack
+
+- **Framework**: Next.js 14 + React Router 7 (hybrid SPA)
+- **Database**: InstantDB (real-time, local-first)
+- **AI**: Vercel AI SDK with Gemini 2.5 Flash (migrating from OpenAI)
+- **UI**: Mantine UI v8 (migrating from ShadCN)
+- **Styling**: Tailwind CSS + CSS Modules
+- **Package Manager**: npm (migrated from Bun for Claude Code compatibility)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm 9+
+- InstantDB account (free tier available)
+- Google API key for AI features (optional)
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Create `.env.local` file:
+
+```env
+NEXT_PUBLIC_INSTANTDB_APP_ID=your_instantdb_app_id
+GOOGLE_API_KEY=your_google_api_key
+```
+
+4. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev    # Start development server
+npm run build  # Build for production
+npm run start  # Start production server
+npm run lint   # Run ESLint
+```
 
-## Learn More
+## Documentation
 
-To learn more about Next.js, take a look at the following resources:
+- **[AGENTS.md](./AGENTS.md)** - AI architecture and Gemini migration plan
+- **[Claude.md](./Claude.md)** - Developer onboarding guide
+- **[FUNCTIONALITY.md](./FUNCTIONALITY.md)** - Complete feature breakdown
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Status
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+🚧 **Active Migration** - Modernizing the tech stack:
 
-## Deploy on Vercel
+- ✅ Phase 1: Documentation complete
+- ✅ Phase 2: npm migration complete
+- ⏳ Phase 3: Remove dark mode (pending)
+- ⏳ Phase 4: AI upgrade to Gemini 2.5 Flash + TOON format (pending)
+- ⏳ Phase 5-7: Package upgrades + Mantine UI migration (pending)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See [FUNCTIONALITY.md](./FUNCTIONALITY.md) for detailed migration plan.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Getting Help
+
+- Check [Claude.md](./Claude.md) for development patterns
+- Check [AGENTS.md](./AGENTS.md) for AI integration details
+- See [FUNCTIONALITY.md](./FUNCTIONALITY.md) for page-specific documentation
+
+## License
+
+MIT
