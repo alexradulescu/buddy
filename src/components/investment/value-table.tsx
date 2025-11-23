@@ -1,8 +1,8 @@
+'use client'
+
 import { useMemo, useState } from 'react'
 import { Edit, Trash2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button, Card, Table } from '@mantine/core'
 import { InvestmentValue } from '@/types/investment'
 import ValueForm from './forms/value-form'
 
@@ -50,16 +50,26 @@ export default function ValueTable({ investmentId, values, onDelete }: ValueTabl
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Values</CardTitle>
+    <Card shadow="sm" padding="0" radius="md" withBorder>
+      <Card.Section
+        withBorder
+        inheritPadding
+        py="xs"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: 'var(--mantine-color-gray-0)'
+        }}
+      >
+        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>Values</h3>
         {!showForm && (
           <Button size="sm" onClick={() => setShowForm(true)}>
             Add Value
           </Button>
         )}
-      </CardHeader>
-      <CardContent>
+      </Card.Section>
+      <Card.Section inheritPadding py="md">
         {showForm ? (
           <ValueForm
             investmentId={investmentId}
@@ -69,46 +79,38 @@ export default function ValueTable({ investmentId, values, onDelete }: ValueTabl
           />
         ) : sortedValues.length > 0 ? (
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Value</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Date</Table.Th>
+                <Table.Th>Value</Table.Th>
+                <Table.Th>Description</Table.Th>
+                <Table.Th style={{ textAlign: 'right' }}>Actions</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
               {sortedValues.map((value) => (
-                <TableRow key={value.id}>
-                  <TableCell>{formatDate(value.date)}</TableCell>
-                  <TableCell>{formatCurrency(value.value)}</TableCell>
-                  <TableCell>{value.description || '-'}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(value)}
-                    >
-                      <Edit className="h-4 w-4" />
+                <Table.Tr key={value.id}>
+                  <Table.Td>{formatDate(value.date)}</Table.Td>
+                  <Table.Td>{formatCurrency(value.value)}</Table.Td>
+                  <Table.Td>{value.description || '-'}</Table.Td>
+                  <Table.Td style={{ textAlign: 'right' }}>
+                    <Button variant="subtle" size="compact-sm" onClick={() => handleEdit(value)}>
+                      <Edit size={16} />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onDelete(value.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
+                    <Button variant="subtle" size="compact-sm" color="red" onClick={() => onDelete(value.id)}>
+                      <Trash2 size={16} />
                     </Button>
-                  </TableCell>
-                </TableRow>
+                  </Table.Td>
+                </Table.Tr>
               ))}
-            </TableBody>
+            </Table.Tbody>
           </Table>
         ) : (
-          <div className="text-center py-4">
-            <p className="text-muted-foreground">No values recorded yet</p>
+          <div style={{ textAlign: 'center', padding: '1rem' }}>
+            <p style={{ color: 'var(--mantine-color-dimmed)' }}>No values recorded yet</p>
           </div>
         )}
-      </CardContent>
+      </Card.Section>
     </Card>
   )
 }

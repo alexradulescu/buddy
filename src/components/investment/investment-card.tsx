@@ -1,9 +1,10 @@
+'use client'
+
 import { useMemo } from 'react'
-import { cn } from '@/lib/utils'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { Investment } from '@/types/investment'
 import { Link } from 'react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, Badge } from '@mantine/core'
 
 interface InvestmentCardProps {
   investment: Investment
@@ -33,48 +34,56 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
   }
 
   return (
-    <Link to={`/investments/${investment.id}`}>
-      <Card className="h-full hover:bg-accent/50 transition-colors">
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-lg">{investment.name}</CardTitle>
-            <span
-              className={cn(
-                'px-2 py-1 rounded-full text-xs',
-                investment.isActive
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                  : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
-              )}
-            >
+    <Link to={`/investments/${investment.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Card shadow="sm" padding="lg" radius="md" withBorder style={{ height: '100%', transition: 'background-color 0.2s', cursor: 'pointer' }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--mantine-color-gray-0)'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+      >
+        <Card.Section withBorder inheritPadding py="xs">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>{investment.name}</h3>
+            <Badge color={investment.isActive ? 'green' : 'gray'}>
               {investment.isActive ? 'Active' : 'Inactive'}
-            </span>
+            </Badge>
           </div>
-          {investment.description && <p className="text-sm text-muted-foreground mt-1">{investment.description}</p>}
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-2 text-sm">
+          {investment.description && (
+            <p style={{ fontSize: '0.875rem', color: 'var(--mantine-color-dimmed)', marginTop: '0.25rem', marginBottom: 0 }}>
+              {investment.description}
+            </p>
+          )}
+        </Card.Section>
+        <Card.Section inheritPadding py="md">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.875rem' }}>
             <div>
-              <p className="text-muted-foreground">Contributions</p>
-              <p className="font-medium">{formatCurrency(totalContributions)}</p>
+              <p style={{ color: 'var(--mantine-color-dimmed)', margin: 0 }}>Contributions</p>
+              <p style={{ fontWeight: 500, margin: '0.25rem 0 0 0' }}>{formatCurrency(totalContributions)}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Current Value</p>
-              <p className="font-medium">{formatCurrency(currentValue)}</p>
+              <p style={{ color: 'var(--mantine-color-dimmed)', margin: 0 }}>Current Value</p>
+              <p style={{ fontWeight: 500, margin: '0.25rem 0 0 0' }}>{formatCurrency(currentValue)}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Profit/Loss</p>
-              <p className={cn('font-medium', profit >= 0 ? 'text-green-600' : 'text-red-600')}>
+              <p style={{ color: 'var(--mantine-color-dimmed)', margin: 0 }}>Profit/Loss</p>
+              <p style={{
+                fontWeight: 500,
+                margin: '0.25rem 0 0 0',
+                color: profit >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
+              }}>
                 {formatCurrency(profit)}
               </p>
             </div>
             <div>
-              <p className="text-muted-foreground">Return</p>
-              <p className={cn('font-medium', profitPercentage >= 0 ? 'text-green-600' : 'text-red-600')}>
+              <p style={{ color: 'var(--mantine-color-dimmed)', margin: 0 }}>Return</p>
+              <p style={{
+                fontWeight: 500,
+                margin: '0.25rem 0 0 0',
+                color: profitPercentage >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
+              }}>
                 {currentValue === null ? 'N/A' : `${profitPercentage.toFixed(2)}%`}
               </p>
             </div>
           </div>
-        </CardContent>
+        </Card.Section>
       </Card>
     </Link>
   )

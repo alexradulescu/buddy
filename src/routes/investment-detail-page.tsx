@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react'
@@ -6,15 +8,12 @@ import ContributionTable from '@/components/investment/contribution-table'
 import PerformanceGraph from '@/components/investment/performance-graph'
 import ValueTable from '@/components/investment/value-table'
 import { PageHeader } from '@/components/page-header'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useToast } from '@/hooks/use-toast'
+import { Button, Card, Tabs, Modal } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 
 export default function InvestmentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { toast } = useToast()
   const {
     investments,
     getInvestmentContributions,
@@ -25,21 +24,19 @@ export default function InvestmentDetailPage() {
     deleteContribution,
     deleteValue
   } = useInvestmentStore()
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('contributions')
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
   // Find the investment by ID
   const investment = investments.find((inv) => inv.id === id)
 
   if (!investment || !id) {
     return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <h2 className="text-xl font-medium">Investment not found</h2>
-        <p className="text-muted-foreground mb-4">The investment you're looking for doesn't exist.</p>
-        <Button asChild>
-          <Link to="/investments">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Investments
-          </Link>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '16rem' }}>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 500, margin: '0 0 0.5rem 0' }}>Investment not found</h2>
+        <p style={{ color: 'var(--mantine-color-dimmed)', marginBottom: '1rem' }}>The investment you're looking for doesn't exist.</p>
+        <Button component={Link} to="/investments" leftSection={<ArrowLeft size={16} />}>
+          Back to Investments
         </Button>
       </div>
     )
@@ -56,37 +53,38 @@ export default function InvestmentDetailPage() {
   const profitPercentage = totalContributions > 0 ? (profit / totalContributions) * 100 : 0
 
   const handleDeleteInvestment = async () => {
-    if (window.confirm('Are you sure you want to delete this investment? This action cannot be undone.')) {
-      try {
-        await deleteInvestment(id)
-        toast({
-          title: 'Investment deleted',
-          description: 'The investment has been successfully deleted.'
-        })
-        navigate('/investments')
-      } catch (error) {
-        toast({
-          title: 'Error',
-          description: 'Failed to delete the investment. Please try again.',
-          variant: 'destructive'
-        })
-      }
+    try {
+      await deleteInvestment(id)
+      notifications.show({
+        title: 'Investment deleted',
+        message: 'The investment has been successfully deleted.',
+        color: 'green'
+      })
+      navigate('/investments')
+    } catch (error) {
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to delete the investment. Please try again.',
+        color: 'red'
+      })
     }
+    setDeleteModalOpen(false)
   }
 
   const handleDeleteContribution = async (contributionId: string) => {
     if (window.confirm('Are you sure you want to delete this contribution?')) {
       try {
         await deleteContribution(contributionId)
-        toast({
+        notifications.show({
           title: 'Contribution deleted',
-          description: 'The contribution has been successfully deleted.'
+          message: 'The contribution has been successfully deleted.',
+          color: 'green'
         })
       } catch (error) {
-        toast({
+        notifications.show({
           title: 'Error',
-          description: 'Failed to delete the contribution. Please try again.',
-          variant: 'destructive'
+          message: 'Failed to delete the contribution. Please try again.',
+          color: 'red'
         })
       }
     }
@@ -96,15 +94,16 @@ export default function InvestmentDetailPage() {
     if (window.confirm('Are you sure you want to delete this value entry?')) {
       try {
         await deleteValue(valueId)
-        toast({
+        notifications.show({
           title: 'Value entry deleted',
-          description: 'The value entry has been successfully deleted.'
+          message: 'The value entry has been successfully deleted.',
+          color: 'green'
         })
       } catch (error) {
-        toast({
+        notifications.show({
           title: 'Error',
-          description: 'Failed to delete the value entry. Please try again.',
-          variant: 'destructive'
+          message: 'Failed to delete the value entry. Please try again.',
+          color: 'red'
         })
       }
     }
@@ -119,23 +118,16 @@ export default function InvestmentDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/investments">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Investments
-          </Link>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Button variant="subtle" size="sm" component={Link} to="/investments" leftSection={<ArrowLeft size={16} />}>
+          Back to Investments
         </Button>
-        <div className="space-x-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link to={`/investments/${id}/edit`}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </Link>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <Button variant="outline" size="sm" component={Link} to={`/investments/${id}/edit`} leftSection={<Edit size={16} />}>
+            Edit
           </Button>
-          <Button variant="destructive" size="sm" onClick={handleDeleteInvestment}>
-            <Trash2 className="mr-2 h-4 w-4" />
+          <Button variant="filled" color="red" size="sm" onClick={() => setDeleteModalOpen(true)} leftSection={<Trash2 size={16} />}>
             Delete
           </Button>
         </div>
@@ -143,59 +135,89 @@ export default function InvestmentDetailPage() {
 
       <PageHeader title={investment.name} description={investment.description || 'No description provided'} />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Contributions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalContributions)}</div>
-          </CardContent>
+      <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card.Section withBorder inheritPadding py="xs">
+            <h4 style={{ fontSize: '0.875rem', fontWeight: 500, margin: 0 }}>Total Contributions</h4>
+          </Card.Section>
+          <Card.Section inheritPadding py="md">
+            <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{formatCurrency(totalContributions)}</div>
+          </Card.Section>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Current Value</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(currentValue)}</div>
-          </CardContent>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card.Section withBorder inheritPadding py="xs">
+            <h4 style={{ fontSize: '0.875rem', fontWeight: 500, margin: 0 }}>Current Value</h4>
+          </Card.Section>
+          <Card.Section inheritPadding py="md">
+            <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{formatCurrency(currentValue)}</div>
+          </Card.Section>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Profit/Loss</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card.Section withBorder inheritPadding py="xs">
+            <h4 style={{ fontSize: '0.875rem', fontWeight: 500, margin: 0 }}>Profit/Loss</h4>
+          </Card.Section>
+          <Card.Section inheritPadding py="md">
+            <div style={{
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              color: profit >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
+            }}>
               {formatCurrency(profit)}
             </div>
-          </CardContent>
+          </Card.Section>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Return</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${profitPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card.Section withBorder inheritPadding py="xs">
+            <h4 style={{ fontSize: '0.875rem', fontWeight: 500, margin: 0 }}>Return</h4>
+          </Card.Section>
+          <Card.Section inheritPadding py="md">
+            <div style={{
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              color: profitPercentage >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
+            }}>
               {currentValue === null ? 'N/A' : `${profitPercentage.toFixed(2)}%`}
             </div>
-          </CardContent>
+          </Card.Section>
         </Card>
       </div>
 
       <PerformanceGraph contributions={contributions} values={values} />
 
-      <Tabs defaultValue="contributions" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="contributions">Contributions</TabsTrigger>
-          <TabsTrigger value="values">Values</TabsTrigger>
-        </TabsList>
-        <TabsContent value="contributions" className="mt-4">
+      <Tabs value={activeTab} onChange={(value) => setActiveTab(value || 'contributions')}>
+        <Tabs.List>
+          <Tabs.Tab value="contributions">Contributions</Tabs.Tab>
+          <Tabs.Tab value="values">Values</Tabs.Tab>
+        </Tabs.List>
+
+        <Tabs.Panel value="contributions" pt="md">
           <ContributionTable investmentId={id} contributions={contributions} onDelete={handleDeleteContribution} />
-        </TabsContent>
-        <TabsContent value="values" className="mt-4">
+        </Tabs.Panel>
+        <Tabs.Panel value="values" pt="md">
           <ValueTable investmentId={id} values={values} onDelete={handleDeleteValue} />
-        </TabsContent>
+        </Tabs.Panel>
       </Tabs>
+
+      <Modal
+        opened={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title="Delete Investment"
+        centered
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <p style={{ margin: 0 }}>
+            Are you sure you want to delete this investment? This action cannot be undone.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+            <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button color="red" onClick={handleDeleteInvestment}>
+              Delete
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

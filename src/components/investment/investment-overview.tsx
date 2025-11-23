@@ -1,12 +1,12 @@
+'use client'
+
 import { useMemo } from 'react'
 import { TrendingUp } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Card, Table } from '@mantine/core'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
-import { cn } from '@/lib/utils'
 
 export function InvestmentOverview() {
-  const { investments, getInvestmentContributions, getInvestmentValues, getLatestValue, getTotalContributions } = useInvestmentStore()
+  const { investments, getLatestValue, getTotalContributions } = useInvestmentStore()
 
   // Get only active investments
   const activeInvestments = useMemo(() => {
@@ -65,69 +65,71 @@ export function InvestmentOverview() {
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <TrendingUp className="mr-2 h-5 w-5" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <Card shadow="sm" padding="0" radius="md" withBorder>
+        <Card.Section withBorder inheritPadding py="xs" style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <TrendingUp size={20} />
             Investment Summary
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Total Value</p>
-              <p className="text-2xl font-bold">{formatCurrency(totalInvestmentValue)}</p>
+          </h3>
+        </Card.Section>
+        <Card.Section inheritPadding py="md">
+          <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+            <div>
+              <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--mantine-color-dimmed)', margin: 0 }}>Total Value</p>
+              <p style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0.5rem 0 0 0' }}>{formatCurrency(totalInvestmentValue)}</p>
             </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Total Invested</p>
-              <p className="text-2xl font-bold">{formatCurrency(totalContributions)}</p>
+            <div>
+              <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--mantine-color-dimmed)', margin: 0 }}>Total Invested</p>
+              <p style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0.5rem 0 0 0' }}>{formatCurrency(totalContributions)}</p>
             </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Total P&L</p>
-              <p className={cn(
-                "text-2xl font-bold", 
-                totalProfitLoss >= 0 ? "text-green-600" : "text-red-600"
-              )}>
+            <div>
+              <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--mantine-color-dimmed)', margin: 0 }}>Total P&L</p>
+              <p style={{
+                fontSize: '1.5rem',
+                fontWeight: 700,
+                margin: '0.5rem 0 0 0',
+                color: totalProfitLoss >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
+              }}>
                 {formatCurrency(totalProfitLoss)} ({profitLossPercentage.toFixed(2)}%)
               </p>
             </div>
           </div>
-        </CardContent>
+        </Card.Section>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Active Investments</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card shadow="sm" padding="0" radius="md" withBorder>
+        <Card.Section withBorder inheritPadding py="xs" style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>Active Investments</h3>
+        </Card.Section>
+        <Card.Section inheritPadding py="md">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead className="text-right">Current Value</TableHead>
-                <TableHead className="text-right">Total Invested</TableHead>
-                <TableHead className="text-right">P&L</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Name</Table.Th>
+                <Table.Th style={{ textAlign: 'right' }}>Current Value</Table.Th>
+                <Table.Th style={{ textAlign: 'right' }}>Total Invested</Table.Th>
+                <Table.Th style={{ textAlign: 'right' }}>P&L</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
               {investmentData.map((investment) => (
-                <TableRow key={investment.id}>
-                  <TableCell className="font-medium">{investment.name}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(investment.currentValue)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(investment.totalContributions)}</TableCell>
-                  <TableCell className="text-right">
-                    <span className={cn(
-                      investment.profit >= 0 ? "text-green-600" : "text-red-600"
-                    )}>
+                <Table.Tr key={investment.id}>
+                  <Table.Td style={{ fontWeight: 500 }}>{investment.name}</Table.Td>
+                  <Table.Td style={{ textAlign: 'right' }}>{formatCurrency(investment.currentValue)}</Table.Td>
+                  <Table.Td style={{ textAlign: 'right' }}>{formatCurrency(investment.totalContributions)}</Table.Td>
+                  <Table.Td style={{ textAlign: 'right' }}>
+                    <span style={{
+                      color: investment.profit >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
+                    }}>
                       {formatCurrency(investment.profit)} ({investment.profitPercentage.toFixed(2)}%)
                     </span>
-                  </TableCell>
-                </TableRow>
+                  </Table.Td>
+                </Table.Tr>
               ))}
-            </TableBody>
+            </Table.Tbody>
           </Table>
-        </CardContent>
+        </Card.Section>
       </Card>
     </div>
   )

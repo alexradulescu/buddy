@@ -43,7 +43,7 @@ export default function HomePage() {
     }, 0)
 
   return (
-    <div className="d-flex flex-col space-y-8 gap-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       <PageHeader title="Budget Overview" />
 
       <HomeOverview

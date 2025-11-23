@@ -16,31 +16,31 @@ export function HomeOverview({ totalMonthlyIncomes, totalMonthlyExpenses, netInc
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+    <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
       <OverviewCard
         title={'Total Income'}
         value={formatCurrency(totalMonthlyIncomes)}
-        icon={<PiggyBank className="h-4 w-4 text-muted-foreground" />}
+        icon={<PiggyBank size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
       />
       <OverviewCard
         title={'Total Expenses'}
         value={formatCurrency(totalMonthlyExpenses)}
-        icon={<CreditCard className="h-4 w-4 text-muted-foreground" />}
+        icon={<CreditCard size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
       />
       <OverviewCard
         title={'Net Income'}
         value={formatCurrency(netIncome)}
-        icon={<Package2 className="h-4 w-4 text-muted-foreground" />}
+        icon={<Package2 size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
       />
       <OverviewCard
         title={'Investments'}
         value={formatCurrency(totalInvestmentValue)}
-        icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />}
+        icon={<TrendingUp size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
       />
       <OverviewCard
         title={'Saving Rate'}
         value={totalMonthlyIncomes > 0 ? `${((netIncome / totalMonthlyIncomes) * 100).toFixed(2)}%` : 'N/A'}
-        icon={<BarChart2 className="h-4 w-4 text-muted-foreground" />}
+        icon={<BarChart2 size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
       />
     </div>
   )

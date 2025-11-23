@@ -1,41 +1,47 @@
+'use client'
+
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { Plus } from 'lucide-react'
 import { Link } from 'react-router'
 import InvestmentCard from '@/components/investment/investment-card'
 import { PageHeader } from '@/components/page-header'
-import { Button } from '@/components/ui/button'
+import { Button } from '@mantine/core'
 
 export default function InvestmentsPage() {
   const { investments } = useInvestmentStore()
 
   return (
-    <div className="space-y-8">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       <PageHeader
         title="Investments"
         description="Track and manage your investments"
         action={
-          <Button asChild>
-            <Link to="/investments/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Investment
-            </Link>
+          <Button component={Link} to="/investments/new" leftSection={<Plus size={16} />}>
+            Add Investment
           </Button>
         }
       />
 
       {investments.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center bg-background rounded-lg border p-8">
-          <h3 className="text-lg font-medium">No investments yet</h3>
-          <p className="text-muted-foreground mb-4">Get started by adding your first investment</p>
-          <Button asChild>
-            <Link to="/investments/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Investment
-            </Link>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '3rem 2rem',
+          textAlign: 'center',
+          backgroundColor: 'var(--mantine-color-white)',
+          borderRadius: 'var(--mantine-radius-md)',
+          border: '1px solid var(--mantine-color-gray-3)'
+        }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 500, margin: '0 0 0.25rem 0' }}>No investments yet</h3>
+          <p style={{ color: 'var(--mantine-color-dimmed)', marginBottom: '1rem' }}>Get started by adding your first investment</p>
+          <Button component={Link} to="/investments/new" leftSection={<Plus size={16} />}>
+            Add Investment
           </Button>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
           {investments.map((investment) => (
             <InvestmentCard key={investment.id} investment={investment} />
           ))}
