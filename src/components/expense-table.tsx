@@ -3,7 +3,7 @@
 import React from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { TrashIcon } from 'lucide-react'
-import { Button, NumberInput, Select, Table, Text, Textarea, ScrollArea } from '@mantine/core'
+import { Button, NumberInput, Select, Stack, Table, Text, Textarea, ScrollArea } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
 
 interface ExpenseTableProps {
