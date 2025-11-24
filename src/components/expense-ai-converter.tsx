@@ -2,29 +2,20 @@
 
 import React, { useMemo, useState } from 'react'
 import { Expense, ExpenseCategory, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
-import { experimental_useObject as useObject } from '@ai-sdk/react'
 import { ExpenseTable } from '@/components/expense-table'
 import { Button, Stack, Text, Textarea, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
-import { z } from 'zod'
 
 interface ExpenseAiConverterProps {
   onExpensesGenerated: (expenses: Expense[]) => void
 }
-
-// Schema for a single expense
-const expenseSchema = z.object({
-  amount: z.number().nonnegative(),
-  categoryId: z.string().uuid(),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  description: z.string()
-})
 
 export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpensesGenerated }) => {
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
   const { data: { expenses = [] } = {} } = useExpenseStore()
   const [aiGeneratedExpenses, setAiGeneratedExpenses] = useState<Expense[]>([])
   const [inputText, setInputText] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const historicalExpenses = useMemo(() => {
     const threeMonthsAgo = new Date()
@@ -39,11 +30,55 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
       }))
   }, [expenses])
 
-  const { object, submit, isLoading, error } = useObject({
-    api: '/api/completion',
-    schema: z.array(expenseSchema),
-    onFinish: ({ object: expenses }) => {
-      if (expenses && Array.isArray(expenses)) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!inputText.trim()) {
+      notifications.show({
+        title: 'Empty input',
+        message: 'Please enter transaction data to convert',
+        color: 'yellow'
+      })
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('/api/completion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: inputText,
+          expenseCategories: expenseCategories.map(cat => ({ id: cat.id, name: cat.name })),
+          historicalExpenses
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
+        throw new Error(errorData.message || `Server error: ${response.status}`)
+      }
+
+      // Read the streamed response
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let fullText = ''
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          fullText += decoder.decode(value, { stream: true })
+        }
+      }
+
+      // Parse the complete response
+      const expenses = JSON.parse(fullText)
+
+      if (expenses && Array.isArray(expenses) && expenses.length > 0) {
         const processedExpenses = expenses.map((expense) => ({
           ...expense,
           id: crypto.randomUUID()
@@ -63,34 +98,16 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
           color: 'yellow'
         })
       }
-    },
-    onError: (error) => {
-      console.error('Error processing completion:', error)
+    } catch (error) {
+      console.error('Error processing expenses:', error)
       notifications.show({
         title: 'Error',
-        message: error.message || 'Failed to process expenses',
+        message: error instanceof Error ? error.message : 'Failed to process expenses',
         color: 'red'
       })
+    } finally {
+      setIsLoading(false)
     }
-  })
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!inputText.trim()) {
-      notifications.show({
-        title: 'Empty input',
-        message: 'Please enter transaction data to convert',
-        color: 'yellow'
-      })
-      return
-    }
-
-    submit({
-      prompt: inputText,
-      expenseCategories: expenseCategories.map(cat => ({ id: cat.id, name: cat.name })),
-      historicalExpenses
-    })
   }
 
   const handleExpenseChange = (
@@ -127,7 +144,6 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
 
   return (
     <Stack gap="md">
-      {error && <Text c="red" mt="md">Error: {error.message}</Text>}
       {aiGeneratedExpenses.length > 0 ? (
         <Stack gap="md">
           <Title order={3} size="h5">AI Generated Expenses</Title>
