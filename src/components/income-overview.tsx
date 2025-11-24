@@ -72,7 +72,7 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
   }
 
   return (
-    <Card withBorder shadow="sm" radius="md">
+    <Card withBorder shadow="sm" radius="md" padding="0">
       <Card.Section withBorder inheritPadding py="md">
         <Title order={3} size="h4" mb={4}>Income Categories</Title>
         <Text size="sm" c="dimmed">

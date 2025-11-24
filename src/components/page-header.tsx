@@ -35,7 +35,7 @@ export const PageHeader: FC<Props> = ({ title, description, action }) => {
   const selectedDate = new Date(selectedYear, selectedMonth)
 
   return (
-    <Stack mb="xl">
+    <Stack mb="md">
       <Group justify="space-between" align="center">
         <Stack gap={0}>
           <Title order={1} size="h2">{title}</Title>
@@ -62,7 +62,7 @@ export const PageHeader: FC<Props> = ({ title, description, action }) => {
                 }
               }}
               valueFormat="MMM YY"
-              style={{ width: '70px' }}
+              style={{ width: '80px' }}
               styles={{
                 input: {
                   borderRadius: 0,

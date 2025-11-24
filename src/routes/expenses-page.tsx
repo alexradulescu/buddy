@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { ExpenseAiConverter } from '@/components/expense-ai-converter'
 import { ExpenseForm } from '@/components/expense-form'
 import { ExpenseList } from '@/components/expense-list'
 import { PageHeader } from '@/components/page-header'
@@ -19,7 +18,6 @@ export default function ExpensesPage() {
         <Tabs.List>
           <Tabs.Tab value="list">Expense List</Tabs.Tab>
           <Tabs.Tab value="add">Add Expense</Tabs.Tab>
-          <Tabs.Tab value="ai">AI Converter</Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="list" pt="md">
@@ -31,12 +29,6 @@ export default function ExpensesPage() {
         <Tabs.Panel value="add" pt="md">
           <Card shadow="sm" padding="lg" radius="md" withBorder>
             <ExpenseForm selectedYear={selectedYear} selectedMonth={selectedMonth} />
-          </Card>
-        </Tabs.Panel>
-
-        <Tabs.Panel value="ai" pt="md">
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <ExpenseAiConverter onExpensesGenerated={() => {}} />
           </Card>
         </Tabs.Panel>
       </Tabs>

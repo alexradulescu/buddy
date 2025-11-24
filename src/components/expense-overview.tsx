@@ -101,7 +101,7 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
   )
 
   return (
-    <Card withBorder>
+    <Card withBorder padding="0">
       <Card.Section withBorder inheritPadding py="md">
         <Title order={3} size="h4" mb={4}>Expense Categories</Title>
         <Text size="sm" c="dimmed">
