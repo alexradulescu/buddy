@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { Income, IncomeCategory } from '@/stores/instantdb'
 import { NavLink } from 'react-router'
-import { Card, Table, Title, Text, Anchor } from '@mantine/core'
+import { Card, Table, Title, Text, Anchor, ScrollArea } from '@mantine/core'
 
 interface IncomeOverviewProps {
   incomes: Income[]
@@ -80,17 +80,18 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
         </Text>
       </Card.Section>
       <Card.Section>
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Category</Table.Th>
-              <Table.Th ta="right">Current Income</Table.Th>
-              <Table.Th ta="right">Year-to-Date Income</Table.Th>
-              <Table.Th ta="right">Annual Income</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {incomeCategories.map((category) => {
+        <ScrollArea>
+          <Table style={{ minWidth: 600 }}>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Category</Table.Th>
+                <Table.Th ta="right">Current Income</Table.Th>
+                <Table.Th ta="right">Year-to-Date Income</Table.Th>
+                <Table.Th ta="right">Annual Income</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {incomeCategories.map((category) => {
               const data = categoryData[category.id] || { monthlyIncome: 0, yearToDateIncome: 0, annualIncome: 0 }
 
               return (
@@ -115,7 +116,8 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
               )
             })}
           </Table.Tbody>
-        </Table>
+          </Table>
+        </ScrollArea>
       </Card.Section>
     </Card>
   )

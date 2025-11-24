@@ -54,8 +54,13 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
     api: '/api/completion',
     streamProtocol: 'text',
     body: {
-      expenseCategories: getKvExpenseCategories(expenseCategories),
-      historicalExpenses
+      // Convert to arrays as expected by API
+      expenseCategories: expenseCategories.map(cat => ({ id: cat.id, name: cat.name })),
+      historicalExpenses: Object.entries(historicalExpenses).map(([description, categoryId]) => ({
+        description,
+        categoryId,
+        amount: 0 // Historical expenses don't need amount for categorization
+      }))
     },
     onFinish: (prompt: string, completion: string) => {
       try {

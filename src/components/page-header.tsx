@@ -62,7 +62,7 @@ export const PageHeader: FC<Props> = ({ title, description, action }) => {
                 }
               }}
               valueFormat="MMM YY"
-              style={{ width: '100px' }}
+              style={{ width: '70px' }}
               styles={{
                 input: {
                   borderRadius: 0,
