@@ -1,6 +1,6 @@
 import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
-import { streamObject } from 'ai'
+import { generateObject } from 'ai'
 import { z } from 'zod'
 import { buildTOONContext } from '@/lib/toon-helpers'
 
@@ -80,7 +80,7 @@ export const maxDuration = 60
  * Categorize expenses with Gemini 2.5 Flash (primary provider)
  */
 async function categorizeWithGemini(contextData: string, transactions: string, useTOON: boolean) {
-  const result = await streamObject({
+  const { object } = await generateObject({
     model: google('gemini-2.5-flash') as AnyLanguageModel,
     output: 'array',
     schema: expenseSchema,
@@ -92,14 +92,14 @@ async function categorizeWithGemini(contextData: string, transactions: string, u
     })
   })
 
-  return result
+  return object
 }
 
 /**
  * Categorize expenses with OpenAI GPT-4o (fallback provider)
  */
 async function categorizeWithOpenAI(contextData: string, transactions: string, useTOON: boolean) {
-  const result = await streamObject({
+  const { object } = await generateObject({
     model: openai('gpt-4o') as AnyLanguageModel,
     output: 'array',
     schema: expenseSchema,
@@ -111,7 +111,7 @@ async function categorizeWithOpenAI(contextData: string, transactions: string, u
     })
   })
 
-  return result
+  return object
 }
 
 /**
@@ -146,16 +146,16 @@ export async function POST(req: Request) {
     // Try Gemini first (97% cheaper than GPT-4o)
     try {
       console.log('[AI] Using Gemini 2.5 Flash with TOON format')
-      const result = await categorizeWithGemini(toonContext, prompt, true)
-      return result.toTextStreamResponse()
+      const expenses = await categorizeWithGemini(toonContext, prompt, true)
+      return Response.json(expenses)
     } catch (geminiError) {
       console.warn('[AI] Gemini failed, falling back to OpenAI:', geminiError)
 
       // Fallback to OpenAI with TOON format
       try {
         console.log('[AI] Using OpenAI GPT-4o with TOON format (fallback)')
-        const result = await categorizeWithOpenAI(toonContext, prompt, true)
-        return result.toTextStreamResponse()
+        const expenses = await categorizeWithOpenAI(toonContext, prompt, true)
+        return Response.json(expenses)
       } catch (openaiError) {
         console.error('[AI] Both providers failed:', {
           gemini: geminiError,
@@ -166,15 +166,12 @@ export async function POST(req: Request) {
     }
   } catch (error) {
     console.error('[AI] Request processing error:', error)
-    return new Response(
-      JSON.stringify({
+    return Response.json(
+      {
         error: 'Failed to process expense categorization request',
         message: error instanceof Error ? error.message : 'Unknown error'
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
+      },
+      { status: 500 }
     )
   }
 }

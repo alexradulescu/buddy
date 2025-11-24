@@ -62,21 +62,8 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
         throw new Error(errorData.message || `Server error: ${response.status}`)
       }
 
-      // Read the streamed response
-      const reader = response.body?.getReader()
-      const decoder = new TextDecoder()
-      let fullText = ''
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-          fullText += decoder.decode(value, { stream: true })
-        }
-      }
-
-      // Parse the complete response
-      const expenses = JSON.parse(fullText)
+      // Parse the JSON response
+      const expenses = await response.json()
 
       if (expenses && Array.isArray(expenses) && expenses.length > 0) {
         const processedExpenses = expenses.map((expense) => ({
