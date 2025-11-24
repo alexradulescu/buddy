@@ -33,11 +33,11 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
           <Table.Thead>
             <Table.Tr>
               <Table.Th style={{ width: '50px' }}>#</Table.Th>
+              <Table.Th style={{ width: '100px' }}>Date</Table.Th>
+              <Table.Th style={{ width: '220px' }}>Description</Table.Th>
               <Table.Th style={{ width: '80px' }}>Amount</Table.Th>
               <Table.Th style={{ width: '130px' }}>Category</Table.Th>
-              <Table.Th style={{ width: '130px' }}>Date</Table.Th>
-              <Table.Th style={{ width: '220px' }}>Description</Table.Th>
-              <Table.Th style={{ width: '50px' }}></Table.Th>
+              <Table.Th style={{ width: '50px' }}>Action</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -45,6 +45,21 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
               <Table.Tr key={expense.id}>
                 <Table.Td ta="center" c="dimmed" style={{ padding: '4px' }}>
                   {index + 1}
+                </Table.Td>
+                <Table.Td style={{ padding: '4px' }}>
+                  <DateInput
+                    value={new Date(expense.date)}
+                    onChange={(date) => onInputChange(index, 'date', date!)}
+                    valueFormat="DD MMM YY"
+                    styles={{ input: { borderRadius: 0 } }}
+                  />
+                </Table.Td>
+                <Table.Td style={{ padding: '4px' }}>
+                  <Textarea
+                    value={expense.description}
+                    onChange={(e) => onInputChange(index, 'description', e.target.value)}
+                    styles={{ input: { borderRadius: 0, padding: '8px' } }}
+                  />
                 </Table.Td>
                 <Table.Td style={{ padding: '4px' }}>
                   <NumberInput
@@ -68,20 +83,6 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                         label: category.name
                       }))}
                     styles={{ input: { borderRadius: 0 } }}
-                  />
-                </Table.Td>
-                <Table.Td style={{ padding: '4px' }}>
-                  <DateInput
-                    value={new Date(expense.date)}
-                    onChange={(date) => onInputChange(index, 'date', date!)}
-                    styles={{ input: { borderRadius: 0 } }}
-                  />
-                </Table.Td>
-                <Table.Td style={{ padding: '4px' }}>
-                  <Textarea
-                    value={expense.description}
-                    onChange={(e) => onInputChange(index, 'description', e.target.value)}
-                    styles={{ input: { borderRadius: 0, padding: '8px' } }}
                   />
                 </Table.Td>
                 <Table.Td style={{ padding: '4px' }}>

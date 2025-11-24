@@ -127,6 +127,7 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
 
   const handleReset = () => {
     setAiGeneratedExpenses([])
+    setInputText('')
   }
 
   return (
