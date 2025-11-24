@@ -15,6 +15,20 @@ textarea {
   display: flex !important;
 }
 
+/* Mobile: padding bottom for bottom nav, normal padding left */
+.main-content {
+  padding-left: 1rem !important;
+}
+
+/* Dashboard responsive views */
+.dashboard-desktop {
+  display: none;
+}
+
+.dashboard-mobile {
+  display: block;
+}
+
 @media (min-width: 640px) {
   .sidebar-desktop {
     display: flex !important;
@@ -22,5 +36,20 @@ textarea {
 
   .nav-mobile {
     display: none !important;
+  }
+
+  /* Desktop: padding left for sidebar, normal padding bottom */
+  .main-content {
+    padding-left: 5rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  /* Show desktop dashboard, hide mobile accordion */
+  .dashboard-desktop {
+    display: block;
+  }
+
+  .dashboard-mobile {
+    display: none;
   }
 }

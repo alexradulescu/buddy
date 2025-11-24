@@ -5,7 +5,7 @@ import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { format } from 'date-fns'
 import { Edit, Search, Trash } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Button, Group, Stack, Text, TextInput, Select, Table } from '@mantine/core'
+import { Button, Group, Stack, Text, TextInput, Select, Table, ScrollArea } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { DeleteConfirmation } from './delete-confirmation'
 import { TransactionForm } from './transaction-form'
@@ -107,9 +107,8 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
           <Text size="sm" c="dimmed">
             Total: {filteredExpenses.length} item{filteredExpenses.length !== 1 ? 's' : ''}
           </Text>
-          <div style={{ border: '1px solid var(--mantine-color-default-border)', borderRadius: '8px', overflow: 'hidden' }}>
-            <div style={{ maxHeight: '60dvh', overflow: 'auto' }}>
-            <Table highlightOnHover>
+          <ScrollArea style={{ border: '1px solid var(--mantine-color-default-border)', borderRadius: '8px' }}>
+            <Table highlightOnHover style={{ minWidth: 700 }}>
               <Table.Thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--mantine-color-body)' }}>
                 <Table.Tr>
                   <Table.Th style={{ width: '50px' }}>#</Table.Th>
@@ -144,8 +143,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
                 ))}
               </Table.Tbody>
             </Table>
-            </div>
-          </div>
+          </ScrollArea>
         </Stack>
       )}
 

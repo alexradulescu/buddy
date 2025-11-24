@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { TrendingUp } from 'lucide-react'
-import { Card, Table } from '@mantine/core'
+import { Card, Table, Stack, SimpleGrid, Title, Text, Group, ScrollArea } from '@mantine/core'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 
 export function InvestmentOverview() {
@@ -65,72 +65,67 @@ export function InvestmentOverview() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <Stack gap="md">
       <Card shadow="sm" padding="0" radius="md" withBorder>
-        <Card.Section withBorder inheritPadding py="xs" style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+          <Group gap="xs">
             <TrendingUp size={20} />
-            Investment Summary
-          </h3>
+            <Title order={3} size="h5">Investment Summary</Title>
+          </Group>
         </Card.Section>
         <Card.Section inheritPadding py="md">
-          <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-            <div>
-              <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--mantine-color-dimmed)', margin: 0 }}>Total Value</p>
-              <p style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0.5rem 0 0 0' }}>{formatCurrency(totalInvestmentValue)}</p>
-            </div>
-            <div>
-              <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--mantine-color-dimmed)', margin: 0 }}>Total Invested</p>
-              <p style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0.5rem 0 0 0' }}>{formatCurrency(totalContributions)}</p>
-            </div>
-            <div>
-              <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--mantine-color-dimmed)', margin: 0 }}>Total P&L</p>
-              <p style={{
-                fontSize: '1.5rem',
-                fontWeight: 700,
-                margin: '0.5rem 0 0 0',
-                color: totalProfitLoss >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
-              }}>
+          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+            <Stack gap="xs">
+              <Text size="sm" fw={500} c="dimmed">Total Value</Text>
+              <Text size="xl" fw={700}>{formatCurrency(totalInvestmentValue)}</Text>
+            </Stack>
+            <Stack gap="xs">
+              <Text size="sm" fw={500} c="dimmed">Total Invested</Text>
+              <Text size="xl" fw={700}>{formatCurrency(totalContributions)}</Text>
+            </Stack>
+            <Stack gap="xs">
+              <Text size="sm" fw={500} c="dimmed">Total P&L</Text>
+              <Text size="xl" fw={700} c={totalProfitLoss >= 0 ? 'green.6' : 'red.6'}>
                 {formatCurrency(totalProfitLoss)} ({profitLossPercentage.toFixed(2)}%)
-              </p>
-            </div>
-          </div>
+              </Text>
+            </Stack>
+          </SimpleGrid>
         </Card.Section>
       </Card>
 
       <Card shadow="sm" padding="0" radius="md" withBorder>
-        <Card.Section withBorder inheritPadding py="xs" style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>Active Investments</h3>
+        <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+          <Title order={3} size="h5">Active Investments</Title>
         </Card.Section>
-        <Card.Section inheritPadding py="md">
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Name</Table.Th>
-                <Table.Th style={{ textAlign: 'right' }}>Current Value</Table.Th>
-                <Table.Th style={{ textAlign: 'right' }}>Total Invested</Table.Th>
-                <Table.Th style={{ textAlign: 'right' }}>P&L</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {investmentData.map((investment) => (
-                <Table.Tr key={investment.id}>
-                  <Table.Td style={{ fontWeight: 500 }}>{investment.name}</Table.Td>
-                  <Table.Td style={{ textAlign: 'right' }}>{formatCurrency(investment.currentValue)}</Table.Td>
-                  <Table.Td style={{ textAlign: 'right' }}>{formatCurrency(investment.totalContributions)}</Table.Td>
-                  <Table.Td style={{ textAlign: 'right' }}>
-                    <span style={{
-                      color: investment.profit >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
-                    }}>
-                      {formatCurrency(investment.profit)} ({investment.profitPercentage.toFixed(2)}%)
-                    </span>
-                  </Table.Td>
+        <Card.Section>
+          <ScrollArea>
+            <Table style={{ minWidth: 600 }}>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Name</Table.Th>
+                  <Table.Th ta="right">Current Value</Table.Th>
+                  <Table.Th ta="right">Total Invested</Table.Th>
+                  <Table.Th ta="right">P&L</Table.Th>
                 </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
+              </Table.Thead>
+              <Table.Tbody>
+                {investmentData.map((investment) => (
+                  <Table.Tr key={investment.id}>
+                    <Table.Td fw={500}>{investment.name}</Table.Td>
+                    <Table.Td ta="right">{formatCurrency(investment.currentValue)}</Table.Td>
+                    <Table.Td ta="right">{formatCurrency(investment.totalContributions)}</Table.Td>
+                    <Table.Td ta="right">
+                      <Text c={investment.profit >= 0 ? 'green.6' : 'red.6'}>
+                        {formatCurrency(investment.profit)} ({investment.profitPercentage.toFixed(2)}%)
+                      </Text>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
         </Card.Section>
       </Card>
-    </div>
+    </Stack>
   )
 }

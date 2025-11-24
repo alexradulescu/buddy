@@ -3,7 +3,7 @@
 import React, { FC } from 'react'
 import { format } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button, Group, Stack, Title, Text } from '@mantine/core'
+import { ActionIcon, Group, Stack, Title, Text } from '@mantine/core'
 import { MonthPickerInput } from '@mantine/dates'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
@@ -42,10 +42,16 @@ export const PageHeader: FC<Props> = ({ title, description, action }) => {
           {description && <Text c="dimmed">{description}</Text>}
         </Stack>
         {action || (
-          <Group gap="xs">
-            <Button variant="outline" onClick={() => handleMonthChange(-1)} aria-label="Previous month">
+          <Group gap={0}>
+            <ActionIcon
+              variant="outline"
+              onClick={() => handleMonthChange(-1)}
+              aria-label="Previous month"
+              size="lg"
+              style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+            >
               <ChevronLeft size={16} />
-            </Button>
+            </ActionIcon>
             <MonthPickerInput
               value={selectedDate}
               onChange={(value) => {
@@ -55,12 +61,25 @@ export const PageHeader: FC<Props> = ({ title, description, action }) => {
                   setSelectedYear(date.getFullYear())
                 }
               }}
-              valueFormat="MMMM YYYY"
-              style={{ width: '240px' }}
+              valueFormat="MMM YY"
+              style={{ width: '100px' }}
+              styles={{
+                input: {
+                  borderRadius: 0,
+                  borderLeft: 0,
+                  borderRight: 0
+                }
+              }}
             />
-            <Button variant="outline" onClick={() => handleMonthChange(1)} aria-label="Next month">
+            <ActionIcon
+              variant="outline"
+              onClick={() => handleMonthChange(1)}
+              aria-label="Next month"
+              size="lg"
+              style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+            >
               <ChevronRight size={16} />
-            </Button>
+            </ActionIcon>
           </Group>
         )}
       </Group>

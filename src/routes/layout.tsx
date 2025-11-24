@@ -12,9 +12,10 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
           <Navigation />
           <Box
             component="main"
+            className="main-content"
             flex={1}
             p="md"
-            pl="5rem"
+            pb="5rem"
             bg="#fafaf9"
             m="1"
             style={{

@@ -3,7 +3,7 @@
 import React from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { TrashIcon } from 'lucide-react'
-import { Button, NumberInput, Select, Table, Text, Textarea } from '@mantine/core'
+import { Button, NumberInput, Select, Table, Text, Textarea, ScrollArea } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
 
 interface ExpenseTableProps {
@@ -24,12 +24,12 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
   onDeleteRow
 }) => {
   return (
-    <div style={{ overflowX: 'auto' }}>
+    <div>
       <Text size="sm" c="dimmed" mb="xs">
         Total: {expenses.length} item{expenses.length !== 1 ? 's' : ''}
       </Text>
-      <div style={{ maxHeight: '50vh', overflowY: 'auto' }}>
-        <Table>
+      <ScrollArea h="50vh">
+        <Table style={{ minWidth: 600 }}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th style={{ width: '50px' }}>#</Table.Th>
@@ -97,7 +97,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
             ))}
           </Table.Tbody>
         </Table>
-      </div>
+      </ScrollArea>
     </div>
   )
 }
