@@ -103,7 +103,7 @@ export default function ExpensesPage() {
   }
 
   return (
-    <Stack gap="xl">
+    <Stack gap="lg">
       <PageHeader title="Expenses" />
 
       <Tabs defaultValue="list">
@@ -120,19 +120,19 @@ export default function ExpensesPage() {
         </Tabs.List>
 
         <Tabs.Panel value="list" pt="md">
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card withBorder p="lg">
             <ExpenseList selectedYear={selectedYear} selectedMonth={selectedMonth} />
           </Card>
         </Tabs.Panel>
 
         <Tabs.Panel value="ai-import" pt="md">
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card withBorder p="lg">
             <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
           </Card>
         </Tabs.Panel>
 
         <Tabs.Panel value="manual-entry" pt="md">
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Card withBorder p="lg">
             <Stack gap="md">
               <ExpenseTable
                 expenses={expenses}
@@ -140,16 +140,16 @@ export default function ExpensesPage() {
                 onInputChange={handleInputChange}
                 onDeleteRow={deleteRow}
               />
-              <Group gap="xs">
+              <Group gap="sm">
                 <NumberInput
                   value={rowsToAdd}
                   onChange={(value) => setRowsToAdd(Number(value))}
                   min={1}
-                  style={{ width: '80px' }}
+                  w={80}
                 />
                 <Button onClick={addRows}>Add Rows</Button>
               </Group>
-              <Button onClick={handleSaveExpenses}>Save Expenses</Button>
+              <Button onClick={handleSaveExpenses} fullWidth>Save Expenses</Button>
             </Stack>
           </Card>
         </Tabs.Panel>

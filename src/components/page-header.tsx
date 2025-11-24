@@ -35,20 +35,26 @@ export const PageHeader: FC<Props> = ({ title, description, action }) => {
   const selectedDate = new Date(selectedYear, selectedMonth)
 
   return (
-    <Stack mb="md">
-      <Group justify="space-between" align="center">
-        <Stack gap={0}>
+    <Stack gap="xs" mb="lg">
+      <Group justify="space-between" align="flex-start" wrap="wrap">
+        <Stack gap={2}>
           <Title order={1} size="h2">{title}</Title>
-          {description && <Text c="dimmed">{description}</Text>}
+          {description && <Text size="sm" c="dimmed">{description}</Text>}
         </Stack>
         {action || (
-          <Group gap={0}>
+          <Group gap={0} wrap="nowrap">
             <ActionIcon
-              variant="outline"
+              variant="default"
               onClick={() => handleMonthChange(-1)}
               aria-label="Previous month"
               size="lg"
-              style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+              radius={0}
+              styles={{
+                root: {
+                  borderTopLeftRadius: 'var(--mantine-radius-default)',
+                  borderBottomLeftRadius: 'var(--mantine-radius-default)'
+                }
+              }}
             >
               <ChevronLeft size={16} />
             </ActionIcon>
@@ -62,21 +68,28 @@ export const PageHeader: FC<Props> = ({ title, description, action }) => {
                 }
               }}
               valueFormat="MMM YY"
-              style={{ width: '80px' }}
+              w={80}
               styles={{
                 input: {
                   borderRadius: 0,
                   borderLeft: 0,
-                  borderRight: 0
+                  borderRight: 0,
+                  textAlign: 'center'
                 }
               }}
             />
             <ActionIcon
-              variant="outline"
+              variant="default"
               onClick={() => handleMonthChange(1)}
               aria-label="Next month"
               size="lg"
-              style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+              radius={0}
+              styles={{
+                root: {
+                  borderTopRightRadius: 'var(--mantine-radius-default)',
+                  borderBottomRightRadius: 'var(--mantine-radius-default)'
+                }
+              }}
             >
               <ChevronRight size={16} />
             </ActionIcon>

@@ -102,102 +102,89 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
 
   return (
     <Card withBorder padding="0">
-      <Card.Section withBorder inheritPadding py="md">
+      <Card.Section withBorder inheritPadding py="sm">
         <Title order={3} size="h4" mb={4}>Expense Categories</Title>
         <Text size="sm" c="dimmed">
-          Overview of your expense categories for the selected month
+          Monthly budget tracking and year-to-date overview
         </Text>
       </Card.Section>
       <Card.Section>
         <ScrollArea>
-          <Table style={{ minWidth: 800 }}>
+          <Table striped highlightOnHover miw={800}>
             <Table.Thead>
               <Table.Tr>
-                <Tooltip label="Category of the expense">
-                  <Table.Th>Category</Table.Th>
-                </Tooltip>
-              <Tooltip label="Current expenses for this month.">
-                <Table.Th ta="right">Current Expense</Table.Th>
-              </Tooltip>
-              <Tooltip label="Monthly budget set for this category.">
+                <Table.Th>Category</Table.Th>
+                <Table.Th ta="right">Current</Table.Th>
                 <Table.Th ta="right">Monthly Budget</Table.Th>
-              </Tooltip>
-              <Tooltip label="Expenses for this category, so far this year.">
-                <Table.Th ta="right">Year-to-Date Expense</Table.Th>
-              </Tooltip>
-              <Tooltip label="Year to date budget for this category.">
-                <Table.Th ta="right">Year-to-Date Budget</Table.Th>
-              </Tooltip>
-              <Tooltip label="Annual budget for this category.">
+                <Table.Th ta="right">Year-to-Date</Table.Th>
+                <Table.Th ta="right">YTD Budget</Table.Th>
                 <Table.Th ta="right">Annual Budget</Table.Th>
-              </Tooltip>
-            </Table.Tr>
-          </Table.Thead>
+              </Table.Tr>
+            </Table.Thead>
 
-          <Table.Tbody>
-            {expenseCategoriesData.map(
-              ({
-                category,
-                currentMonthlyExpense,
-                currentYearToDateExpense,
-                yearToDateBudget,
-                annualBudget,
-                monthlyDifference,
-                yearToDateDifference,
-                annualDifference,
-                rowColor
-              }) => (
-                <Table.Tr key={category.id} style={rowColor}>
-                  <Table.Td fw={500}>
-                    <Anchor
-                      component={NavLink}
-                      to={{
-                        pathname: '/expenses',
-                        search: `?month=${selectedMonth}&year=${selectedYear}&categoryExpense=${category.id}`
-                      }}
-                      c="green.6"
-                      underline="hover"
-                    >
-                      {category.name}
-                    </Anchor>
-                  </Table.Td>
-                  <Table.Td ta="right" className="numeric-value">{formatCurrency(currentMonthlyExpense)}</Table.Td>
-                  <Table.Td ta="right" className="numeric-value">
-                    {monthlyDifference !== undefined && (
-                      <Badge color={monthlyDifference >= 0 ? 'gray' : 'red'} variant="light">
-                        {monthlyDifference >= 0 ? '+' : '-'}
-                        {formatCurrency(Math.abs(monthlyDifference))}
-                      </Badge>
-                    )}
-                    {' '}
-                    {formatCurrency(category.maxBudget)}
-                  </Table.Td>
+            <Table.Tbody>
+              {expenseCategoriesData.map(
+                ({
+                  category,
+                  currentMonthlyExpense,
+                  currentYearToDateExpense,
+                  yearToDateBudget,
+                  annualBudget,
+                  monthlyDifference,
+                  yearToDateDifference,
+                  annualDifference,
+                  rowColor
+                }) => (
+                  <Table.Tr key={category.id}>
+                    <Table.Td fw={500}>
+                      <Anchor
+                        component={NavLink}
+                        to={{
+                          pathname: '/expenses',
+                          search: `?month=${selectedMonth}&year=${selectedYear}&categoryExpense=${category.id}`
+                        }}
+                        c="blue.6"
+                        underline="hover"
+                      >
+                        {category.name}
+                      </Anchor>
+                    </Table.Td>
+                    <Table.Td ta="right" className="numeric-value" c={currentMonthlyExpense > (category.maxBudget || 0) ? 'red.6' : undefined}>
+                      {formatCurrency(currentMonthlyExpense)}
+                    </Table.Td>
+                    <Table.Td ta="right" className="numeric-value">
+                      {monthlyDifference !== undefined && (
+                        <Badge size="xs" color={monthlyDifference >= 0 ? 'gray' : 'red'} variant="light" mr="xs">
+                          {monthlyDifference >= 0 ? '+' : '-'}
+                          {formatCurrency(Math.abs(monthlyDifference))}
+                        </Badge>
+                      )}
+                      {formatCurrency(category.maxBudget)}
+                    </Table.Td>
 
-                  <Table.Td ta="right" className="numeric-value">{formatCurrency(currentYearToDateExpense)}</Table.Td>
-                  <Table.Td ta="right" className="numeric-value">
-                    {yearToDateDifference !== undefined && (
-                      <Badge color={yearToDateDifference >= 0 ? 'gray' : 'red'} variant="light">
-                        {yearToDateDifference >= 0 ? '+' : '-'}
-                        {formatCurrency(Math.abs(yearToDateDifference))}
-                      </Badge>
-                    )}
-                    {' '}
-                    {formatCurrency(yearToDateBudget)}
-                  </Table.Td>
-                  <Table.Td ta="right" className="numeric-value">
-                    {annualDifference !== undefined && (
-                      <Badge color={annualDifference >= 0 ? 'gray' : 'red'} variant="light">
-                        {annualDifference >= 0 ? '+' : '-'}
-                        {formatCurrency(Math.abs(annualDifference))}
-                      </Badge>
-                    )}
-                    {' '}
-                    {formatCurrency(annualBudget)}
-                  </Table.Td>
-                </Table.Tr>
-              )
-            )}
-          </Table.Tbody>
+                    <Table.Td ta="right" className="numeric-value">{formatCurrency(currentYearToDateExpense)}</Table.Td>
+                    <Table.Td ta="right" className="numeric-value">
+                      {yearToDateDifference !== undefined && (
+                        <Badge size="xs" color={yearToDateDifference >= 0 ? 'gray' : 'red'} variant="light" mr="xs">
+                          {yearToDateDifference >= 0 ? '+' : '-'}
+                          {formatCurrency(Math.abs(yearToDateDifference))}
+                        </Badge>
+                      )}
+                      {formatCurrency(yearToDateBudget)}
+                    </Table.Td>
+                    <Table.Td ta="right" className="numeric-value">
+                      {annualDifference !== undefined && (
+                        <Badge size="xs" color={annualDifference >= 0 ? 'gray' : 'red'} variant="light" mr="xs">
+                          {annualDifference >= 0 ? '+' : '-'}
+                          {formatCurrency(Math.abs(annualDifference))}
+                        </Badge>
+                      )}
+                      {formatCurrency(annualBudget)}
+                    </Table.Td>
+                  </Table.Tr>
+                )
+              )}
+            </Table.Tbody>
           </Table>
         </ScrollArea>
       </Card.Section>

@@ -3,6 +3,7 @@ import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { HydrationBoundary } from '@/components/hydration-boundary'
 import { Navigation } from '@/components/navigation'
 import { Flex, Box } from '@mantine/core'
+import classes from './layout.module.css'
 
 export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -12,17 +13,15 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
           <Navigation />
           <Box
             component="main"
-            className="main-content"
+            className={classes.mainContent}
             flex={1}
             p="md"
-            pb="5rem"
-            bg="#fafaf9"
-            m="1"
-            style={{
-              overflowY: 'auto',
-              borderRadius: '0.125rem',
-              border: '1px solid #f5f5f4'
-            }}
+            pb={{ base: '5rem', sm: 'md' }}
+            pl={{ base: 'md', sm: '4rem' }}
+            bg="gray.0"
+            style={(theme) => ({
+              overflowY: 'auto'
+            })}
           >
             {children}
           </Box>

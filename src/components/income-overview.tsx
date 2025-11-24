@@ -72,22 +72,22 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
   }
 
   return (
-    <Card withBorder shadow="sm" radius="md" padding="0">
-      <Card.Section withBorder inheritPadding py="md">
+    <Card withBorder padding="0">
+      <Card.Section withBorder inheritPadding py="sm">
         <Title order={3} size="h4" mb={4}>Income Categories</Title>
         <Text size="sm" c="dimmed">
-          Overview of your income categories for the selected month
+          Monthly income tracking and year-to-date overview
         </Text>
       </Card.Section>
       <Card.Section>
         <ScrollArea>
-          <Table style={{ minWidth: 600 }}>
+          <Table striped highlightOnHover miw={600}>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Category</Table.Th>
-                <Table.Th ta="right">Current Income</Table.Th>
-                <Table.Th ta="right">Year-to-Date Income</Table.Th>
-                <Table.Th ta="right">Annual Income</Table.Th>
+                <Table.Th ta="right">Current</Table.Th>
+                <Table.Th ta="right">Year-to-Date</Table.Th>
+                <Table.Th ta="right">Annual</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -103,7 +103,7 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
                         pathname: '/incomes',
                         search: `?month=${selectedMonth}&year=${selectedYear}&categoryIncome=${category.id}`
                       }}
-                      c="green.6"
+                      c="blue.6"
                       underline="hover"
                     >
                       {category.title}
@@ -115,7 +115,7 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
                 </Table.Tr>
               )
             })}
-          </Table.Tbody>
+            </Table.Tbody>
           </Table>
         </ScrollArea>
       </Card.Section>

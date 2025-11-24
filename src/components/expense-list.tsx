@@ -76,15 +76,15 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
 
   return (
     <Stack gap="md">
-      <Stack gap="xs">
+      <Stack gap="sm">
         <TextInput
           placeholder="Search expenses..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           leftSection={<Search size={16} />}
         />
-        <Group gap="xs">
-          <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>Filter by category:</Text>
+        <Group gap="sm" align="center">
+          <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>Filter:</Text>
           <Select
             placeholder="All categories"
             value={selectedCategoryId || 'all'}
@@ -96,27 +96,27 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
                 label: category.name
               }))
             ]}
-            style={{ flex: 1 }}
+            flex={1}
           />
         </Group>
       </Stack>
       {filteredExpenses.length === 0 ? (
-        <Text ta="center" c="dimmed" py="md">No expenses found for this period.</Text>
+        <Text ta="center" c="dimmed" py="xl">No expenses found for this period.</Text>
       ) : (
-        <Stack gap="xs">
+        <Stack gap="sm">
           <Text size="sm" c="dimmed">
-            Total: {filteredExpenses.length} item{filteredExpenses.length !== 1 ? 's' : ''}
+            {filteredExpenses.length} {filteredExpenses.length === 1 ? 'item' : 'items'}
           </Text>
-          <ScrollArea style={{ border: '1px solid var(--mantine-color-default-border)', borderRadius: '8px' }}>
-            <Table highlightOnHover style={{ minWidth: 700 }}>
-              <Table.Thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--mantine-color-body)' }}>
+          <ScrollArea>
+            <Table highlightOnHover striped withTableBorder miw={700}>
+              <Table.Thead>
                 <Table.Tr>
-                  <Table.Th style={{ width: '50px' }}>#</Table.Th>
-                  <Table.Th style={{ width: '120px' }}>Date</Table.Th>
+                  <Table.Th w={50}>#</Table.Th>
+                  <Table.Th w={120}>Date</Table.Th>
                   <Table.Th>Description</Table.Th>
                   <Table.Th>Category</Table.Th>
-                  <Table.Th ta="right" style={{ width: '100px' }}>Amount</Table.Th>
-                  <Table.Th style={{ width: '80px' }}>Actions</Table.Th>
+                  <Table.Th ta="right" w={100}>Amount</Table.Th>
+                  <Table.Th w={100}>Actions</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -127,14 +127,14 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
                     </Table.Td>
                     <Table.Td>{format(new Date(expense.date), 'dd MMM yyyy')}</Table.Td>
                     <Table.Td>{expense.description}</Table.Td>
-                    <Table.Td>{expense.category}</Table.Td>
-                    <Table.Td ta="right">${Number(expense.amount).toFixed(2)}</Table.Td>
+                    <Table.Td c="dimmed">{expense.category}</Table.Td>
+                    <Table.Td ta="right" className="numeric-value">${Number(expense.amount).toFixed(2)}</Table.Td>
                     <Table.Td>
-                      <Group gap="xs">
-                        <Button size="xs" variant="default" onClick={() => setEditingExpense(expense)}>
+                      <Group gap="xs" wrap="nowrap">
+                        <Button size="xs" variant="subtle" onClick={() => setEditingExpense(expense)}>
                           <Edit size={14} />
                         </Button>
-                        <Button size="xs" color="red" onClick={() => handleDeleteClick(expense)}>
+                        <Button size="xs" variant="subtle" color="red" onClick={() => handleDeleteClick(expense)}>
                           <Trash size={14} />
                         </Button>
                       </Group>

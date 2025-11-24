@@ -44,7 +44,7 @@ export default function HomePage() {
     }, 0)
 
   return (
-    <Stack gap="xl">
+    <Stack gap="lg">
       <PageHeader title="Budget Overview" />
 
       <HomeOverview
@@ -55,8 +55,8 @@ export default function HomePage() {
       />
 
       {/* Desktop view - regular stack */}
-      <Box className="dashboard-desktop">
-        <Stack gap="xl">
+      <Box hiddenFrom="sm">
+        <Stack gap="lg">
           <ExpenseOverview
             expenses={expenses}
             expenseCategories={expenseCategories}
@@ -76,7 +76,7 @@ export default function HomePage() {
       </Box>
 
       {/* Mobile view - accordion */}
-      <Box className="dashboard-mobile">
+      <Box visibleFrom="sm">
         <Accordion multiple defaultValue={['expenses', 'incomes', 'investments']}>
           <Accordion.Item value="expenses">
             <Accordion.Control>Expense Categories</Accordion.Control>

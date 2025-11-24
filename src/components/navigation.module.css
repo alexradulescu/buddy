@@ -1,0 +1,17 @@
+.sidebarDesktop {
+  display: none !important;
+}
+
+.navMobile {
+  display: flex !important;
+}
+
+@media (min-width: 640px) {
+  .sidebarDesktop {
+    display: flex !important;
+  }
+
+  .navMobile {
+    display: none !important;
+  }
+}
