@@ -160,8 +160,8 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                       {category.name}
                     </Anchor>
                   </Table.Td>
-                  <Table.Td ta="right">{formatCurrency(currentMonthlyExpense)}</Table.Td>
-                  <Table.Td ta="right">
+                  <Table.Td ta="right" className="numeric-value">{formatCurrency(currentMonthlyExpense)}</Table.Td>
+                  <Table.Td ta="right" className="numeric-value">
                     {monthlyDifference !== undefined && (
                       <Badge color={monthlyDifference >= 0 ? 'gray' : 'red'} variant="light">
                         {monthlyDifference >= 0 ? '+' : '-'}
@@ -172,8 +172,8 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                     {formatCurrency(category.maxBudget)}
                   </Table.Td>
 
-                  <Table.Td ta="right">{formatCurrency(currentYearToDateExpense)}</Table.Td>
-                  <Table.Td ta="right">
+                  <Table.Td ta="right" className="numeric-value">{formatCurrency(currentYearToDateExpense)}</Table.Td>
+                  <Table.Td ta="right" className="numeric-value">
                     {yearToDateDifference !== undefined && (
                       <Badge color={yearToDateDifference >= 0 ? 'gray' : 'red'} variant="light">
                         {yearToDateDifference >= 0 ? '+' : '-'}
@@ -183,7 +183,7 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                     {' '}
                     {formatCurrency(yearToDateBudget)}
                   </Table.Td>
-                  <Table.Td ta="right">
+                  <Table.Td ta="right" className="numeric-value">
                     {annualDifference !== undefined && (
                       <Badge color={annualDifference >= 0 ? 'gray' : 'red'} variant="light">
                         {annualDifference >= 0 ? '+' : '-'}

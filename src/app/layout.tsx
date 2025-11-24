@@ -4,19 +4,16 @@ import '@mantine/notifications/styles.css'
 import './globals.css'
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import localFont from 'next/font/local'
-import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core'
+import { ColorSchemeScript, MantineProvider, mantineHtmlProps, createTheme } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 
-const geistSans = localFont({
-  src: './fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-  weight: '100 900'
-})
-const geistMono = localFont({
-  src: './fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900'
+// Modern Font Stacks - https://modernfontstacks.com
+const theme = createTheme({
+  fontFamily: 'system-ui, sans-serif',
+  fontFamilyMonospace: "ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
+  headings: {
+    fontFamily: "Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif"
+  }
 })
 
 export const metadata: Metadata = {
@@ -34,8 +31,8 @@ export default function RootLayout({
       <head>
         <ColorSchemeScript defaultColorScheme="light" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <MantineProvider defaultColorScheme="light">
+      <body className="antialiased">
+        <MantineProvider theme={theme} defaultColorScheme="light">
           <Notifications />
           <Suspense fallback={'Loading'}>{children}</Suspense>
         </MantineProvider>

@@ -1,6 +1,7 @@
 'use client'
 
 import { BarChart2, CreditCard, Package2, PiggyBank, TrendingUp } from 'lucide-react'
+import { SimpleGrid } from '@mantine/core'
 import { OverviewCard } from '@/components/overview-card'
 
 interface HomeOverviewProps {
@@ -16,7 +17,7 @@ export function HomeOverview({ totalMonthlyIncomes, totalMonthlyExpenses, netInc
   }
 
   return (
-    <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+    <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 5 }} spacing="md">
       <OverviewCard
         title={'Total Income'}
         value={formatCurrency(totalMonthlyIncomes)}
@@ -42,6 +43,6 @@ export function HomeOverview({ totalMonthlyIncomes, totalMonthlyExpenses, netInc
         value={totalMonthlyIncomes > 0 ? `${((netIncome / totalMonthlyIncomes) * 100).toFixed(2)}%` : 'N/A'}
         icon={<BarChart2 size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
       />
-    </div>
+    </SimpleGrid>
   )
 }

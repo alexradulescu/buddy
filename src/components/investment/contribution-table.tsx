@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { InvestmentContribution } from '@/types/investment'
 import { Edit, Trash2 } from 'lucide-react'
-import { Button, Card, Table } from '@mantine/core'
+import { Button, Card, Table, Group, Title, Text, Center } from '@mantine/core'
 import ContributionForm from './forms/contribution-form'
 
 interface ContributionTableProps {
@@ -51,23 +51,15 @@ export default function ContributionTable({ investmentId, contributions, onDelet
 
   return (
     <Card shadow="sm" padding="0" radius="md" withBorder>
-      <Card.Section
-        withBorder
-        inheritPadding
-        py="xs"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: 'var(--mantine-color-gray-0)'
-        }}
-      >
-        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>Contributions</h3>
-        {!showForm && (
-          <Button size="sm" onClick={() => setShowForm(true)}>
-            Add Contribution
-          </Button>
-        )}
+      <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+        <Group justify="space-between" align="center">
+          <Title order={3} size="lg">Contributions</Title>
+          {!showForm && (
+            <Button size="sm" onClick={() => setShowForm(true)}>
+              Add Contribution
+            </Button>
+          )}
+        </Group>
       </Card.Section>
       <Card.Section inheritPadding py="md">
         {showForm ? (
@@ -84,16 +76,16 @@ export default function ContributionTable({ investmentId, contributions, onDelet
                 <Table.Th>Date</Table.Th>
                 <Table.Th>Amount</Table.Th>
                 <Table.Th>Description</Table.Th>
-                <Table.Th style={{ textAlign: 'right' }}>Actions</Table.Th>
+                <Table.Th ta="right">Actions</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {sortedContributions.map((contribution) => (
                 <Table.Tr key={contribution.id}>
                   <Table.Td>{formatDate(contribution.date)}</Table.Td>
-                  <Table.Td>{formatCurrency(contribution.amount)}</Table.Td>
+                  <Table.Td className="numeric-value">{formatCurrency(contribution.amount)}</Table.Td>
                   <Table.Td>{contribution.description || '-'}</Table.Td>
-                  <Table.Td style={{ textAlign: 'right' }}>
+                  <Table.Td ta="right">
                     <Button variant="subtle" size="compact-sm" onClick={() => handleEdit(contribution)}>
                       <Edit size={16} />
                     </Button>
@@ -106,9 +98,9 @@ export default function ContributionTable({ investmentId, contributions, onDelet
             </Table.Tbody>
           </Table>
         ) : (
-          <div style={{ textAlign: 'center', padding: '1rem' }}>
-            <p style={{ color: 'var(--mantine-color-dimmed)' }}>No contributions yet</p>
-          </div>
+          <Center p="md">
+            <Text c="dimmed">No contributions yet</Text>
+          </Center>
         )}
       </Card.Section>
     </Card>

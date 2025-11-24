@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { Investment } from '@/types/investment'
 import { Link } from 'react-router'
-import { Card, Badge } from '@mantine/core'
+import { Card, Badge, Stack, Group, Text, SimpleGrid } from '@mantine/core'
 
 interface InvestmentCardProps {
   investment: Investment
@@ -40,49 +40,41 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
       >
         <Card.Section withBorder inheritPadding py="xs">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>{investment.name}</h3>
+          <Group justify="space-between" align="center">
+            <Text size="lg" fw={600}>{investment.name}</Text>
             <Badge color={investment.isActive ? 'green' : 'gray'}>
               {investment.isActive ? 'Active' : 'Inactive'}
             </Badge>
-          </div>
+          </Group>
           {investment.description && (
-            <p style={{ fontSize: '0.875rem', color: 'var(--mantine-color-dimmed)', marginTop: '0.25rem', marginBottom: 0 }}>
+            <Text size="sm" c="dimmed" mt="xs">
               {investment.description}
-            </p>
+            </Text>
           )}
         </Card.Section>
         <Card.Section inheritPadding py="md">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.875rem' }}>
-            <div>
-              <p style={{ color: 'var(--mantine-color-dimmed)', margin: 0 }}>Contributions</p>
-              <p style={{ fontWeight: 500, margin: '0.25rem 0 0 0' }}>{formatCurrency(totalContributions)}</p>
-            </div>
-            <div>
-              <p style={{ color: 'var(--mantine-color-dimmed)', margin: 0 }}>Current Value</p>
-              <p style={{ fontWeight: 500, margin: '0.25rem 0 0 0' }}>{formatCurrency(currentValue)}</p>
-            </div>
-            <div>
-              <p style={{ color: 'var(--mantine-color-dimmed)', margin: 0 }}>Profit/Loss</p>
-              <p style={{
-                fontWeight: 500,
-                margin: '0.25rem 0 0 0',
-                color: profit >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
-              }}>
+          <SimpleGrid cols={2} spacing="xs">
+            <Stack gap="xs">
+              <Text size="sm" c="dimmed">Contributions</Text>
+              <Text fw={500} className="numeric-value">{formatCurrency(totalContributions)}</Text>
+            </Stack>
+            <Stack gap="xs">
+              <Text size="sm" c="dimmed">Current Value</Text>
+              <Text fw={500} className="numeric-value">{formatCurrency(currentValue)}</Text>
+            </Stack>
+            <Stack gap="xs">
+              <Text size="sm" c="dimmed">Profit/Loss</Text>
+              <Text fw={500} c={profit >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
                 {formatCurrency(profit)}
-              </p>
-            </div>
-            <div>
-              <p style={{ color: 'var(--mantine-color-dimmed)', margin: 0 }}>Return</p>
-              <p style={{
-                fontWeight: 500,
-                margin: '0.25rem 0 0 0',
-                color: profitPercentage >= 0 ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-red-6)'
-              }}>
+              </Text>
+            </Stack>
+            <Stack gap="xs">
+              <Text size="sm" c="dimmed">Return</Text>
+              <Text fw={500} c={profitPercentage >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
                 {currentValue === null ? 'N/A' : `${profitPercentage.toFixed(2)}%`}
-              </p>
-            </div>
-          </div>
+              </Text>
+            </Stack>
+          </SimpleGrid>
         </Card.Section>
       </Card>
     </Link>

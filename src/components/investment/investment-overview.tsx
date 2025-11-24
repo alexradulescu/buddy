@@ -77,15 +77,15 @@ export function InvestmentOverview() {
           <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
             <Stack gap="xs">
               <Text size="sm" fw={500} c="dimmed">Total Value</Text>
-              <Text size="xl" fw={700}>{formatCurrency(totalInvestmentValue)}</Text>
+              <Text size="xl" fw={700} className="numeric-value">{formatCurrency(totalInvestmentValue)}</Text>
             </Stack>
             <Stack gap="xs">
               <Text size="sm" fw={500} c="dimmed">Total Invested</Text>
-              <Text size="xl" fw={700}>{formatCurrency(totalContributions)}</Text>
+              <Text size="xl" fw={700} className="numeric-value">{formatCurrency(totalContributions)}</Text>
             </Stack>
             <Stack gap="xs">
               <Text size="sm" fw={500} c="dimmed">Total P&L</Text>
-              <Text size="xl" fw={700} c={totalProfitLoss >= 0 ? 'green.6' : 'red.6'}>
+              <Text size="xl" fw={700} c={totalProfitLoss >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
                 {formatCurrency(totalProfitLoss)} ({profitLossPercentage.toFixed(2)}%)
               </Text>
             </Stack>
@@ -112,10 +112,10 @@ export function InvestmentOverview() {
                 {investmentData.map((investment) => (
                   <Table.Tr key={investment.id}>
                     <Table.Td fw={500}>{investment.name}</Table.Td>
-                    <Table.Td ta="right">{formatCurrency(investment.currentValue)}</Table.Td>
-                    <Table.Td ta="right">{formatCurrency(investment.totalContributions)}</Table.Td>
+                    <Table.Td ta="right" className="numeric-value">{formatCurrency(investment.currentValue)}</Table.Td>
+                    <Table.Td ta="right" className="numeric-value">{formatCurrency(investment.totalContributions)}</Table.Td>
                     <Table.Td ta="right">
-                      <Text c={investment.profit >= 0 ? 'green.6' : 'red.6'}>
+                      <Text c={investment.profit >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
                         {formatCurrency(investment.profit)} ({investment.profitPercentage.toFixed(2)}%)
                       </Text>
                     </Table.Td>

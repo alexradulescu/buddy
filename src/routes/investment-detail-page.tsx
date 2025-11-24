@@ -143,7 +143,7 @@ export default function InvestmentDetailPage() {
             <Text size="sm" fw={500}>Total Contributions</Text>
           </Card.Section>
           <Card.Section inheritPadding py="md">
-            <Text size="xl" fw={700}>{formatCurrency(totalContributions)}</Text>
+            <Text size="xl" fw={700} className="numeric-value">{formatCurrency(totalContributions)}</Text>
           </Card.Section>
         </Card>
         <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -151,7 +151,7 @@ export default function InvestmentDetailPage() {
             <Text size="sm" fw={500}>Current Value</Text>
           </Card.Section>
           <Card.Section inheritPadding py="md">
-            <Text size="xl" fw={700}>{formatCurrency(currentValue)}</Text>
+            <Text size="xl" fw={700} className="numeric-value">{formatCurrency(currentValue)}</Text>
           </Card.Section>
         </Card>
         <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -159,7 +159,7 @@ export default function InvestmentDetailPage() {
             <Text size="sm" fw={500}>Profit/Loss</Text>
           </Card.Section>
           <Card.Section inheritPadding py="md">
-            <Text size="xl" fw={700} c={profit >= 0 ? 'green.6' : 'red.6'}>
+            <Text size="xl" fw={700} c={profit >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
               {formatCurrency(profit)}
             </Text>
           </Card.Section>
@@ -169,7 +169,7 @@ export default function InvestmentDetailPage() {
             <Text size="sm" fw={500}>Return</Text>
           </Card.Section>
           <Card.Section inheritPadding py="md">
-            <Text size="xl" fw={700} c={profitPercentage >= 0 ? 'green.6' : 'red.6'}>
+            <Text size="xl" fw={700} c={profitPercentage >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
               {currentValue === null ? 'N/A' : `${profitPercentage.toFixed(2)}%`}
             </Text>
           </Card.Section>

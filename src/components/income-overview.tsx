@@ -108,9 +108,9 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
                       {category.title}
                     </Anchor>
                   </Table.Td>
-                  <Table.Td ta="right">{formatCurrency(data.monthlyIncome)}</Table.Td>
-                  <Table.Td ta="right">{formatCurrency(data.yearToDateIncome)}</Table.Td>
-                  <Table.Td ta="right">{formatCurrency(data.annualIncome)}</Table.Td>
+                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.monthlyIncome)}</Table.Td>
+                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.yearToDateIncome)}</Table.Td>
+                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.annualIncome)}</Table.Td>
                 </Table.Tr>
               )
             })}
