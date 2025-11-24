@@ -119,15 +119,25 @@ New Transactions to Categorize:
 
 **Location**: `src/components/expense-ai-converter.tsx`
 
-```typescript
-import { useCompletion } from 'ai/react';
+#### Architecture Pattern: Separation of Concerns
 
-export function ExpenseAiConverter() {
+**CRITICAL**: AI components should follow the same separation pattern as all components.
+
+**✅ DO: Separate Business Logic from UI**
+
+```typescript
+// Hook layer - Business logic (data fetching, AI calls, state management)
+function useExpenseAI() {
+  const { expenses, categories } = useExpenseStore();
   const { completion, complete, isLoading } = useCompletion({
     api: '/api/completion'
   });
 
-  async function handleConvert(text: string) {
+  // Business logic: prepare context, call AI
+  async function convertTransactions(text: string) {
+    const historicalExpenses = expenses.slice(-100); // Last 100 for context
+    const activeCategories = categories.filter(c => !c.isArchived);
+
     await complete(text, {
       body: {
         expenses: historicalExpenses,
@@ -137,10 +147,41 @@ export function ExpenseAiConverter() {
     });
   }
 
-  // Display streamed response in editable table
-  // User can review/edit before saving to database
+  return { completion, convertTransactions, isLoading };
+}
+
+// Component layer - Visual presentation only
+export function ExpenseAiConverter() {
+  const { completion, convertTransactions, isLoading } = useExpenseAI();
+  const [inputText, setInputText] = useState('');
+
+  return (
+    <Stack gap="md">
+      <Textarea
+        value={inputText}
+        onChange={(e) => setInputText(e.target.value)}
+        placeholder="Paste bank transactions here..."
+        rows={10}
+      />
+      <Button
+        onClick={() => convertTransactions(inputText)}
+        loading={isLoading}
+      >
+        Convert with AI
+      </Button>
+      {completion && (
+        <ExpenseTable data={completion} />
+      )}
+    </Stack>
+  );
 }
 ```
+
+**Why This Matters for AI**:
+- ✅ Business logic (AI calls, context preparation) is testable in isolation
+- ✅ UI can be updated without touching AI logic
+- ✅ Easy to swap AI providers or add fallbacks
+- ✅ Context building logic can be reused across components
 
 ### User Flow
 

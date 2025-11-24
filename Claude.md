@@ -813,41 +813,394 @@ npm install -D @types/react@latest @types/react-dom@latest @types/node@latest
 
 ## Best Practices
 
-### 1. State Management
+### 1. Component Architecture: Separation of Concerns
+
+**CRITICAL**: Always separate business logic from visual components.
+
+#### ✅ DO: Business Logic in Custom Hooks
+
+```typescript
+// src/stores/instantdb.ts - Business logic layer
+export function useExpenseStore() {
+  const { data } = db.useQuery({
+    expenses: {},
+    expenseCategories: {}
+  });
+
+  // All business logic here
+  const calculateCategoryAmount = useCallback(
+    (items: Expense[], categoryId: string): number => {
+      return items
+        .filter(item => item.categoryId === categoryId)
+        .reduce((total, item) => total + (item.amount || 0), 0);
+    },
+    []
+  );
+
+  return {
+    expenses: data?.expenses || [],
+    categories: data?.expenseCategories || [],
+    calculateCategoryAmount
+  };
+}
+```
+
+#### ✅ DO: Visual Components Focus on Rendering
+
+```typescript
+// src/components/expense-overview.tsx - Visual layer
+export function ExpenseOverview({ selectedYear, selectedMonth }: Props) {
+  // Get data and business logic from hook
+  const { expenses, categories, calculateCategoryAmount } = useExpenseStore();
+
+  // Compute display data using business logic
+  const categoryData = useMemo(
+    () => categories.map(cat => ({
+      category: cat,
+      amount: calculateCategoryAmount(expenses, cat.id)
+    })),
+    [categories, expenses, calculateCategoryAmount]
+  );
+
+  // Component only handles rendering
+  return (
+    <Card withBorder>
+      <Card.Section withBorder inheritPadding py="md">
+        <Title order={3}>Expense Categories</Title>
+      </Card.Section>
+      <Card.Section>
+        <Table>
+          <Table.Tbody>
+            {categoryData.map(({ category, amount }) => (
+              <Table.Tr key={category.id}>
+                <Table.Td>{category.name}</Table.Td>
+                <Table.Td className="numeric-value">{formatCurrency(amount)}</Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Card.Section>
+    </Card>
+  );
+}
+```
+
+#### ❌ DON'T: Mix Business Logic and Rendering
+
+```typescript
+// Bad: Business logic mixed into component
+export function ExpenseOverview({ expenses }: Props) {
+  return (
+    <Table>
+      {expenses.map(expense => {
+        // ❌ Calculating in render - hard to test, reuse
+        const total = expenses
+          .filter(e => e.categoryId === expense.categoryId)
+          .reduce((sum, e) => sum + e.amount, 0);
+
+        return <Table.Tr>...</Table.Tr>;
+      })}
+    </Table>
+  );
+}
+```
+
+---
+
+### 2. Styling with Mantine: Prop-Based Approach
+
+**CRITICAL**: Use Mantine's component props instead of inline styles or CSS classes.
+
+#### ✅ DO: Use Mantine Layout Components
+
+```typescript
+// Stack for vertical layouts
+<Stack gap="md">
+  <Title order={2}>Dashboard</Title>
+  <Text c="dimmed">Overview of your finances</Text>
+</Stack>
+
+// Group for horizontal layouts
+<Group justify="space-between" align="center">
+  <Text size="sm" fw={500}>Total</Text>
+  <Text size="xl" fw={700}>$1,234.56</Text>
+</Group>
+
+// SimpleGrid for responsive grids
+<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
+  <Card>...</Card>
+  <Card>...</Card>
+  <Card>...</Card>
+</SimpleGrid>
+```
+
+#### ✅ DO: Use Mantine Typography Props
+
+```typescript
+<Text
+  size="xl"           // Font size: xs, sm, md, lg, xl
+  fw={700}           // Font weight: 400, 500, 600, 700
+  c="green.6"        // Color from Mantine theme
+  ta="center"        // Text align
+  className="numeric-value"  // Custom font-family only
+>
+  $1,234.56
+</Text>
+
+<Title
+  order={3}          // h1-h6 semantic level
+  size="h5"          // Visual size (can differ from order)
+  mb="md"            // Margin bottom
+>
+  Page Title
+</Title>
+```
+
+#### ✅ DO: Use Mantine Spacing Props
+
+```typescript
+<Box
+  p="md"             // Padding: xs, sm, md, lg, xl
+  m="lg"             // Margin
+  mt="xs"            // Margin top
+  mb="xl"            // Margin bottom
+  pl="sm"            // Padding left
+  gap="md"           // For flex/grid containers
+>
+  Content
+</Box>
+```
+
+#### ❌ DON'T: Use Inline Styles for What Mantine Props Can Do
+
+```typescript
+// ❌ Bad - Using inline styles
+<div style={{
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: '1rem'
+}}>
+  <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>Label</span>
+  <span style={{ fontSize: '1.5rem', fontWeight: 700 }}>Value</span>
+</div>
+
+// ✅ Good - Using Mantine components and props
+<Group justify="space-between" align="center" gap="md">
+  <Text size="sm" fw={500}>Label</Text>
+  <Text size="xl" fw={700}>Value</Text>
+</Group>
+```
+
+#### 🟡 WHEN to Use Inline Styles
+
+Only use inline styles for:
+1. Dynamic values not supported by props
+2. Hover states that need dynamic colors
+3. Complex transformations
+
+```typescript
+// ✅ Acceptable - Dynamic color from data
+<Card
+  style={{
+    borderLeft: `4px solid ${getStatusColor(status)}`,
+    transition: 'transform 0.2s'
+  }}
+  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+>
+  Content
+</Card>
+```
+
+---
+
+### 3. Typography: Modern Font Stacks
+
+**Implemented**: System fonts for performance, semantic font usage.
+
+#### Font Stack Configuration
+
+```css
+/* globals.css */
+:root {
+  --font-system: system-ui, sans-serif;
+  --font-humanist: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+}
+
+/* Body text uses system font */
+body {
+  font-family: var(--font-system);
+}
+
+/* Headings use humanist font */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-humanist);
+}
+
+/* Numeric values use monospace with tabular nums */
+.numeric-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+```
+
+#### Mantine Theme Integration
+
+```typescript
+// app/layout.tsx
+import { createTheme, MantineProvider } from '@mantine/core';
+
+const theme = createTheme({
+  fontFamily: 'system-ui, sans-serif',
+  fontFamilyMonospace: "ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
+  headings: {
+    fontFamily: "Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif"
+  }
+});
+
+<MantineProvider theme={theme}>
+  {children}
+</MantineProvider>
+```
+
+#### Usage Pattern
+
+```typescript
+// ✅ Headings automatically use humanist font
+<Title order={2}>Investment Portfolio</Title>
+
+// ✅ Add numeric-value class to all currency/numbers
+<Text size="xl" fw={700} className="numeric-value">
+  $1,234.56
+</Text>
+
+<Table.Td ta="right" className="numeric-value">
+  {formatCurrency(amount)}
+</Table.Td>
+```
+
+**Why This Matters**:
+- **Performance**: System fonts load instantly (no network request)
+- **Consistency**: Tabular nums ensure numbers align vertically
+- **Readability**: Humanist fonts are optimized for headings
+
+---
+
+### 4. State Management
 
 - ✅ **DO**: Use InstantDB hooks for server state
 - ✅ **DO**: Use nuqs for URL state (filters, params)
 - ✅ **DO**: Use useState for local component state
+- ✅ **DO**: Extract calculations into useCallback/useMemo
 - ❌ **DON'T**: Mix state management approaches unnecessarily
+- ❌ **DON'T**: Put business logic in components (use hooks)
 
-### 2. Styling
+---
 
-- ✅ **DO**: Use Mantine components for UI primitives
-- ✅ **DO**: Use Tailwind for layout and spacing
-- ✅ **DO**: Use CSS Modules for custom component styles
-- ❌ **DON'T**: Write inline styles unless absolutely necessary
-- ❌ **DON'T**: Use `!important` (shows architectural issue)
+### 5. Component Patterns
 
-### 3. Components
+#### ✅ DO: Props-Based Composition
 
-- ✅ **DO**: Keep components small and focused
-- ✅ **DO**: Extract reusable logic into custom hooks
-- ✅ **DO**: Use TypeScript for props and state
-- ❌ **DON'T**: Create "god components" with too many responsibilities
+```typescript
+interface CardProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+}
 
-### 4. Performance
+export function OverviewCard({ title, value, icon }: CardProps) {
+  return (
+    <Card shadow="sm" padding="lg" radius="md" withBorder>
+      <Group justify="space-between" align="center" mb="xs">
+        <Text size="sm" fw={500}>{title}</Text>
+        {icon}
+      </Group>
+      <Text size="xl" fw={700} className="numeric-value">{value}</Text>
+    </Card>
+  );
+}
+```
+
+#### ✅ DO: Responsive Design with Mantine Props
+
+```typescript
+<SimpleGrid
+  cols={{ base: 1, xs: 2, sm: 3, md: 4, lg: 5 }}  // Responsive columns
+  spacing="md"
+>
+  <OverviewCard {...} />
+  <OverviewCard {...} />
+</SimpleGrid>
+
+<Box
+  display={{ base: 'none', sm: 'block' }}  // Hide on mobile
+>
+  Desktop only content
+</Box>
+```
+
+#### ✅ DO: Clean Data Tables with ScrollArea
+
+```typescript
+<ScrollArea>
+  <Table highlightOnHover style={{ minWidth: 700 }}>
+    <Table.Thead>
+      <Table.Tr>
+        <Table.Th>Description</Table.Th>
+        <Table.Th ta="right">Amount</Table.Th>
+      </Table.Tr>
+    </Table.Thead>
+    <Table.Tbody>
+      {expenses.map(expense => (
+        <Table.Tr key={expense.id}>
+          <Table.Td fw={500}>{expense.description}</Table.Td>
+          <Table.Td ta="right" className="numeric-value">
+            {formatCurrency(expense.amount)}
+          </Table.Td>
+        </Table.Tr>
+      ))}
+    </Table.Tbody>
+  </Table>
+</ScrollArea>
+```
+
+---
+
+### 6. Performance
 
 - ✅ **DO**: Use React.memo for expensive components
 - ✅ **DO**: Use useMemo/useCallback for expensive calculations
 - ✅ **DO**: Lazy load heavy components
+- ✅ **DO**: Move calculations to custom hooks
+- ❌ **DON'T**: Calculate in render (use useMemo)
 - ❌ **DON'T**: Premature optimization (measure first)
 
-### 5. AI Integration
+---
+
+### 7. AI Integration
 
 - ✅ **DO**: Use TOON format for context (saves tokens)
 - ✅ **DO**: Implement fallback providers
 - ✅ **DO**: Validate AI output with Zod schemas
 - ❌ **DON'T**: Trust AI output blindly (always validate)
+
+---
+
+### 8. Code Organization Checklist
+
+Before committing code, verify:
+
+- [ ] Business logic is in custom hooks, not components
+- [ ] Using Mantine components (Stack, Group, Text, Title) instead of divs/spans
+- [ ] Using Mantine props (ta, fw, c, gap) instead of inline styles
+- [ ] Added `className="numeric-value"` to all currency/number displays
+- [ ] Used SimpleGrid with responsive cols for grids
+- [ ] Used ScrollArea for tables that might overflow
+- [ ] Extracted expensive calculations to useMemo
+- [ ] TypeScript props are properly typed
+- [ ] No mixing of styling approaches (pick Mantine props first)
 
 ---
 
