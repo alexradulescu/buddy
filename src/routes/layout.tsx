@@ -1,31 +1,50 @@
 import { FC, PropsWithChildren } from 'react'
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { HydrationBoundary } from '@/components/hydration-boundary'
-import { Navigation } from '@/components/navigation'
-import { Flex, Box } from '@mantine/core'
-import classes from './layout.module.css'
+import { DesktopNav, MobileNav } from '@/components/navigation'
+import { AppShell, Group } from '@mantine/core'
 
 export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <NuqsAdapter>
       <HydrationBoundary>
-        <Flex mih="100vh" bg="white">
-          <Navigation />
-          <Box
-            component="main"
-            className={classes.mainContent}
-            flex={1}
-            p="md"
-            pb={{ base: '5rem', sm: 'md' }}
-            pl={{ base: 'md', sm: '4rem' }}
-            bg="gray.0"
+        <AppShell
+          navbar={{
+            width: 56,
+            breakpoint: 'sm'
+          }}
+          footer={{
+            height: 64
+          }}
+          padding="md"
+          withBorder={false}
+        >
+          {/* Desktop sidebar navigation - automatically shown on sm+ */}
+          <AppShell.Navbar
             style={(theme) => ({
-              overflowY: 'auto'
+              borderRight: `1px solid ${theme.colors.gray[2]}`
             })}
           >
+            <DesktopNav />
+          </AppShell.Navbar>
+
+          {/* Mobile bottom navigation - manually controlled */}
+          <AppShell.Footer
+            hiddenFrom="sm"
+            style={(theme) => ({
+              borderTop: `1px solid ${theme.colors.gray[2]}`
+            })}
+          >
+            <Group gap={0} h="100%" align="center">
+              <MobileNav />
+            </Group>
+          </AppShell.Footer>
+
+          {/* Main content area */}
+          <AppShell.Main bg="gray.0">
             {children}
-          </Box>
-        </Flex>
+          </AppShell.Main>
+        </AppShell>
       </HydrationBoundary>
     </NuqsAdapter>
   )
