@@ -3,7 +3,6 @@
 import React from 'react'
 import { useCategoryStore } from '@/stores/instantdb'
 import { CategoryManager } from '@/components/category-manager'
-import { PageHeader } from '@/components/page-header'
 import { Stack } from '@mantine/core'
 
 export default function SettingsPage() {
@@ -19,7 +18,6 @@ export default function SettingsPage() {
 
   return (
     <>
-      <PageHeader title="Settings" />
       <Stack gap="xl">
         <CategoryManager
           type="expense"

@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react'
 import { ExpenseList } from '@/components/expense-list'
-import { PageHeader } from '@/components/page-header'
 import { Card, Stack, Tabs, Group, NumberInput, Button } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'
@@ -104,7 +103,6 @@ export default function ExpensesPage() {
 
   return (
     <Stack gap="lg">
-      <PageHeader title="Expenses" />
 
       <Tabs defaultValue="list">
         <Tabs.List>

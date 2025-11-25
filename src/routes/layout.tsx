@@ -2,6 +2,7 @@ import { FC, PropsWithChildren } from 'react'
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { HydrationBoundary } from '@/components/hydration-boundary'
 import { DesktopNav, MobileNav } from '@/components/navigation'
+import { AppHeader } from '@/components/app-header'
 import { AppShell, Group } from '@mantine/core'
 
 export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
@@ -9,9 +10,11 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
     <NuqsAdapter>
       <HydrationBoundary>
         <AppShell
+          header={{ height: 60 }}
           navbar={{
             width: 56,
-            breakpoint: 'sm'
+            breakpoint: 'sm',
+            collapsed: { mobile: true }
           }}
           footer={{
             height: 64
@@ -19,7 +22,16 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
           padding="md"
           withBorder={false}
         >
-          {/* Desktop sidebar navigation - automatically shown on sm+ */}
+          {/* Header with page title and month picker */}
+          <AppShell.Header
+            style={(theme) => ({
+              borderBottom: `1px solid ${theme.colors.gray[2]}`
+            })}
+          >
+            <AppHeader />
+          </AppShell.Header>
+
+          {/* Desktop sidebar navigation */}
           <AppShell.Navbar
             style={(theme) => ({
               borderRight: `1px solid ${theme.colors.gray[2]}`
@@ -28,14 +40,17 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
             <DesktopNav />
           </AppShell.Navbar>
 
-          {/* Mobile bottom navigation - manually controlled */}
+          {/* Mobile bottom navigation */}
           <AppShell.Footer
             hiddenFrom="sm"
             style={(theme) => ({
-              borderTop: `1px solid ${theme.colors.gray[2]}`
+              borderTop: `1px solid ${theme.colors.gray[2]}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             })}
           >
-            <Group gap={0} h="100%" align="center">
+            <Group gap={0} h="100%" align="center" style={{ width: '100%' }}>
               <MobileNav />
             </Group>
           </AppShell.Footer>

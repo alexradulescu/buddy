@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import { useAccountBalances, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
 import { AccountForm } from '@/components/account-form'
 import { AccountList } from '@/components/account-list'
-import { PageHeader } from '@/components/page-header'
 import { Button, Card, Modal, Stack, SimpleGrid, Group, Text, Title } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
@@ -64,7 +63,6 @@ export default function AccountsPage() {
 
   return (
     <Stack gap="xl">
-      <PageHeader title="Accounts" />
 
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
         <Card shadow="sm" padding="0" radius="md" withBorder>

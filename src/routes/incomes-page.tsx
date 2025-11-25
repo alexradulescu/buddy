@@ -3,7 +3,6 @@
 import React from 'react'
 import { IncomeForm } from '@/components/income-form'
 import { IncomeList } from '@/components/income-list'
-import { PageHeader } from '@/components/page-header'
 import { Card, Stack, SimpleGrid, Title } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
@@ -12,7 +11,6 @@ export default function IncomesPage() {
 
   return (
     <Stack gap="xl">
-      <PageHeader title="Incomes" />
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Card.Section withBorder inheritPadding py="md">

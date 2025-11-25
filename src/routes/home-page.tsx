@@ -45,8 +45,6 @@ export default function HomePage() {
 
   return (
     <Stack gap="lg">
-      <PageHeader title="Budget Overview" />
-
       <HomeOverview
         totalMonthlyIncomes={totalMonthlyIncomes}
         totalMonthlyExpenses={totalMonthlyExpenses}
