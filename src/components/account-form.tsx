@@ -3,9 +3,8 @@
 import React, { useState } from 'react'
 import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
 import { useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useToast } from '@/hooks/use-toast'
+import { Button, TextInput, NumberInput } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 
 interface AccountFormProps {
   initialData?: AccountBalance
@@ -16,14 +15,15 @@ interface AccountFormProps {
 
 export const AccountForm: React.FC<AccountFormProps> = ({ initialData, onSubmit, selectedYear, selectedMonth }) => {
   const { addAccountBalance, updateAccountBalance } = useAccountBalances(selectedYear, selectedMonth)
-  const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    setValue,
+    watch
   } = useForm<Omit<AccountBalance, 'id'>>({
     defaultValues: initialData || {
       title: '',
@@ -33,29 +33,33 @@ export const AccountForm: React.FC<AccountFormProps> = ({ initialData, onSubmit,
     }
   })
 
+  const amount = watch('amount')
+
   const onSubmitForm = async (data: Omit<AccountBalance, 'id'>) => {
     setIsSubmitting(true)
     try {
       if (initialData) {
         updateAccountBalance(initialData.id, data)
-        toast({
+        notifications.show({
           title: 'Account balance updated',
-          description: `Updated balance for ${data.title}`
+          message: `Updated balance for ${data.title}`,
+          color: 'green'
         })
       } else {
         addAccountBalance(data)
-        toast({
+        notifications.show({
           title: 'Account balance added',
-          description: `Added new balance for ${data.title}`
+          message: `Added new balance for ${data.title}`,
+          color: 'green'
         })
       }
       reset()
       onSubmit()
     } catch (error) {
-      toast({
+      notifications.show({
         title: 'Error',
-        description: 'An error occurred while saving the account balance.',
-        variant: 'destructive'
+        message: 'An error occurred while saving the account balance.',
+        color: 'red'
       })
     } finally {
       setIsSubmitting(false)
@@ -63,19 +67,27 @@ export const AccountForm: React.FC<AccountFormProps> = ({ initialData, onSubmit,
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmitForm)} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <div>
-        <Input {...register('title', { required: 'Title is required' })} placeholder="Account Title" />
-        {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+        <TextInput {...register('title', { required: 'Title is required' })} placeholder="Account Title" />
+        {errors.title && (
+          <p style={{ color: 'var(--mantine-color-red-6)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+            {errors.title.message}
+          </p>
+        )}
       </div>
       <div>
-        <Input
-          type="number"
-          step="0.01"
-          {...register('amount', { required: 'Amount is required', valueAsNumber: true })}
+        <NumberInput
+          value={amount}
+          onChange={(value) => setValue('amount', Number(value) || 0)}
           placeholder="Balance Amount"
+          decimalScale={2}
         />
-        {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount.message}</p>}
+        {errors.amount && (
+          <p style={{ color: 'var(--mantine-color-red-6)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+            {errors.amount.message}
+          </p>
+        )}
       </div>
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Saving...' : initialData ? 'Update Balance' : 'Add Balance'}

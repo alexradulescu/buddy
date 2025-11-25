@@ -2,97 +2,100 @@
 
 import React, { useMemo, useState } from 'react'
 import { Expense, ExpenseCategory, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
-import { useCompletion, experimental_useObject as useObject } from '@ai-sdk/react'
-import { Loader2 } from 'lucide-react'
 import { ExpenseTable } from '@/components/expense-table'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
-
-function isJsonString(input: string): boolean {
-  try {
-    JSON.parse(input)
-  } catch (e) {
-    return false
-  }
-  return true
-}
+import { Button, Stack, Text, Textarea, Title } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 
 interface ExpenseAiConverterProps {
   onExpensesGenerated: (expenses: Expense[]) => void
 }
 
-export interface HistoricalExpense extends Omit<Expense, 'amount' | 'id' | 'date'> {}
-
-const getKvExpenseCategories = (expenseCategories: ExpenseCategory[]): Record<string, string> => {
-  const kvExpenseCategories: Record<string, string> = {}
-  expenseCategories.forEach((category) => {
-    kvExpenseCategories[category.id] = category.name
-  })
-  return kvExpenseCategories
-}
-
 export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpensesGenerated }) => {
-  const { toast } = useToast()
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
   const { data: { expenses = [] } = {} } = useExpenseStore()
   const [aiGeneratedExpenses, setAiGeneratedExpenses] = useState<Expense[]>([])
+  const [inputText, setInputText] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const historicalExpenses = useMemo(() => {
     const threeMonthsAgo = new Date()
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
 
-    const historicalExpenses: Record<string, string> = {}
-
-    expenses.forEach(({ description, categoryId, date }) => {
-      if (new Date(date) >= threeMonthsAgo) {
-        historicalExpenses[description] = categoryId
-      }
-    })
-
-    return historicalExpenses
+    return expenses
+      .filter(({ date }) => new Date(date) >= threeMonthsAgo)
+      .map(({ description, categoryId }) => ({
+        description,
+        categoryId,
+        amount: 0
+      }))
   }, [expenses])
 
-  const { input, handleInputChange, handleSubmit, isLoading, error } = useCompletion({
-    api: '/api/completion',
-    streamProtocol: 'text',
-    body: {
-      expenseCategories: getKvExpenseCategories(expenseCategories),
-      historicalExpenses
-    },
-    onFinish: (prompt: string, completion: string) => {
-      try {
-        // The API returns an array of objects directly
-        const expenses = isJsonString(completion) ? JSON.parse(completion) : completion
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-        const processedExpenses = Array.isArray(expenses)
-          ? expenses.map((expense: Expense) => ({ ...expense, id: crypto.randomUUID() }))
-          : []
+    if (!inputText.trim()) {
+      notifications.show({
+        title: 'Empty input',
+        message: 'Please enter transaction data to convert',
+        color: 'yellow'
+      })
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('/api/completion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: inputText,
+          expenseCategories: expenseCategories.map(cat => ({ id: cat.id, name: cat.name })),
+          historicalExpenses
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
+        throw new Error(errorData.message || `Server error: ${response.status}`)
+      }
+
+      // Parse the JSON response
+      const expenses = await response.json()
+
+      if (expenses && Array.isArray(expenses) && expenses.length > 0) {
+        const processedExpenses = expenses.map((expense) => ({
+          ...expense,
+          id: crypto.randomUUID()
+        }))
 
         setAiGeneratedExpenses(processedExpenses)
 
-        toast({
+        notifications.show({
           title: 'Expenses processed',
-          description: `${processedExpenses.length} expenses have been processed and are ready for review.`
+          message: `${processedExpenses.length} expenses have been processed and are ready for review.`,
+          color: 'green'
         })
-      } catch (error) {
-        console.error('Error processing completion:', error)
-        toast({
-          title: 'Error processing expenses',
-          description: 'Failed to process the AI response',
-          variant: 'destructive'
+      } else {
+        notifications.show({
+          title: 'No expenses found',
+          message: 'The AI did not find any expenses to process.',
+          color: 'yellow'
         })
       }
-    },
-    onError: (error: Error) => {
-      console.error('Error processing completion:', error)
-      toast({
+    } catch (error) {
+      console.error('Error processing expenses:', error)
+      notifications.show({
         title: 'Error',
-        description: error.message,
-        variant: 'destructive'
+        message: error instanceof Error ? error.message : 'Failed to process expenses',
+        color: 'red'
       })
+    } finally {
+      setIsLoading(false)
     }
-  })
+  }
 
   const handleExpenseChange = (
     index: number,
@@ -124,14 +127,14 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
 
   const handleReset = () => {
     setAiGeneratedExpenses([])
+    setInputText('')
   }
 
   return (
-    <div className="space-y-4">
-      {error && <div className="text-red-500 mt-4">Error: {error.message}</div>}
+    <Stack gap="md">
       {aiGeneratedExpenses.length > 0 ? (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">AI Generated Expenses</h3>
+        <Stack gap="md">
+          <Title order={3} size="h5">AI Generated Expenses</Title>
           <ExpenseTable
             expenses={aiGeneratedExpenses}
             expenseCategories={expenseCategories}
@@ -139,31 +142,25 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
             onDeleteRow={handleDeleteExpense}
           />
           <Button onClick={handleSaveExpenses}>Save Processed Expenses</Button>
-          <Button variant={'destructive'} onClick={handleReset}>
+          <Button color="red" onClick={handleReset}>
             Reset
           </Button>
-        </div>
+        </Stack>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <Stack component="form" onSubmit={handleSubmit} gap="md">
           <Textarea
-            value={input}
-            onChange={handleInputChange}
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
             placeholder="Enter your expense details here..."
-            className="min-h-[100px] max-h-96 overflow-auto"
+            minRows={4}
+            maxRows={10}
             readOnly={isLoading}
           />
-          <Button type="submit" disabled={isLoading} className="w-full">
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Converting...
-              </>
-            ) : (
-              'Convert'
-            )}
+          <Button type="submit" disabled={isLoading} fullWidth loading={isLoading}>
+            {isLoading ? 'Converting...' : 'Convert'}
           </Button>
-        </form>
+        </Stack>
       )}
-    </div>
+    </Stack>
   )
 }

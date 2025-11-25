@@ -1,13 +1,12 @@
+'use client'
+
 import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { InvestmentValue } from '@/types/investment'
-import { useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
+import { useForm, Controller } from 'react-hook-form'
+import { Button, NumberInput, Textarea } from '@mantine/core'
+import { DatePickerInput } from '@mantine/dates'
+import { notifications } from '@mantine/notifications'
 
 interface ValueFormProps {
   investmentId: string
@@ -17,14 +16,13 @@ interface ValueFormProps {
 }
 
 export default function ValueForm({ investmentId, value, onSuccess, onCancel }: ValueFormProps) {
-  const { toast } = useToast()
   const { addValue, updateValue } = useInvestmentStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const form = useForm({
+  const { control, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
-      value: value?.value?.toString() || '0',
-      date: value?.date ? new Date(value.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      value: value?.value || 0,
+      date: value?.date ? new Date(value.date) : new Date(),
       description: value?.description || ''
     }
   })
@@ -33,25 +31,27 @@ export default function ValueForm({ investmentId, value, onSuccess, onCancel }: 
     setIsSubmitting(true)
     try {
       const formattedData = {
-        ...data,
-        value: parseFloat(data.value),
-        date: new Date(data.date).toISOString()
+        value: data.value,
+        date: data.date.toISOString(),
+        description: data.description
       }
 
       if (value) {
         await updateValue(value.id, formattedData)
-        toast({
+        notifications.show({
           title: 'Value updated',
-          description: 'Your value entry has been updated successfully.'
+          message: 'Your value entry has been updated successfully.',
+          color: 'green'
         })
       } else {
         await addValue({
           ...formattedData,
           investmentId
         })
-        toast({
+        notifications.show({
           title: 'Value added',
-          description: 'Your value entry has been added successfully.'
+          message: 'Your value entry has been added successfully.',
+          color: 'green'
         })
       }
 
@@ -59,10 +59,10 @@ export default function ValueForm({ investmentId, value, onSuccess, onCancel }: 
         onSuccess()
       }
     } catch (error) {
-      toast({
+      notifications.show({
         title: 'Error',
-        description: 'There was an error saving your value entry. Please try again.',
-        variant: 'destructive'
+        message: 'There was an error saving your value entry. Please try again.',
+        color: 'red'
       })
     } finally {
       setIsSubmitting(false)
@@ -70,76 +70,69 @@ export default function ValueForm({ investmentId, value, onSuccess, onCancel }: 
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{value ? 'Edit Value' : 'Add Value'}</CardTitle>
-      </CardHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="value"
-              rules={{
-                required: 'Value is required',
-                validate: (value) => parseFloat(value) > 0 || 'Value must be greater than 0'
-              }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Value</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      {...field}
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+    <div style={{ padding: '1rem', border: '1px solid var(--mantine-color-gray-3)', borderRadius: 'var(--mantine-radius-md)', backgroundColor: 'var(--mantine-color-gray-0)' }}>
+      <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1rem', marginTop: 0 }}>
+        {value ? 'Edit Value' : 'Add Value'}
+      </h3>
+      <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <Controller
+          name="value"
+          control={control}
+          rules={{
+            required: 'Value is required',
+            validate: (value) => value > 0 || 'Value must be greater than 0'
+          }}
+          render={({ field }) => (
+            <NumberInput
+              label="Value"
+              placeholder="0.00"
+              decimalScale={2}
+              fixedDecimalScale
+              prefix="$"
+              error={errors.value?.message}
+              {...field}
             />
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="date"
-              rules={{ required: 'Date is required' }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Date</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+        <Controller
+          name="date"
+          control={control}
+          rules={{ required: 'Date is required' }}
+          render={({ field }) => (
+            <DatePickerInput
+              label="Date"
+              placeholder="Select date"
+              valueFormat="YYYY-MM-DD"
+              error={errors.date?.message}
+              value={field.value}
+              onChange={(value) => field.onChange(value || new Date())}
             />
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Value description" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+        <Controller
+          name="description"
+          control={control}
+          render={({ field }) => (
+            <Textarea
+              label="Description (optional)"
+              placeholder="Value description"
+              error={errors.description?.message}
+              {...field}
             />
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : value ? 'Update' : 'Add'}
-            </Button>
-          </CardFooter>
-        </form>
-      </Form>
-    </Card>
+          )}
+        />
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+          <Button variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" loading={isSubmitting}>
+            {value ? 'Update' : 'Add'}
+          </Button>
+        </div>
+      </form>
+    </div>
   )
 }

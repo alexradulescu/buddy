@@ -1,15 +1,12 @@
+'use client'
+
 import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { Investment } from '@/types/investment'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { useNavigate } from 'react-router'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
+import { Button, Card, TextInput, Textarea, Switch } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 
 interface InvestmentFormProps {
   investment?: Investment
@@ -18,11 +15,10 @@ interface InvestmentFormProps {
 
 export default function InvestmentForm({ investment, onSuccess }: InvestmentFormProps) {
   const navigate = useNavigate()
-  const { toast } = useToast()
   const { addInvestment, updateInvestment } = useInvestmentStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const form = useForm({
+  const { control, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       name: investment?.name || '',
       description: investment?.description || '',
@@ -35,18 +31,20 @@ export default function InvestmentForm({ investment, onSuccess }: InvestmentForm
     try {
       if (investment) {
         await updateInvestment(investment.id, data)
-        toast({
+        notifications.show({
           title: 'Investment updated',
-          description: 'Your investment has been updated successfully.'
+          message: 'Your investment has been updated successfully.',
+          color: 'green'
         })
       } else {
         await addInvestment({
           ...data,
           createdDate: new Date().toISOString()
         })
-        toast({
+        notifications.show({
           title: 'Investment created',
-          description: 'Your investment has been created successfully.'
+          message: 'Your investment has been created successfully.',
+          color: 'green'
         })
       }
 
@@ -56,10 +54,10 @@ export default function InvestmentForm({ investment, onSuccess }: InvestmentForm
         navigate('/investments')
       }
     } catch (error) {
-      toast({
+      notifications.show({
         title: 'Error',
-        description: 'There was an error saving your investment. Please try again.',
-        variant: 'destructive'
+        message: 'There was an error saving your investment. Please try again.',
+        color: 'red'
       })
     } finally {
       setIsSubmitting(false)
@@ -67,68 +65,69 @@ export default function InvestmentForm({ investment, onSuccess }: InvestmentForm
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{investment ? 'Edit Investment' : 'Add Investment'}</CardTitle>
-      </CardHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              rules={{ required: 'Name is required' }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Investment name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <Card shadow="sm" padding="lg" radius="md" withBorder>
+      <Card.Section withBorder inheritPadding py="md">
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>
+          {investment ? 'Edit Investment' : 'Add Investment'}
+        </h2>
+      </Card.Section>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Card.Section inheritPadding py="md" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <Controller
+            name="name"
+            control={control}
+            rules={{ required: 'Name is required' }}
+            render={({ field }) => (
+              <TextInput
+                label="Name"
+                placeholder="Investment name"
+                error={errors.name?.message}
+                {...field}
+              />
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Investment description" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <Textarea
+                label="Description (optional)"
+                placeholder="Investment description"
+                error={errors.description?.message}
+                {...field}
+              />
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="isActive"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                  <div className="space-y-0.5">
-                    <FormLabel>Active</FormLabel>
-                    <FormDescription>Mark this investment as active or inactive</FormDescription>
+          <Controller
+            name="isActive"
+            control={control}
+            render={({ field }) => (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', border: '1px solid var(--mantine-color-gray-3)', borderRadius: 'var(--mantine-radius-md)' }}>
+                <div>
+                  <div style={{ fontWeight: 500 }}>Active</div>
+                  <div style={{ fontSize: '0.875rem', color: 'var(--mantine-color-dimmed)' }}>
+                    Mark this investment as active or inactive
                   </div>
-                  <FormControl>
-                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button type="button" variant="outline" onClick={() => navigate('/investments')}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : investment ? 'Update' : 'Create'}
-            </Button>
-          </CardFooter>
-        </form>
-      </Form>
+                </div>
+                <Switch
+                  checked={field.value}
+                  onChange={field.onChange}
+                />
+              </div>
+            )}
+          />
+        </Card.Section>
+        <Card.Section withBorder inheritPadding py="md" style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Button variant="outline" onClick={() => navigate('/investments')}>
+            Cancel
+          </Button>
+          <Button type="submit" loading={isSubmitting}>
+            {investment ? 'Update' : 'Create'}
+          </Button>
+        </Card.Section>
+      </form>
     </Card>
   )
 }

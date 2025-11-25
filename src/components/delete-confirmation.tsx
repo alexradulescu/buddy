@@ -1,16 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { Button, Modal } from '@mantine/core'
 
 interface DeleteConfirmationProps {
   isOpen: boolean
@@ -34,42 +24,39 @@ export function DeleteConfirmation({
   recordDetails,
 }: DeleteConfirmationProps) {
   return (
-    <AlertDialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {description}
-            {recordDetails && (
-              <div className="mt-4 space-y-2 rounded-md border p-3">
-                {Object.entries(recordDetails).map(([key, value]) => (
-                  <div key={key} className="flex justify-between">
-                    <span className="font-medium text-muted-foreground capitalize">
-                      {key.replace(/([A-Z])/g, ' $1').trim()}:
-                    </span>
-                    <span className="text-foreground">
-                      {value === null || value === undefined ? 'N/A' : value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>{cancelText}</AlertDialogCancel>
-          <AlertDialogAction
+    <Modal opened={isOpen} onClose={onClose} title={title} centered>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <p style={{ color: 'var(--mantine-color-dimmed)' }}>
+          {description}
+          {recordDetails && (
+            <div style={{ marginTop: '1rem', padding: '0.75rem', border: '1px solid var(--mantine-color-gray-3)', borderRadius: '4px' }}>
+              {Object.entries(recordDetails).map(([key, value]) => (
+                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ fontWeight: 500, color: 'var(--mantine-color-dimmed)', textTransform: 'capitalize' }}>
+                    {key.replace(/([A-Z])/g, ' $1').trim()}:
+                  </span>
+                  <span>
+                    {value === null || value === undefined ? 'N/A' : value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </p>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+          <Button variant="outline" onClick={onClose}>{cancelText}</Button>
+          <Button
+            color="red"
             onClick={(e) => {
               e.preventDefault()
               onConfirm()
               onClose()
             }}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             {confirmText}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </Button>
+        </div>
+      </div>
+    </Modal>
   )
 }

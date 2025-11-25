@@ -1,14 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { cn } from '@/lib/utils'
 import { useAccountBalances, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
 import { AccountForm } from '@/components/account-form'
 import { AccountList } from '@/components/account-list'
-import { PageHeader } from '@/components/page-header'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Button, Card, Modal, Stack, SimpleGrid, Group, Text, Title } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 const getPreviousMonthYear = (year: number, month: number) => {
@@ -66,72 +62,72 @@ export default function AccountsPage() {
   const discrepancy = realAccountsTotal - expectedAccountsTotal
 
   return (
-    <div className="space-y-8">
-      <PageHeader title="Accounts" />
+    <Stack gap="xl">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card className="overflow-hidden">
-          <CardHeader className="flex flex-row items-start bg-muted/50 py-3">
-            <CardTitle className="group flex items-center gap-1 text-md">Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 text-sm">
-            <ul className="grid gap-3">
-              <li className="flex items-center justify-between">
-                <span className="text-muted-foreground">Total Account Balances</span>
-                <span>${currentMonthBalance.toFixed(2)}</span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-muted-foreground">Total Expenses</span>
-                <span>${currentMonthExpenses.toFixed(2)}</span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-muted-foreground">Total Income</span>
-                <span>${currentMonthIncome.toFixed(2)}</span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-muted-foreground">Expected Accounts Total</span>
-                <span>${expectedAccountsTotal.toFixed(2)}</span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-muted-foreground">Real Accounts Total</span>
-                <span>${realAccountsTotal.toFixed(2)}</span>
-              </li>
-            </ul>
-          </CardContent>
-          <CardFooter className="flex flex-row items-center justify-between border-t bg-muted/50 px-6 py-3">
-            <span className="text-muted-foreground">Discrepancy</span>
-            <span className={cn(discrepancy > 0 ? 'text-green-600' : 'text-red-600', 'font-semibold')}>
-              ${discrepancy.toFixed(2)}
-            </span>
-          </CardFooter>
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
+        <Card shadow="sm" padding="0" radius="md" withBorder>
+          <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+            <Title order={3} size="h5">Summary</Title>
+          </Card.Section>
+          <Card.Section inheritPadding py="md">
+            <Stack gap="sm">
+              <Group justify="space-between">
+                <Text c="dimmed">Total Account Balances</Text>
+                <Text>${currentMonthBalance.toFixed(2)}</Text>
+              </Group>
+              <Group justify="space-between">
+                <Text c="dimmed">Total Expenses</Text>
+                <Text>${currentMonthExpenses.toFixed(2)}</Text>
+              </Group>
+              <Group justify="space-between">
+                <Text c="dimmed">Total Income</Text>
+                <Text>${currentMonthIncome.toFixed(2)}</Text>
+              </Group>
+              <Group justify="space-between">
+                <Text c="dimmed">Expected Accounts Total</Text>
+                <Text>${expectedAccountsTotal.toFixed(2)}</Text>
+              </Group>
+              <Group justify="space-between">
+                <Text c="dimmed">Real Accounts Total</Text>
+                <Text>${realAccountsTotal.toFixed(2)}</Text>
+              </Group>
+            </Stack>
+          </Card.Section>
+          <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+            <Group justify="space-between">
+              <Text c="dimmed">Discrepancy</Text>
+              <Text fw={600} c={discrepancy > 0 ? 'green.6' : 'red.6'}>
+                ${discrepancy.toFixed(2)}
+              </Text>
+            </Group>
+          </Card.Section>
         </Card>
 
-        <Card className="overflow-hidden">
-          <CardHeader className="bg-muted/50 py-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Account Balances</CardTitle>
-              <Dialog open={isAddAccountDialogOpen} onOpenChange={setIsAddAccountDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button size={'sm'}>Add</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add New Account Balance</DialogTitle>
-                  </DialogHeader>
-                  <AccountForm
-                    onSubmit={() => setIsAddAccountDialogOpen(false)}
-                    selectedYear={selectedYear}
-                    selectedMonth={selectedMonth}
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            <AccountList selectedYear={selectedYear} selectedMonth={selectedMonth} />
-          </CardContent>
+        <Card shadow="sm" padding="0" radius="md" withBorder>
+          <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+            <Group justify="space-between">
+              <Title order={3} size="h5">Account Balances</Title>
+              <Button size="sm" onClick={() => setIsAddAccountDialogOpen(true)}>
+                Add
+              </Button>
+            </Group>
+          </Card.Section>
+          <AccountList selectedYear={selectedYear} selectedMonth={selectedMonth} />
         </Card>
-      </div>
-    </div>
+      </SimpleGrid>
+
+      <Modal
+        opened={isAddAccountDialogOpen}
+        onClose={() => setIsAddAccountDialogOpen(false)}
+        title="Add New Account Balance"
+        centered
+      >
+        <AccountForm
+          onSubmit={() => setIsAddAccountDialogOpen(false)}
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+        />
+      </Modal>
+    </Stack>
   )
 }

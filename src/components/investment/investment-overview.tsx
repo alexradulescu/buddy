@@ -1,12 +1,12 @@
+'use client'
+
 import { useMemo } from 'react'
 import { TrendingUp } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Card, Table, Stack, SimpleGrid, Title, Text, Group, ScrollArea } from '@mantine/core'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
-import { cn } from '@/lib/utils'
 
 export function InvestmentOverview() {
-  const { investments, getInvestmentContributions, getInvestmentValues, getLatestValue, getTotalContributions } = useInvestmentStore()
+  const { investments, getLatestValue, getTotalContributions } = useInvestmentStore()
 
   // Get only active investments
   const activeInvestments = useMemo(() => {
@@ -65,70 +65,67 @@ export function InvestmentOverview() {
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <TrendingUp className="mr-2 h-5 w-5" />
-            Investment Summary
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Total Value</p>
-              <p className="text-2xl font-bold">{formatCurrency(totalInvestmentValue)}</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Total Invested</p>
-              <p className="text-2xl font-bold">{formatCurrency(totalContributions)}</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">Total P&L</p>
-              <p className={cn(
-                "text-2xl font-bold", 
-                totalProfitLoss >= 0 ? "text-green-600" : "text-red-600"
-              )}>
+    <Stack gap="md">
+      <Card shadow="sm" padding="0" radius="md" withBorder>
+        <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+          <Group gap="xs">
+            <TrendingUp size={20} />
+            <Title order={3} size="h5">Investment Summary</Title>
+          </Group>
+        </Card.Section>
+        <Card.Section inheritPadding py="md">
+          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+            <Stack gap="xs">
+              <Text size="sm" fw={500} c="dimmed">Total Value</Text>
+              <Text size="xl" fw={700} className="numeric-value">{formatCurrency(totalInvestmentValue)}</Text>
+            </Stack>
+            <Stack gap="xs">
+              <Text size="sm" fw={500} c="dimmed">Total Invested</Text>
+              <Text size="xl" fw={700} className="numeric-value">{formatCurrency(totalContributions)}</Text>
+            </Stack>
+            <Stack gap="xs">
+              <Text size="sm" fw={500} c="dimmed">Total P&L</Text>
+              <Text size="xl" fw={700} c={totalProfitLoss >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
                 {formatCurrency(totalProfitLoss)} ({profitLossPercentage.toFixed(2)}%)
-              </p>
-            </div>
-          </div>
-        </CardContent>
+              </Text>
+            </Stack>
+          </SimpleGrid>
+        </Card.Section>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Active Investments</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead className="text-right">Current Value</TableHead>
-                <TableHead className="text-right">Total Invested</TableHead>
-                <TableHead className="text-right">P&L</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {investmentData.map((investment) => (
-                <TableRow key={investment.id}>
-                  <TableCell className="font-medium">{investment.name}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(investment.currentValue)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(investment.totalContributions)}</TableCell>
-                  <TableCell className="text-right">
-                    <span className={cn(
-                      investment.profit >= 0 ? "text-green-600" : "text-red-600"
-                    )}>
-                      {formatCurrency(investment.profit)} ({investment.profitPercentage.toFixed(2)}%)
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
+      <Card shadow="sm" padding="0" radius="md" withBorder>
+        <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+          <Title order={3} size="h5">Active Investments</Title>
+        </Card.Section>
+        <Card.Section>
+          <ScrollArea>
+            <Table style={{ minWidth: 600 }}>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Name</Table.Th>
+                  <Table.Th ta="right">Current Value</Table.Th>
+                  <Table.Th ta="right">Total Invested</Table.Th>
+                  <Table.Th ta="right">P&L</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {investmentData.map((investment) => (
+                  <Table.Tr key={investment.id}>
+                    <Table.Td fw={500}>{investment.name}</Table.Td>
+                    <Table.Td ta="right" className="numeric-value">{formatCurrency(investment.currentValue)}</Table.Td>
+                    <Table.Td ta="right" className="numeric-value">{formatCurrency(investment.totalContributions)}</Table.Td>
+                    <Table.Td ta="right">
+                      <Text c={investment.profit >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
+                        {formatCurrency(investment.profit)} ({investment.profitPercentage.toFixed(2)}%)
+                      </Text>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
+        </Card.Section>
       </Card>
-    </div>
+    </Stack>
   )
 }

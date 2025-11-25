@@ -2,10 +2,9 @@
 
 import React, { FC } from 'react'
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ActionIcon, Group, Stack, Title, Text } from '@mantine/core'
+import { MonthPickerInput } from '@mantine/dates'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 interface Props {
@@ -33,48 +32,70 @@ export const PageHeader: FC<Props> = ({ title, description, action }) => {
     setSelectedYear(newYear)
   }
 
+  const selectedDate = new Date(selectedYear, selectedMonth)
+
   return (
-    <div className="space-y-2 mb-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-          {description && <p className="text-muted-foreground">{description}</p>}
-        </div>
-        {action ? (
-          <div>{action}</div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" onClick={() => handleMonthChange(-1)} aria-label="Previous month">
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {format(new Date(selectedYear, selectedMonth), 'MMMM yyyy')}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  onSelect={(date) => {
-                    if (date) {
-                      setSelectedMonth(date.getMonth())
-                      setSelectedYear(date.getFullYear())
-                    }
-                  }}
-                  initialFocus
-                  month={new Date(selectedYear, selectedMonth)}
-                  defaultMonth={new Date(selectedYear, selectedMonth)}
-                />
-              </PopoverContent>
-            </Popover>
-            <Button variant="outline" size="icon" onClick={() => handleMonthChange(1)} aria-label="Next month">
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+    <Stack gap="xs" mb="lg">
+      <Group justify="space-between" align="flex-start" wrap="wrap">
+        <Stack gap={2}>
+          <Title order={1} size="h2">{title}</Title>
+          {description && <Text size="sm" c="dimmed">{description}</Text>}
+        </Stack>
+        {action || (
+          <Group gap={0} wrap="nowrap">
+            <ActionIcon
+              variant="default"
+              onClick={() => handleMonthChange(-1)}
+              aria-label="Previous month"
+              size="lg"
+              radius={0}
+              styles={{
+                root: {
+                  borderTopLeftRadius: 'var(--mantine-radius-default)',
+                  borderBottomLeftRadius: 'var(--mantine-radius-default)'
+                }
+              }}
+            >
+              <ChevronLeft size={16} />
+            </ActionIcon>
+            <MonthPickerInput
+              value={selectedDate}
+              onChange={(value) => {
+                if (value) {
+                  const date = new Date(value)
+                  setSelectedMonth(date.getMonth())
+                  setSelectedYear(date.getFullYear())
+                }
+              }}
+              valueFormat="MMM YY"
+              w={80}
+              styles={{
+                input: {
+                  borderRadius: 0,
+                  borderLeft: 0,
+                  borderRight: 0,
+                  textAlign: 'center'
+                }
+              }}
+            />
+            <ActionIcon
+              variant="default"
+              onClick={() => handleMonthChange(1)}
+              aria-label="Next month"
+              size="lg"
+              radius={0}
+              styles={{
+                root: {
+                  borderTopRightRadius: 'var(--mantine-radius-default)',
+                  borderBottomRightRadius: 'var(--mantine-radius-default)'
+                }
+              }}
+            >
+              <ChevronRight size={16} />
+            </ActionIcon>
+          </Group>
         )}
-      </div>
-    </div>
+      </Group>
+    </Stack>
   )
 }

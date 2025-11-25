@@ -1,5 +1,7 @@
+'use client'
+
 import { useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@mantine/core'
 import { InvestmentContribution, InvestmentValue } from '@/types/investment'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
@@ -79,24 +81,24 @@ export default function PerformanceGraph({ contributions, values }: PerformanceG
   // If there's no data, show a message
   if (chartData.length === 0 || (contributions.length === 0 && values.length === 0)) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Performance</CardTitle>
-        </CardHeader>
-        <CardContent className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Add contributions and values to see performance data</p>
-        </CardContent>
+      <Card shadow="sm" padding="0" radius="md" withBorder>
+        <Card.Section withBorder inheritPadding py="xs" style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>Performance</h3>
+        </Card.Section>
+        <Card.Section inheritPadding py="md" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '16rem' }}>
+          <p style={{ color: 'var(--mantine-color-dimmed)' }}>Add contributions and values to see performance data</p>
+        </Card.Section>
       </Card>
     )
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Performance</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="h-80">
+    <Card shadow="sm" padding="0" radius="md" withBorder>
+      <Card.Section withBorder inheritPadding py="xs" style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}>
+        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>Performance</h3>
+      </Card.Section>
+      <Card.Section inheritPadding py="md">
+        <div style={{ height: '20rem' }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
@@ -113,30 +115,30 @@ export default function PerformanceGraph({ contributions, values }: PerformanceG
               <Tooltip
                 formatter={(value) => {
                   // Ensure value is a number
-                  const numValue = typeof value === 'string' ? parseFloat(value) : 
-                                  Array.isArray(value) ? parseFloat(value[0].toString()) : 
+                  const numValue = typeof value === 'string' ? parseFloat(value) :
+                                  Array.isArray(value) ? parseFloat(value[0].toString()) :
                                   Number(value);
                   return [`$${numValue.toFixed(2)}`, undefined];
                 }}
               />
               <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="contributions" 
-                name="Contributions" 
-                stroke="#8884d8" 
-                activeDot={{ r: 8 }} 
+              <Line
+                type="monotone"
+                dataKey="contributions"
+                name="Contributions"
+                stroke="#8884d8"
+                activeDot={{ r: 8 }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="value" 
-                name="Value" 
-                stroke="#82ca9d" 
+              <Line
+                type="monotone"
+                dataKey="value"
+                name="Value"
+                stroke="#82ca9d"
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </CardContent>
+      </Card.Section>
     </Card>
   )
 }

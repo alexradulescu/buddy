@@ -1,9 +1,9 @@
+'use client'
+
 import { useMemo, useState } from 'react'
 import { InvestmentContribution } from '@/types/investment'
 import { Edit, Trash2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button, Card, Table, Group, Title, Text, Center } from '@mantine/core'
 import ContributionForm from './forms/contribution-form'
 
 interface ContributionTableProps {
@@ -50,16 +50,18 @@ export default function ContributionTable({ investmentId, contributions, onDelet
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Contributions</CardTitle>
-        {!showForm && (
-          <Button size="sm" onClick={() => setShowForm(true)}>
-            Add Contribution
-          </Button>
-        )}
-      </CardHeader>
-      <CardContent>
+    <Card shadow="sm" padding="0" radius="md" withBorder>
+      <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+        <Group justify="space-between" align="center">
+          <Title order={3} size="lg">Contributions</Title>
+          {!showForm && (
+            <Button size="sm" onClick={() => setShowForm(true)}>
+              Add Contribution
+            </Button>
+          )}
+        </Group>
+      </Card.Section>
+      <Card.Section inheritPadding py="md">
         {showForm ? (
           <ContributionForm
             investmentId={investmentId}
@@ -69,38 +71,38 @@ export default function ContributionTable({ investmentId, contributions, onDelet
           />
         ) : sortedContributions.length > 0 ? (
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Date</Table.Th>
+                <Table.Th>Amount</Table.Th>
+                <Table.Th>Description</Table.Th>
+                <Table.Th ta="right">Actions</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
               {sortedContributions.map((contribution) => (
-                <TableRow key={contribution.id}>
-                  <TableCell>{formatDate(contribution.date)}</TableCell>
-                  <TableCell>{formatCurrency(contribution.amount)}</TableCell>
-                  <TableCell>{contribution.description || '-'}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(contribution)}>
-                      <Edit className="h-4 w-4" />
+                <Table.Tr key={contribution.id}>
+                  <Table.Td>{formatDate(contribution.date)}</Table.Td>
+                  <Table.Td className="numeric-value">{formatCurrency(contribution.amount)}</Table.Td>
+                  <Table.Td>{contribution.description || '-'}</Table.Td>
+                  <Table.Td ta="right">
+                    <Button variant="subtle" size="compact-sm" onClick={() => handleEdit(contribution)}>
+                      <Edit size={16} />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => onDelete(contribution.id)}>
-                      <Trash2 className="h-4 w-4" />
+                    <Button variant="subtle" size="compact-sm" color="red" onClick={() => onDelete(contribution.id)}>
+                      <Trash2 size={16} />
                     </Button>
-                  </TableCell>
-                </TableRow>
+                  </Table.Td>
+                </Table.Tr>
               ))}
-            </TableBody>
+            </Table.Tbody>
           </Table>
         ) : (
-          <div className="text-center py-4">
-            <p className="text-muted-foreground">No contributions yet</p>
-          </div>
+          <Center p="md">
+            <Text c="dimmed">No contributions yet</Text>
+          </Center>
         )}
-      </CardContent>
+      </Card.Section>
     </Card>
   )
 }

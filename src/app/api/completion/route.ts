@@ -1,160 +1,177 @@
+import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
-import { streamObject } from 'ai'
+import { generateObject } from 'ai'
 import { z } from 'zod'
+import { buildTOONContext } from '@/lib/toon-helpers'
+
+// Type assertion to handle LanguageModelV2 compatibility
+type AnyLanguageModel = any
 
 interface BasePromptProps {
   transactions?: string
-  categories?: string
-  historicalExpenses?: string
+  contextData?: string
+  useTOON?: boolean
 }
 
-const basePrompt = ({
-  transactions,
-  categories,
-  historicalExpenses
-}: BasePromptProps) => `You are an intelligent assistant tasked with categorizing a list of bank transactions for an expense tracker. The user has provided 3 key inputs:
-1. A list of past transactions, each with a description and its assigned category name and category ID.
-2. A user-defined list of active categories that must be strictly followed. They are in key-value format as follows: categoryId: categoryName
-3. List of current transactions to process based in the following rules:
-- Skip/ignore any expense with the description containing any of the following words: Salary, Bullish
-- Format the amount as a number with two decimal places, without including the currency symbol.
-- If there are 2 amounts for an expense the smaller one is the amount, the larger one is the remaining balance.
-- Format the date as 'yyyy-MM-dd'. If no year is present on the date of an expense, set current year, 2025.
-- If there are 2 dates on an expense, use the latest one available.
-- Do minimal cleanup of the description to be better human readable and easier to identify.
-- Categorize each transaction based on the provided categories and historical expenses. Follow these steps:
-- Use the past transactions to help infer the correct categoryId for new transactions.
-- Only assign categoryId from the provided map of active categories.
-- If a new transaction's description or context closely matches a past transaction, use the same categoryId if available. If the categoryId is not available, use the categoryif of the category with the closest label to the category label in the past transactions. For example if closest category label was "Food [2024]" but in the available categories the closest label is "Food", use the categoryId of "Food".
-- If no clear match exists, make your best guess based on the description while adhering strictly to the category list.
-- Make sure to return the categoryId (example: "0db82f5d-1979-4568-8bbc-f67ece393c23") and not category label (example: "Food [2024]").
+/**
+ * System prompt for AI expense categorization
+ * Updated to handle TOON format input
+ */
+const systemPrompt = `You are an intelligent expense categorization assistant.
 
+Your task is to categorize bank transactions based on historical expense patterns and active categories.
 
-Here are examples of past expenses:
-${historicalExpenses}
+IMPORTANT RULES:
+- Skip/ignore transactions containing: "Salary", "Bullish" (these are income, not expenses)
+- Format amounts as decimal numbers (e.g., 45.50) without currency symbols
+- If 2 amounts exist, use the smaller one (larger is usually remaining balance)
+- Format dates as 'yyyy-MM-dd'. If no year, default to 2025
+- If 2 dates exist, use the latest date
+- Clean up descriptions for readability while preserving key information
+- Only use categoryId from the provided active categories list
+- Match historical patterns for consistent categorization
+- If old category name differs from active name, map to closest active category
 
-The user-defined categories are:
-${categories}
+Context will be provided in TOON format (Token-Oriented Object Notation) or JSON format.
+TOON format is a compact tabular representation optimized for LLMs.
 
-Now, categorize the following new transactions:
+Example TOON format:
+historicalExpenses[3]{description,categoryId,amount}:
+  Starbucks Coffee,abc-123,5.50
+  Shell Gas Station,def-456,45.00
+  Cinema Ticket,ghi-789,25.00
+activeCategories[3]{id,name}:
+  abc-123,Food & Dining
+  def-456,Transportation
+  ghi-789,Entertainment`
+
+/**
+ * Builds the user prompt with context and transactions
+ */
+const buildPrompt = ({ transactions, contextData, useTOON }: BasePromptProps) => {
+  const formatLabel = useTOON ? 'TOON format' : 'JSON format'
+
+  return `Historical expense context (${formatLabel}):
+${contextData}
+
+New transactions to categorize:
 ${transactions}
-`
 
-const newBasePrompt = ({
-  transactions,
-  categories,
-  historicalExpenses
-}: BasePromptProps) => `Below is a detailed prompt you can use. It clearly explains the process, includes dedicated sections for historicalExpenses, expenseCategories, and newExpenses, and provides an illustrative example:
+Analyze the context above and categorize each transaction.
+Return ONLY the categorized expenses without any additional text.`
+}
 
----
-
-**Prompt for AI Expense Categorization**
-
-Your task is to categorize new expenses based on historical expense data and a set of defined expense categories. Follow these instructions carefully:
-
-- **Objective:**  
-  Map each new expense to the most appropriate category based on past expense descriptions and category details.
-
-- **Data Sections:**  
-  - **historicalExpenses:** A list of objects, each with an "expense" (a descriptive string) and a "categoryId" (the ID associated with that expense).  
-  - **expenseCategories:** A list of objects, each containing:  
-    - "id": Unique identifier for the category.  
-    - "name": The name of the category (which may include a year or other details).  
-    - "isActive": A boolean indicating if this category is active.  
-  - **newExpenses:** A list of objects, each with an "expense" field containing the description of the expense that needs to be categorized.
-
-- **Instructions for Matching:**  
-  - **Step 1: Analyze Historical Data**  
-    Review the historicalExpenses to understand how previous expenses were categorized.
-  
-  - **Step 2: Compare Expense Descriptions**  
-    For each new expense, compare its description with the descriptions in historicalExpenses. Identify the closest match based on similarity of wording (e.g., "Supermarket shopping" is similar to "Supermarket").
-
-  - **Step 3: Determine Category Mapping**  
-    - Use the categoryId from the matching historical expense as a starting point.  
-    - Check the corresponding expenseCategories: If there are multiple categories that could match (for instance, due to similar labels across different years), prioritize the one where "isActive" is true.
-
-  - **Step 4: Return the Mapping**  
-    Output a JSON array where each new expense object is augmented with the determined categoryId.
-
-- **Example:**  
-
-  - *Historical Expenses:*  
-    <code>
-    [
-      { "expense": "Supermarket", "categoryId": "123" }
-    ]
-    </code>
-
-  - *Expense Categories:*  
-    <code>
-    [
-      { "id": "123", "name": "Groceries [2024]", "isActive": false },
-      { "id": "987", "name": "Groceries 2025", "isActive": true }
-    ]
-    </code>
-
-  - *New Expenses:*  
-    <code>
-    [
-      { "expense": "Supermarket shopping" }
-    ]
-    </code>
-
-  - *Expected Output:*  
-    <code>
-    [
-      { "expense": "Supermarket shopping", "categoryId": "987" }
-    ]
-    </code>
-
-  *Rationale:* The new expense "Supermarket shopping" closely resembles the historical expense "Supermarket". Although the historical mapping is linked to categoryId "123", the active category in the expenseCategories list is "Groceries 2025" (id "987"). Therefore, the new expense should be mapped to categoryId "987".
-
-- **Template Section for Input Data:**  
-  <code>
-  historicalExpenses: ${historicalExpenses}
-  expenseCategories: ${categories}
-  newExpenses: ${transactions}
-  </code>
-
-- **Final Task:**  
-  Given the provided historicalExpenses, expenseCategories, and newExpenses, determine the best matching category for each new expense. Return the results as a JSON array with each expense and its corresponding categoryId.
-
----
-
-This prompt provides clear guidance and examples, ensuring the AI understands how to use past expense data to accurately categorize new expenses.`
+/**
+ * Expense schema for validation
+ */
+const expenseSchema = z.object({
+  amount: z.number().nonnegative().describe('Amount of the expense'),
+  categoryId: z
+    .string()
+    .uuid()
+    .describe('UUID categoryId from active categories (e.g., 0db82f5d-1979-4568-8bbc-f67ece393c23)'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).describe('Date in yyyy-MM-dd format'),
+  description: z.string().describe('Cleaned up description preserving key information')
+})
 
 export const maxDuration = 60
 
-/** Based on the first user and openai messages, generates a title for the conversation */
-export async function POST(req: Request) {
-  const {
-    prompt,
-    expenseCategories,
-    historicalExpenses
-  }: { prompt: string; expenseCategories: string; historicalExpenses: Record<string, string> } = await req.json()
-
-  const result = streamObject({
-    model: openai('gpt-4o'),
+/**
+ * Categorize expenses with Gemini 2.5 Flash (primary provider)
+ */
+async function categorizeWithGemini(contextData: string, transactions: string, useTOON: boolean) {
+  const { object } = await generateObject({
+    model: google('gemini-2.5-flash') as AnyLanguageModel,
     output: 'array',
-    schema: z.object({
-      amount: z.number().nonnegative().describe('Amount of the expense'),
-      categoryId: z
-        .string()
-        .describe(
-          'CategoryId of the expense, based on the expense category mapping provided. Example: 0db82f5d-1979-4568-8bbc-f67ece393c23'
-        ),
-      date: z.string().describe('Date of the expense, in yyyy-MM-dd format'),
-      description: z
-        .string()
-        .describe('Description of the expense with minimal cleanup, but keeping the original description')
-    }),
-    prompt: basePrompt({
-      transactions: prompt,
-      categories: expenseCategories,
-      historicalExpenses: JSON.stringify(historicalExpenses)
+    schema: expenseSchema,
+    system: systemPrompt,
+    prompt: buildPrompt({
+      transactions,
+      contextData,
+      useTOON
     })
   })
 
-  return result.toTextStreamResponse()
+  return object
+}
+
+/**
+ * Categorize expenses with OpenAI GPT-4o (fallback provider)
+ */
+async function categorizeWithOpenAI(contextData: string, transactions: string, useTOON: boolean) {
+  const { object } = await generateObject({
+    model: openai('gpt-4o') as AnyLanguageModel,
+    output: 'array',
+    schema: expenseSchema,
+    system: systemPrompt,
+    prompt: buildPrompt({
+      transactions,
+      contextData,
+      useTOON
+    })
+  })
+
+  return object
+}
+
+/**
+ * POST handler for expense categorization
+ *
+ * Multi-provider fallback strategy:
+ * 1. Try Gemini 2.5 Flash (fast, cheap) with TOON format
+ * 2. Fall back to OpenAI GPT-4o if Gemini fails
+ *
+ * Expected request body:
+ * {
+ *   prompt: string,              // Raw transaction text to categorize
+ *   expenseCategories: object[], // Active categories with id and name
+ *   historicalExpenses: object[] // Past expenses for pattern matching
+ * }
+ */
+export async function POST(req: Request) {
+  try {
+    const {
+      prompt,
+      expenseCategories,
+      historicalExpenses
+    }: {
+      prompt: string
+      expenseCategories: Array<{ id: string; name: string }>
+      historicalExpenses: Array<{ description: string; categoryId: string; amount: number }>
+    } = await req.json()
+
+    // Convert context to TOON format for 40% token reduction
+    const toonContext = buildTOONContext(historicalExpenses || [], expenseCategories || [])
+
+    // Try Gemini first (97% cheaper than GPT-4o)
+    try {
+      console.log('[AI] Using Gemini 2.5 Flash with TOON format')
+      const expenses = await categorizeWithGemini(toonContext, prompt, true)
+      return Response.json(expenses)
+    } catch (geminiError) {
+      console.warn('[AI] Gemini failed, falling back to OpenAI:', geminiError)
+
+      // Fallback to OpenAI with TOON format
+      try {
+        console.log('[AI] Using OpenAI GPT-4o with TOON format (fallback)')
+        const expenses = await categorizeWithOpenAI(toonContext, prompt, true)
+        return Response.json(expenses)
+      } catch (openaiError) {
+        console.error('[AI] Both providers failed:', {
+          gemini: geminiError,
+          openai: openaiError
+        })
+        throw new Error('AI categorization failed with all providers')
+      }
+    }
+  } catch (error) {
+    console.error('[AI] Request processing error:', error)
+    return Response.json(
+      {
+        error: 'Failed to process expense categorization request',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    )
+  }
 }

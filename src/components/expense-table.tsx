@@ -3,12 +3,8 @@
 import React from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { TrashIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Textarea } from './ui/textarea'
+import { Button, NumberInput, Select, Stack, Table, Text, Textarea, ScrollArea } from '@mantine/core'
+import { DateInput } from '@mantine/dates'
 
 interface ExpenseTableProps {
   expenses: Expense[]
@@ -28,89 +24,87 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
   onDeleteRow
 }) => {
   return (
-    <div className="overflow-x-auto">
-      <div className="mb-2 text-sm text-muted-foreground">
-        Total: {expenses.length} item{expenses.length !== 1 ? 's' : ''}
-      </div>
-      <div className="max-h-[50vh] overflow-y-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">#</TableHead>
-              <TableHead className="w-[80px]">Amount</TableHead>
-              <TableHead className="w-[130px]">Category</TableHead>
-              <TableHead className="w-[130px]">Date</TableHead>
-              <TableHead className="w-[220px]">Description</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+    <Stack gap="sm">
+      <Text size="sm" c="dimmed">
+        {expenses.length} {expenses.length === 1 ? 'item' : 'items'}
+      </Text>
+      <ScrollArea h="50vh">
+        <Table withColumnBorders miw={700}>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th w={50}>#</Table.Th>
+              <Table.Th w={100}>Date</Table.Th>
+              <Table.Th miw={200}>Description</Table.Th>
+              <Table.Th w={100}>Amount</Table.Th>
+              <Table.Th w={150}>Category</Table.Th>
+              <Table.Th w={60}>Action</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
             {expenses.map((expense, index) => (
-              <TableRow key={expense.id}>
-                <TableCell className="p-1 text-center text-sm text-muted-foreground">
+              <Table.Tr key={expense.id}>
+                <Table.Td ta="center" c="dimmed" p="xs">
                   {index + 1}
-                </TableCell>
-                <TableCell className="p-1">
-                  <Input
-                    type="number"
-                    value={expense.amount}
-                    onChange={(e) => onInputChange(index, 'amount', Number(e.target.value))}
-                    step="0.01"
-                    min="0"
-                    required
-                    className="w-full h-full rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none py-2"
+                </Table.Td>
+                <Table.Td p="xs">
+                  <DateInput
+                    value={new Date(expense.date)}
+                    onChange={(date) => onInputChange(index, 'date', date!)}
+                    valueFormat="DD MMM YY"
+                    styles={{ input: { borderRadius: 0, padding: '8px' } }}
                   />
-                </TableCell>
-                <TableCell className="p-1">
-                  <Select
-                    value={expense.categoryId}
-                    onValueChange={(value) => onInputChange(index, 'categoryId', value)}
-                  >
-                    <SelectTrigger className="w-full h-full rounded-none">
-                      <div className="w-full flex items-center truncate max-w-[100px] overflow-hidden">
-                        <SelectValue placeholder={'Select Category'} className="truncate overflow-hidden" />
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {expenseCategories
-                        .filter((category) => !category.isArchived)
-                        .map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell className="p-1">
-                  <DatePicker
-                    date={new Date(expense.date)}
-                    onDateChange={(date) => onInputChange(index, 'date', date!)}
-                    className="w-full h-full rounded-none"
-                  />
-                </TableCell>
-                <TableCell className="p-1">
+                </Table.Td>
+                <Table.Td p="xs">
                   <Textarea
                     value={expense.description}
                     onChange={(e) => onInputChange(index, 'description', e.target.value)}
-                    className="w-full h-full rounded-none py-2"
+                    autosize
+                    minRows={1}
+                    styles={{ input: { borderRadius: 0, padding: '8px' } }}
                   />
-                </TableCell>
-                <TableCell className="p-1">
+                </Table.Td>
+                <Table.Td p="xs">
+                  <NumberInput
+                    value={expense.amount}
+                    onChange={(value) => onInputChange(index, 'amount', Number(value))}
+                    decimalScale={2}
+                    min={0}
+                    required
+                    styles={{ input: { borderRadius: 0, padding: '8px' } }}
+                  />
+                </Table.Td>
+                <Table.Td p="xs">
+                  <Select
+                    value={expense.categoryId}
+                    onChange={(value) => onInputChange(index, 'categoryId', value || '')}
+                    placeholder="Category"
+                    data={expenseCategories
+                      .filter((category) => !category.isArchived)
+                      .map((category) => ({
+                        value: category.id,
+                        label: category.name
+                      }))}
+                    styles={{ input: { borderRadius: 0 } }}
+                    searchable
+                  />
+                </Table.Td>
+                <Table.Td p="xs">
                   <Button
-                    variant="ghost"
-                    size="icon"
+                    variant="subtle"
+                    color="red"
                     onClick={() => onDeleteRow(expense.id)}
-                    className="w-full h-full rounded-none"
+                    w="100%"
+                    h="100%"
+                    p={0}
                   >
-                    <TrashIcon className="h-4 w-4" />
+                    <TrashIcon size={16} />
                   </Button>
-                </TableCell>
-              </TableRow>
+                </Table.Td>
+              </Table.Tr>
             ))}
-          </TableBody>
+          </Table.Tbody>
         </Table>
-      </div>
-    </div>
+      </ScrollArea>
+    </Stack>
   )
 }

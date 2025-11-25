@@ -3,8 +3,7 @@
 import { useMemo } from 'react'
 import { Income, IncomeCategory } from '@/stores/instantdb'
 import { NavLink } from 'react-router'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Card, Table, Title, Text, Anchor, ScrollArea } from '@mantine/core'
 
 interface IncomeOverviewProps {
   incomes: Income[]
@@ -73,48 +72,53 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Income Categories</CardTitle>
-        <CardDescription>Overview of your income categories for the selected month</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Current Income</TableHead>
-              <TableHead className="text-right">Year-to-Date Income</TableHead>
-              <TableHead className="text-right">Annual Income</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {incomeCategories.map((category) => {
+    <Card withBorder padding="0">
+      <Card.Section withBorder inheritPadding py="sm">
+        <Title order={3} size="h4" mb={4}>Income Categories</Title>
+        <Text size="sm" c="dimmed">
+          Monthly income tracking and year-to-date overview
+        </Text>
+      </Card.Section>
+      <Card.Section>
+        <ScrollArea>
+          <Table striped highlightOnHover miw={600}>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Category</Table.Th>
+                <Table.Th ta="right">Current</Table.Th>
+                <Table.Th ta="right">Year-to-Date</Table.Th>
+                <Table.Th ta="right">Annual</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {incomeCategories.map((category) => {
               const data = categoryData[category.id] || { monthlyIncome: 0, yearToDateIncome: 0, annualIncome: 0 }
 
               return (
-                <TableRow key={category.id}>
-                  <TableCell className="font-medium">
-                    <NavLink
+                <Table.Tr key={category.id}>
+                  <Table.Td fw={500}>
+                    <Anchor
+                      component={NavLink}
                       to={{
                         pathname: '/incomes',
                         search: `?month=${selectedMonth}&year=${selectedYear}&categoryIncome=${category.id}`
                       }}
-                      prefetch="intent"
-                      className="text-green-600 hover:underline"
+                      c="blue.6"
+                      underline="hover"
                     >
                       {category.title}
-                    </NavLink>
-                  </TableCell>
-                  <TableCell className="text-right">{formatCurrency(data.monthlyIncome)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(data.yearToDateIncome)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(data.annualIncome)}</TableCell>
-                </TableRow>
+                    </Anchor>
+                  </Table.Td>
+                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.monthlyIncome)}</Table.Td>
+                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.yearToDateIncome)}</Table.Td>
+                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.annualIncome)}</Table.Td>
+                </Table.Tr>
               )
             })}
-          </TableBody>
-        </Table>
-      </CardContent>
+            </Table.Tbody>
+          </Table>
+        </ScrollArea>
+      </Card.Section>
     </Card>
   )
 }

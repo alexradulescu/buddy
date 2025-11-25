@@ -3,22 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import { ExpenseCategory, IncomeCategory } from '@/stores/instantdb'
 import { Plus, Save, Trash2 } from 'lucide-react'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useToast } from '@/hooks/use-toast'
-import { Checkbox } from './ui/checkbox'
+import { Button, Card, TextInput, NumberInput, Checkbox, Table, Modal } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 
 type EditableExpenseCategory = Partial<ExpenseCategory> & {
   id?: string
@@ -41,7 +27,6 @@ interface CategoryManagerProps {
 }
 
 export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categories, onAdd, onUpdate, onDelete }) => {
-  const { toast } = useToast()
   const [editableCategories, setEditableCategories] = useState<EditableCategory[]>(
     categories.map((category) => ({
       ...category,
@@ -60,45 +45,44 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
     if (type === 'expense') {
       const expenseCategory = category as EditableExpenseCategory
       if (!expenseCategory.name || expenseCategory.name.trim() === '') {
-        toast({
+        notifications.show({
           title: 'Validation Error',
-          description: 'Category name is required',
-          variant: 'destructive'
+          message: 'Category name is required',
+          color: 'red'
         })
         return false
       }
-      // Allow either monthly or annual budget to be set, but validate they are positive if set
       if (expenseCategory.maxBudget !== undefined && expenseCategory?.maxBudget < 0) {
-        toast({
+        notifications.show({
           title: 'Validation Error',
-          description: 'Monthly budget must be positive',
-          variant: 'destructive'
+          message: 'Monthly budget must be positive',
+          color: 'red'
         })
         return false
       }
       if (expenseCategory.maxAnnualBudget !== undefined && expenseCategory.maxAnnualBudget < 0) {
-        toast({
+        notifications.show({
           title: 'Validation Error',
-          description: 'Annual budget must be positive',
-          variant: 'destructive'
+          message: 'Annual budget must be positive',
+          color: 'red'
         })
         return false
       }
     } else {
       const incomeCategory = category as EditableIncomeCategory
       if (!incomeCategory.title || incomeCategory.title.trim() === '') {
-        toast({
+        notifications.show({
           title: 'Validation Error',
-          description: 'Category title is required',
-          variant: 'destructive'
+          message: 'Category title is required',
+          color: 'red'
         })
         return false
       }
       if (incomeCategory.targetAmount !== undefined && incomeCategory.targetAmount < 0) {
-        toast({
+        notifications.show({
           title: 'Validation Error',
-          description: 'Target amount must be positive',
-          variant: 'destructive'
+          message: 'Target amount must be positive',
+          color: 'red'
         })
         return false
       }
@@ -148,15 +132,16 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
       try {
         await onDelete(deletingCategoryId)
         setEditableCategories(editableCategories.filter((cat) => 'id' in cat && cat.id !== deletingCategoryId))
-        toast({
+        notifications.show({
           title: 'Success',
-          description: 'Category deleted successfully'
+          message: 'Category deleted successfully',
+          color: 'green'
         })
       } catch (error) {
-        toast({
+        notifications.show({
           title: 'Error',
-          description: 'Failed to delete category',
-          variant: 'destructive'
+          message: 'Failed to delete category',
+          color: 'red'
         })
       }
     }
@@ -166,19 +151,19 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
 
   const handleSave = async (category: EditableCategory) => {
     if (isExpenseCategory(category) && !category.name) {
-      toast({
+      notifications.show({
         title: 'Error',
-        description: 'Name is required for expense categories',
-        variant: 'destructive'
+        message: 'Name is required for expense categories',
+        color: 'red'
       })
       return
     }
 
     if (isIncomeCategory(category) && !category.title) {
-      toast({
+      notifications.show({
         title: 'Error',
-        description: 'Title is required for income categories',
-        variant: 'destructive'
+        message: 'Title is required for income categories',
+        color: 'red'
       })
       return
     }
@@ -192,10 +177,10 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
         await onUpdate(category.id, updateData)
       }
     } catch (error) {
-      toast({
+      notifications.show({
         title: 'Error',
-        description: `Failed to save category: ${error}`,
-        variant: 'destructive'
+        message: `Failed to save category: ${error}`,
+        color: 'red'
       })
     }
   }
@@ -203,7 +188,6 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
   const handleSaveChanges = async () => {
     let hasError = false
 
-    // Process each category
     for (const category of editableCategories) {
       if (!validateCategory(category)) {
         hasError = true
@@ -214,155 +198,162 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
     }
 
     if (!hasError) {
-      toast({
+      notifications.show({
         title: 'Success',
-        description: 'All changes saved successfully'
+        message: 'All changes saved successfully',
+        color: 'green'
       })
       setHasChanges(false)
     }
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-2xl font-bold">
-          {type === 'expense' ? 'Expense Categories' : 'Income Categories'}
-        </CardTitle>
-        <div className="space-x-2">
-          <Button variant="outline" onClick={handleAddRow}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Row
-          </Button>
-          <Button onClick={handleSaveChanges} disabled={!hasChanges}>
-            <Save className="h-4 w-4 mr-2" />
-            Save Changes
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{type === 'expense' ? 'Name' : 'Title'}</TableHead>
-              {type === 'expense' ? (
-                <>
-                  <TableHead>Monthly Budget</TableHead>
-                  <TableHead>Annual Budget</TableHead>
-                </>
-              ) : (
-                <TableHead>Target Amount</TableHead>
-              )}
-              <TableHead>Archived</TableHead>
-              <TableHead className="w-[100px]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {editableCategories.map((category, index) => (
-              <TableRow key={category.id || `new-${index}`}>
-                <TableCell>
-                  <Input
-                    value={
-                      type === 'expense'
-                        ? (category as EditableExpenseCategory).name
-                        : (category as EditableIncomeCategory).title
-                    }
-                    onChange={(e) => handleInputChange(index, type === 'expense' ? 'name' : 'title', e.target.value)}
-                    placeholder={`Enter category ${type === 'expense' ? 'name' : 'title'}`}
-                  />
-                </TableCell>
+    <>
+      <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <Card.Section withBorder inheritPadding py="md">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>
+              {type === 'expense' ? 'Expense Categories' : 'Income Categories'}
+            </h2>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <Button variant="outline" onClick={handleAddRow} leftSection={<Plus size={16} />}>
+                Add Row
+              </Button>
+              <Button onClick={handleSaveChanges} disabled={!hasChanges} leftSection={<Save size={16} />}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </Card.Section>
+
+        <Card.Section>
+          <Table striped highlightOnHover withTableBorder withColumnBorders>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>{type === 'expense' ? 'Name' : 'Title'}</Table.Th>
                 {type === 'expense' ? (
                   <>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={(category as EditableExpenseCategory).maxBudget || ''}
-                        onChange={(e) => {
-                          if (e.target.value) {
-                            handleInputChange(index, 'maxBudget', parseFloat(e.target.value))
-                          }
-                        }}
-                        placeholder="Monthly budget"
-                        step="0.01"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={(category as EditableExpenseCategory).maxAnnualBudget || ''}
-                        onChange={(e) => {
-                          if (e.target.value) {
-                            handleInputChange(index, 'maxAnnualBudget', parseFloat(e.target.value))
-                          }
-                        }}
-                        placeholder="Annual budget"
-                        step="0.01"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={(category as EditableExpenseCategory).isArchived}
-                        onCheckedChange={(checked) => {
-                          handleInputChange(index, 'isArchived', checked)
-                        }}
-                      />
-                    </TableCell>
+                    <Table.Th>Monthly Budget</Table.Th>
+                    <Table.Th>Annual Budget</Table.Th>
                   </>
                 ) : (
-                  <>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={(category as EditableIncomeCategory).targetAmount || ''}
-                        onChange={(e) => {
-                          if (e.target.value) {
-                            handleInputChange(index, 'targetAmount', parseFloat(e.target.value))
-                          }
-                        }}
-                        placeholder="Target amount"
-                        step="0.01"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={(category as EditableIncomeCategory).isArchived}
-                        onCheckedChange={(checked) => {
-                          handleInputChange(index, 'isArchived', checked)
-                        }}
-                      />
-                    </TableCell>
-                  </>
+                  <Table.Th>Target Amount</Table.Th>
                 )}
-                <TableCell>
-                  {category.id && (
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleDelete(category.id!)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                <Table.Th>Archived</Table.Th>
+                <Table.Th style={{ width: '100px' }}>Actions</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {editableCategories.map((category, index) => (
+                <Table.Tr key={category.id || `new-${index}`}>
+                  <Table.Td>
+                    <TextInput
+                      value={
+                        type === 'expense'
+                          ? (category as EditableExpenseCategory).name || ''
+                          : (category as EditableIncomeCategory).title || ''
+                      }
+                      onChange={(e) => handleInputChange(index, type === 'expense' ? 'name' : 'title', e.target.value)}
+                      placeholder={`Enter category ${type === 'expense' ? 'name' : 'title'}`}
+                    />
+                  </Table.Td>
+                  {type === 'expense' ? (
+                    <>
+                      <Table.Td>
+                        <NumberInput
+                          value={(category as EditableExpenseCategory).maxBudget}
+                          onChange={(value) => {
+                            if (value !== '' && value !== undefined) {
+                              handleInputChange(index, 'maxBudget', Number(value))
+                            }
+                          }}
+                          placeholder="Monthly budget"
+                          decimalScale={2}
+                          min={0}
+                        />
+                      </Table.Td>
+                      <Table.Td>
+                        <NumberInput
+                          value={(category as EditableExpenseCategory).maxAnnualBudget}
+                          onChange={(value) => {
+                            if (value !== '' && value !== undefined) {
+                              handleInputChange(index, 'maxAnnualBudget', Number(value))
+                            }
+                          }}
+                          placeholder="Annual budget"
+                          decimalScale={2}
+                          min={0}
+                        />
+                      </Table.Td>
+                      <Table.Td>
+                        <Checkbox
+                          checked={(category as EditableExpenseCategory).isArchived || false}
+                          onChange={(event) => {
+                            handleInputChange(index, 'isArchived', event.currentTarget.checked)
+                          }}
+                        />
+                      </Table.Td>
+                    </>
+                  ) : (
+                    <>
+                      <Table.Td>
+                        <NumberInput
+                          value={(category as EditableIncomeCategory).targetAmount}
+                          onChange={(value) => {
+                            if (value !== '' && value !== undefined) {
+                              handleInputChange(index, 'targetAmount', Number(value))
+                            }
+                          }}
+                          placeholder="Target amount"
+                          decimalScale={2}
+                          min={0}
+                        />
+                      </Table.Td>
+                      <Table.Td>
+                        <Checkbox
+                          checked={(category as EditableIncomeCategory).isArchived || false}
+                          onChange={(event) => {
+                            handleInputChange(index, 'isArchived', event.currentTarget.checked)
+                          }}
+                        />
+                      </Table.Td>
+                    </>
                   )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
+                  <Table.Td>
+                    {category.id && (
+                      <Button
+                        variant="subtle"
+                        color="red"
+                        onClick={() => handleDelete(category.id!)}
+                        p={0}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    )}
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Card.Section>
+      </Card>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the category.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </Card>
+      <Modal
+        opened={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        title="Are you absolutely sure?"
+        centered
+      >
+        <p>This action cannot be undone. This will permanently delete the category.</p>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+          <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button color="red" onClick={confirmDelete}>
+            Delete
+          </Button>
+        </div>
+      </Modal>
+    </>
   )
 }

@@ -5,11 +5,8 @@ import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { format } from 'date-fns'
 import { Edit, Search, Trash } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useToast } from '@/hooks/use-toast'
+import { Button, Group, Stack, Text, TextInput, Select, Table, ScrollArea } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 import { DeleteConfirmation } from './delete-confirmation'
 import { TransactionForm } from './transaction-form'
 
@@ -22,7 +19,6 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
   const { data: { expenses = [] } = {}, removeExpense, updateExpense } = useExpenseStore()
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
 
-  const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategoryId, setSelectedCategoryId] = useQueryState('categoryExpense')
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null)
@@ -57,18 +53,20 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
     removeExpense(expenseToDelete.id)
     setExpenseToDelete(null)
 
-    toast({
+    notifications.show({
       title: 'Expense deleted',
-      description: 'The expense has been successfully removed.'
+      message: 'The expense has been successfully removed.',
+      color: 'green'
     })
   }
 
   const handleSaveExpense = async (data: { amount: number; description: string; date: string; categoryId: string }) => {
     if (editingExpense?.id) {
       await updateExpense(editingExpense.id, data)
-      toast({
+      notifications.show({
         title: 'Expense updated',
-        description: 'The expense has been successfully updated.'
+        message: 'The expense has been successfully updated.',
+        color: 'green'
       })
     }
     setEditingExpense(null)
@@ -77,82 +75,76 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
   const uniqueCategories = expenseCategories.map(({ id, name }) => ({ id, name }))
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search expenses..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground whitespace-nowrap">Filter by category:</span>
+    <Stack gap="md">
+      <Stack gap="sm">
+        <TextInput
+          placeholder="Search expenses..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          leftSection={<Search size={16} />}
+        />
+        <Group gap="sm" align="center">
+          <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>Filter:</Text>
           <Select
-            value={selectedCategoryId || undefined}
-            onValueChange={(value) => setSelectedCategoryId(value || null)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="All categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All categories</SelectItem>
-              {uniqueCategories.map((category: { id: string; name: string }) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+            placeholder="All categories"
+            value={selectedCategoryId || 'all'}
+            onChange={(value) => setSelectedCategoryId(value === 'all' ? null : value)}
+            data={[
+              { value: 'all', label: 'All categories' },
+              ...uniqueCategories.map((category: { id: string; name: string }) => ({
+                value: category.id,
+                label: category.name
+              }))
+            ]}
+            flex={1}
+          />
+        </Group>
+      </Stack>
       {filteredExpenses.length === 0 ? (
-        <p className="text-center text-muted-foreground py-4">No expenses found for this period.</p>
+        <Text ta="center" c="dimmed" py="xl">No expenses found for this period.</Text>
       ) : (
-        <div className="space-y-2">
-          <div className="text-sm text-muted-foreground">
-            Total: {filteredExpenses.length} item{filteredExpenses.length !== 1 ? 's' : ''}
-          </div>
-          <div className="border rounded-md overflow-hidden">
-            <div className="max-h-[60dvh] overflow-auto">
-            <Table>
-              <TableHeader className="sticky top-0 z-10">
-                <TableRow>
-                  <TableHead className="w-[50px]">#</TableHead>
-                  <TableHead className="w-[120px]">Date</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right w-[100px]">Amount</TableHead>
-                  <TableHead className="w-[80px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+        <Stack gap="sm">
+          <Text size="sm" c="dimmed">
+            {filteredExpenses.length} {filteredExpenses.length === 1 ? 'item' : 'items'}
+          </Text>
+          <ScrollArea>
+            <Table highlightOnHover striped withTableBorder miw={700}>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th w={50}>#</Table.Th>
+                  <Table.Th w={120}>Date</Table.Th>
+                  <Table.Th>Description</Table.Th>
+                  <Table.Th>Category</Table.Th>
+                  <Table.Th ta="right" w={100}>Amount</Table.Th>
+                  <Table.Th w={100}>Actions</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
                 {filteredExpenses.map((expense, index) => (
-                  <TableRow key={expense.id}>
-                    <TableCell className="text-center text-sm text-muted-foreground">
+                  <Table.Tr key={expense.id}>
+                    <Table.Td ta="center" c="dimmed">
                       {index + 1}
-                    </TableCell>
-                    <TableCell>{format(new Date(expense.date), 'dd MMM yyyy')}</TableCell>
-                    <TableCell>{expense.description}</TableCell>
-                    <TableCell>{expense.category}</TableCell>
-                    <TableCell className="text-right">${Number(expense.amount).toFixed(2)}</TableCell>
-                    <TableCell className="space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => setEditingExpense(expense)}>
-                        <Edit size={14} />
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDeleteClick(expense)}>
-                        <Trash size={14} />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                    </Table.Td>
+                    <Table.Td>{format(new Date(expense.date), 'dd MMM yyyy')}</Table.Td>
+                    <Table.Td>{expense.description}</Table.Td>
+                    <Table.Td c="dimmed">{expense.category}</Table.Td>
+                    <Table.Td ta="right" className="numeric-value">${Number(expense.amount).toFixed(2)}</Table.Td>
+                    <Table.Td>
+                      <Group gap="xs" wrap="nowrap">
+                        <Button size="xs" variant="subtle" onClick={() => setEditingExpense(expense)}>
+                          <Edit size={14} />
+                        </Button>
+                        <Button size="xs" variant="subtle" color="red" onClick={() => handleDeleteClick(expense)}>
+                          <Trash size={14} />
+                        </Button>
+                      </Group>
+                    </Table.Td>
+                  </Table.Tr>
                 ))}
-              </TableBody>
+              </Table.Tbody>
             </Table>
-            </div>
-          </div>
-        </div>
+          </ScrollArea>
+        </Stack>
       )}
 
       <DeleteConfirmation
@@ -180,14 +172,6 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
         categories={expenseCategories}
         initialData={editingExpense || undefined}
       />
-      <TransactionForm
-        type="expense"
-        open={!!editingExpense}
-        onOpenChange={(open) => !open && setEditingExpense(null)}
-        onSubmit={handleSaveExpense}
-        categories={expenseCategories}
-        initialData={editingExpense || undefined}
-      />
-    </div>
+    </Stack>
   )
 }

@@ -1,13 +1,12 @@
+'use client'
+
 import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { InvestmentContribution } from '@/types/investment'
-import { useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
+import { useForm, Controller } from 'react-hook-form'
+import { Button, NumberInput, Textarea, TextInput } from '@mantine/core'
+import { DatePickerInput } from '@mantine/dates'
+import { notifications } from '@mantine/notifications'
 
 interface ContributionFormProps {
   investmentId: string
@@ -17,16 +16,13 @@ interface ContributionFormProps {
 }
 
 export default function ContributionForm({ investmentId, contribution, onSuccess, onCancel }: ContributionFormProps) {
-  const { toast } = useToast()
   const { addContribution, updateContribution } = useInvestmentStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const form = useForm({
+  const { control, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
-      amount: contribution?.amount?.toString() || '0',
-      date: contribution?.date
-        ? new Date(contribution.date).toISOString().split('T')[0]
-        : new Date().toISOString().split('T')[0],
+      amount: contribution?.amount || 0,
+      date: contribution?.date ? new Date(contribution.date) : new Date(),
       description: contribution?.description || ''
     }
   })
@@ -35,25 +31,27 @@ export default function ContributionForm({ investmentId, contribution, onSuccess
     setIsSubmitting(true)
     try {
       const formattedData = {
-        ...data,
-        amount: parseFloat(data.amount),
-        date: new Date(data.date).toISOString()
+        amount: data.amount,
+        date: data.date.toISOString(),
+        description: data.description
       }
 
       if (contribution) {
         await updateContribution(contribution.id, formattedData)
-        toast({
+        notifications.show({
           title: 'Contribution updated',
-          description: 'Your contribution has been updated successfully.'
+          message: 'Your contribution has been updated successfully.',
+          color: 'green'
         })
       } else {
         await addContribution({
           ...formattedData,
           investmentId
         })
-        toast({
+        notifications.show({
           title: 'Contribution added',
-          description: 'Your contribution has been added successfully.'
+          message: 'Your contribution has been added successfully.',
+          color: 'green'
         })
       }
 
@@ -61,10 +59,10 @@ export default function ContributionForm({ investmentId, contribution, onSuccess
         onSuccess()
       }
     } catch (error) {
-      toast({
+      notifications.show({
         title: 'Error',
-        description: 'There was an error saving your contribution. Please try again.',
-        variant: 'destructive'
+        message: 'There was an error saving your contribution. Please try again.',
+        color: 'red'
       })
     } finally {
       setIsSubmitting(false)
@@ -72,76 +70,69 @@ export default function ContributionForm({ investmentId, contribution, onSuccess
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{contribution ? 'Edit Contribution' : 'Add Contribution'}</CardTitle>
-      </CardHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="amount"
-              rules={{
-                required: 'Amount is required',
-                validate: (value) => parseFloat(value) > 0 || 'Amount must be greater than 0'
-              }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      {...field}
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+    <div style={{ padding: '1rem', border: '1px solid var(--mantine-color-gray-3)', borderRadius: 'var(--mantine-radius-md)', backgroundColor: 'var(--mantine-color-gray-0)' }}>
+      <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1rem', marginTop: 0 }}>
+        {contribution ? 'Edit Contribution' : 'Add Contribution'}
+      </h3>
+      <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <Controller
+          name="amount"
+          control={control}
+          rules={{
+            required: 'Amount is required',
+            validate: (value) => value > 0 || 'Amount must be greater than 0'
+          }}
+          render={({ field }) => (
+            <NumberInput
+              label="Amount"
+              placeholder="0.00"
+              decimalScale={2}
+              fixedDecimalScale
+              prefix="$"
+              error={errors.amount?.message}
+              {...field}
             />
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="date"
-              rules={{ required: 'Date is required' }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Date</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+        <Controller
+          name="date"
+          control={control}
+          rules={{ required: 'Date is required' }}
+          render={({ field }) => (
+            <DatePickerInput
+              label="Date"
+              placeholder="Select date"
+              valueFormat="YYYY-MM-DD"
+              error={errors.date?.message}
+              value={field.value}
+              onChange={(value) => field.onChange(value || new Date())}
             />
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Contribution description" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+        <Controller
+          name="description"
+          control={control}
+          render={({ field }) => (
+            <Textarea
+              label="Description (optional)"
+              placeholder="Contribution description"
+              error={errors.description?.message}
+              {...field}
             />
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : contribution ? 'Update' : 'Add'}
-            </Button>
-          </CardFooter>
-        </form>
-      </Form>
-    </Card>
+          )}
+        />
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+          <Button variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" loading={isSubmitting}>
+            {contribution ? 'Update' : 'Add'}
+          </Button>
+        </div>
+      </form>
+    </div>
   )
 }

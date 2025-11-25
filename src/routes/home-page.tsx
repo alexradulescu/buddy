@@ -9,6 +9,7 @@ import { IncomeOverview } from '@/components/income-overview'
 import { InvestmentOverview } from '@/components/investment/investment-overview'
 import { PageHeader } from '@/components/page-header'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
+import { Stack, Accordion, Box } from '@mantine/core'
 
 export default function HomePage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
@@ -43,9 +44,7 @@ export default function HomePage() {
     }, 0)
 
   return (
-    <div className="d-flex flex-col space-y-8 gap-4">
-      <PageHeader title="Budget Overview" />
-
+    <Stack gap="lg">
       <HomeOverview
         totalMonthlyIncomes={totalMonthlyIncomes}
         totalMonthlyExpenses={totalMonthlyExpenses}
@@ -53,21 +52,62 @@ export default function HomePage() {
         totalInvestmentValue={totalInvestmentValue}
       />
 
-      <ExpenseOverview
-        expenses={expenses}
-        expenseCategories={expenseCategories}
-        selectedYear={selectedYear}
-        selectedMonth={selectedMonth}
-      />
+      {/* Desktop view - regular stack */}
+      <Box hiddenFrom="sm">
+        <Stack gap="lg">
+          <ExpenseOverview
+            expenses={expenses}
+            expenseCategories={expenseCategories}
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+          />
 
-      <IncomeOverview
-        incomes={incomes}
-        incomeCategories={incomeCategories}
-        selectedYear={selectedYear}
-        selectedMonth={selectedMonth}
-      />
+          <IncomeOverview
+            incomes={incomes}
+            incomeCategories={incomeCategories}
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+          />
 
-      <InvestmentOverview />
-    </div>
+          <InvestmentOverview />
+        </Stack>
+      </Box>
+
+      {/* Mobile view - accordion */}
+      <Box visibleFrom="sm">
+        <Accordion multiple defaultValue={['expenses', 'incomes', 'investments']}>
+          <Accordion.Item value="expenses">
+            <Accordion.Control>Expense Categories</Accordion.Control>
+            <Accordion.Panel>
+              <ExpenseOverview
+                expenses={expenses}
+                expenseCategories={expenseCategories}
+                selectedYear={selectedYear}
+                selectedMonth={selectedMonth}
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+
+          <Accordion.Item value="incomes">
+            <Accordion.Control>Income Categories</Accordion.Control>
+            <Accordion.Panel>
+              <IncomeOverview
+                incomes={incomes}
+                incomeCategories={incomeCategories}
+                selectedYear={selectedYear}
+                selectedMonth={selectedMonth}
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+
+          <Accordion.Item value="investments">
+            <Accordion.Control>Investments</Accordion.Control>
+            <Accordion.Panel>
+              <InvestmentOverview />
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+      </Box>
+    </Stack>
   )
 }
