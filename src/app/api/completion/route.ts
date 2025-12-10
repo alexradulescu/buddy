@@ -127,8 +127,8 @@ async function categorizeWithOpenAI(contextData: string, transactions: string, u
  * POST handler for expense categorization
  *
  * Multi-provider fallback strategy:
- * 1. Try Gemini 2.5 Flash (fast, cheap) with TOON format
- * 2. Fall back to OpenAI GPT-4o if Gemini fails
+ * 1. Try OpenAI GPT-5-nano (fast, reliable) with TOON format
+ * 2. Fall back to Gemini 2.5 Flash if OpenAI fails
  *
  * Expected request body:
  * {
@@ -152,23 +152,23 @@ export async function POST(req: Request) {
     // Convert context to TOON format for 40% token reduction
     const toonContext = buildTOONContext(historicalExpenses || [], expenseCategories || [])
 
-    // Try Gemini first (97% cheaper than GPT-4o)
+    // Try OpenAI first (reliable)
     try {
-      console.log('[AI] Using Gemini 2.5 Flash with TOON format')
-      const expenses = await categorizeWithGemini(toonContext, prompt, true)
+      console.log('[AI] Using OpenAI GPT-5-nano with TOON format')
+      const expenses = await categorizeWithOpenAI(toonContext, prompt, true)
       return Response.json(expenses)
-    } catch (geminiError) {
-      console.warn('[AI] Gemini failed, falling back to OpenAI:', geminiError)
+    } catch (openaiError) {
+      console.warn('[AI] OpenAI failed, falling back to Gemini:', openaiError)
 
-      // Fallback to OpenAI with TOON format
+      // Fallback to Gemini with TOON format
       try {
-        console.log('[AI] Using OpenAI GPT-4o with TOON format (fallback)')
-        const expenses = await categorizeWithOpenAI(toonContext, prompt, true)
+        console.log('[AI] Using Gemini 2.5 Flash with TOON format (fallback)')
+        const expenses = await categorizeWithGemini(toonContext, prompt, true)
         return Response.json(expenses)
-      } catch (openaiError) {
+      } catch (geminiError) {
         console.error('[AI] Both providers failed:', {
-          gemini: geminiError,
-          openai: openaiError
+          openai: openaiError,
+          gemini: geminiError
         })
         throw new Error('AI categorization failed with all providers')
       }
