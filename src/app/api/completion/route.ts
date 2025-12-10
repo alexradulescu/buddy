@@ -1,8 +1,8 @@
+import { buildTOONContext } from '@/lib/toon-helpers'
 import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 import { generateObject } from 'ai'
 import { z } from 'zod'
-import { buildTOONContext } from '@/lib/toon-helpers'
 
 // Type assertion to handle LanguageModelV2 compatibility
 type AnyLanguageModel = any
@@ -70,11 +70,14 @@ const expenseSchema = z.object({
     .string()
     .uuid()
     .describe('UUID categoryId from active categories (e.g., 0db82f5d-1979-4568-8bbc-f67ece393c23)'),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).describe('Date in yyyy-MM-dd format'),
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .describe('Date in yyyy-MM-dd format'),
   description: z.string().describe('Cleaned up description preserving key information')
 })
 
-export const maxDuration = 60
+export const maxDuration = 300
 
 /**
  * Categorize expenses with Gemini 2.5 Flash (primary provider)
