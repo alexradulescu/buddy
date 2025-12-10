@@ -24,9 +24,9 @@ Your task is to categorize bank transactions based on historical expense pattern
 IMPORTANT RULES:
 - Skip/ignore transactions containing: "Salary", "Bullish" (these are income, not expenses)
 - Format amounts as decimal numbers (e.g., 45.50) without currency symbols
-- If 2 amounts exist, use the smaller one (larger is usually remaining balance)
+- If 2 amounts exist, always use the one in SGD OR S$.
 - Format dates as 'yyyy-MM-dd'. If no year, default to 2025
-- If 2 dates exist, use the latest date
+- If 2 dates exist, use the later date, usuallynthe first of the 2
 - Clean up descriptions for readability while preserving key information
 - Only use categoryId from the provided active categories list
 - Match historical patterns for consistent categorization
@@ -63,19 +63,21 @@ Return ONLY the categorized expenses without any additional text.`
 
 /**
  * Expense schema for validation
+ * Note: Using lenient validation - strict UUID validation happens client-side
  */
 const expenseSchema = z.object({
   amount: z.number().nonnegative().describe('Amount of the expense'),
-  categoryId: z
-    .string()
-    .uuid()
-    .describe('UUID categoryId from active categories (e.g., 0db82f5d-1979-4568-8bbc-f67ece393c23)'),
-  date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .describe('Date in yyyy-MM-dd format'),
+  categoryId: z.string().min(1).describe('categoryId from active categories list'),
+  date: z.string().min(8).describe('Date in yyyy-MM-dd format'),
   description: z.string().describe('Cleaned up description preserving key information')
 })
+
+/**
+ * Repair malformed JSON from AI responses
+ */
+const repairJson = async ({ text }: { text: string }) => {
+  return text.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']').replace(/'/g, '"')
+}
 
 export const maxDuration = 60
 
@@ -92,14 +94,16 @@ async function categorizeWithGemini(contextData: string, transactions: string, u
       transactions,
       contextData,
       useTOON
-    })
+    }),
+    maxRetries: 3,
+    experimental_repairText: repairJson
   })
 
   return object
 }
 
 /**
- * Categorize expenses with OpenAI GPT-4o (fallback provider)
+ * Categorize expenses with OpenAI GPT-5-nano (fallback provider)
  */
 async function categorizeWithOpenAI(contextData: string, transactions: string, useTOON: boolean) {
   const { object } = await generateObject({
@@ -111,7 +115,9 @@ async function categorizeWithOpenAI(contextData: string, transactions: string, u
       transactions,
       contextData,
       useTOON
-    })
+    }),
+    maxRetries: 3,
+    experimental_repairText: repairJson
   })
 
   return object
