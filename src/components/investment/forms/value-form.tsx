@@ -3,10 +3,9 @@
 import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { InvestmentValue } from '@/types/investment'
-import { useForm, Controller } from 'react-hook-form'
-import { Button, NumberInput, Textarea } from '@mantine/core'
-import { DatePickerInput } from '@mantine/dates'
+import { Button, TextInput, Textarea } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
+import { useForm } from 'react-hook-form'
 
 interface ValueFormProps {
   investmentId: string
@@ -15,26 +14,37 @@ interface ValueFormProps {
   onCancel?: () => void
 }
 
+function formatDateForInput(date?: string): string {
+  const d = date ? new Date(date) : new Date()
+  return d.toISOString().split('T')[0]
+}
+
 export default function ValueForm({ investmentId, value, onSuccess, onCancel }: ValueFormProps) {
   const { addValue, updateValue } = useInvestmentStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
     defaultValues: {
-      value: value?.value || 0,
-      date: value?.date ? new Date(value.date) : new Date(),
+      value: value?.value?.toString() || '',
+      date: formatDateForInput(value?.date),
       description: value?.description || ''
     }
   })
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: { value: string; date: string; description: string }) => {
     setIsSubmitting(true)
     try {
       const formattedData = {
-        value: data.value,
-        date: data.date.toISOString(),
-        description: data.description
+        value: parseFloat(data.value) || 0,
+        date: new Date(data.date).toISOString(),
+        description: data.description || ''
       }
+
+      console.info({ formattedData })
 
       if (value) {
         await updateValue(value.id, formattedData)
@@ -59,6 +69,7 @@ export default function ValueForm({ investmentId, value, onSuccess, onCancel }: 
         onSuccess()
       }
     } catch (error) {
+      console.error('Value save error:', error)
       notifications.show({
         title: 'Error',
         message: 'There was an error saving your value entry. Please try again.',
@@ -70,58 +81,42 @@ export default function ValueForm({ investmentId, value, onSuccess, onCancel }: 
   }
 
   return (
-    <div style={{ padding: '1rem', border: '1px solid var(--mantine-color-gray-3)', borderRadius: 'var(--mantine-radius-md)', backgroundColor: 'var(--mantine-color-gray-0)' }}>
+    <div
+      style={{
+        padding: '1rem',
+        border: '1px solid var(--mantine-color-gray-3)',
+        borderRadius: 'var(--mantine-radius-md)',
+        backgroundColor: 'var(--mantine-color-gray-0)'
+      }}
+    >
       <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1rem', marginTop: 0 }}>
         {value ? 'Edit Value' : 'Add Value'}
       </h3>
       <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <Controller
-          name="value"
-          control={control}
-          rules={{
+        <TextInput
+          label="Value ($)"
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder="0.00"
+          error={errors.value?.message}
+          {...register('value', {
             required: 'Value is required',
-            validate: (value) => value > 0 || 'Value must be greater than 0'
-          }}
-          render={({ field }) => (
-            <NumberInput
-              label="Value"
-              placeholder="0.00"
-              decimalScale={2}
-              fixedDecimalScale
-              prefix="$"
-              error={errors.value?.message}
-              {...field}
-            />
-          )}
+            validate: (v) => parseFloat(v) > 0 || 'Value must be greater than 0'
+          })}
         />
 
-        <Controller
-          name="date"
-          control={control}
-          rules={{ required: 'Date is required' }}
-          render={({ field }) => (
-            <DatePickerInput
-              label="Date"
-              placeholder="Select date"
-              valueFormat="YYYY-MM-DD"
-              error={errors.date?.message}
-              value={field.value}
-              onChange={(value) => field.onChange(value || new Date())}
-            />
-          )}
+        <TextInput
+          label="Date"
+          type="date"
+          error={errors.date?.message}
+          {...register('date', { required: 'Date is required' })}
         />
 
-        <Controller
-          name="description"
-          control={control}
-          render={({ field }) => (
-            <Textarea
-              label="Description (optional)"
-              placeholder="Value description"
-              error={errors.description?.message}
-              {...field}
-            />
-          )}
+        <Textarea
+          label="Description (optional)"
+          placeholder="Value description"
+          {...register('description')}
         />
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
