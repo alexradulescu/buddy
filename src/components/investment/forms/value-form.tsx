@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { InvestmentValue } from '@/types/investment'
-import { Button, TextInput, Textarea } from '@mantine/core'
+import { Button, NumberInput, Textarea } from '@mantine/core'
+import { DatePickerInput } from '@mantine/dates'
 import { notifications } from '@mantine/notifications'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 
 interface ValueFormProps {
   investmentId: string
@@ -14,33 +15,28 @@ interface ValueFormProps {
   onCancel?: () => void
 }
 
-function formatDateForInput(date?: string): string {
-  const d = date ? new Date(date) : new Date()
-  return d.toISOString().split('T')[0]
-}
-
 export default function ValueForm({ investmentId, value, onSuccess, onCancel }: ValueFormProps) {
   const { addValue, updateValue } = useInvestmentStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors }
   } = useForm({
     defaultValues: {
-      value: value?.value?.toString() || '',
-      date: formatDateForInput(value?.date),
+      value: value?.value || 0,
+      date: value?.date ? new Date(value.date) : new Date(),
       description: value?.description || ''
     }
   })
 
-  const onSubmit = async (data: { value: string; date: string; description: string }) => {
+  const onSubmit = async (data: { value: number; date: Date; description: string }) => {
     setIsSubmitting(true)
     try {
       const formattedData = {
-        value: parseFloat(data.value) || 0,
-        date: new Date(data.date).toISOString(),
+        value: Number(data.value) || 0,
+        date: (data.date instanceof Date ? data.date : new Date()).toISOString(),
         description: data.description || ''
       }
 
@@ -93,30 +89,57 @@ export default function ValueForm({ investmentId, value, onSuccess, onCancel }: 
         {value ? 'Edit Value' : 'Add Value'}
       </h3>
       <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <TextInput
-          label="Value ($)"
-          type="number"
-          step="0.01"
-          min="0"
-          placeholder="0.00"
-          error={errors.value?.message}
-          {...register('value', {
+        <Controller
+          name="value"
+          control={control}
+          rules={{
             required: 'Value is required',
-            validate: (v) => parseFloat(v) > 0 || 'Value must be greater than 0'
-          })}
+            validate: (v) => v > 0 || 'Value must be greater than 0'
+          }}
+          render={({ field }) => (
+            <NumberInput
+              label="Value"
+              placeholder="0.00"
+              decimalScale={2}
+              fixedDecimalScale
+              prefix="$"
+              error={errors.value?.message}
+              value={field.value}
+              onChange={(val) => field.onChange(typeof val === 'number' ? val : 0)}
+              onBlur={field.onBlur}
+              name={field.name}
+            />
+          )}
         />
 
-        <TextInput
-          label="Date"
-          type="date"
-          error={errors.date?.message}
-          {...register('date', { required: 'Date is required' })}
+        <Controller
+          name="date"
+          control={control}
+          rules={{ required: 'Date is required' }}
+          render={({ field }) => (
+            <DatePickerInput
+              label="Date"
+              placeholder="Select date"
+              valueFormat="YYYY-MM-DD"
+              clearable={false}
+              error={errors.date?.message}
+              value={field.value}
+              onChange={(val) => field.onChange(val ?? new Date())}
+            />
+          )}
         />
 
-        <Textarea
-          label="Description (optional)"
-          placeholder="Value description"
-          {...register('description')}
+        <Controller
+          name="description"
+          control={control}
+          render={({ field }) => (
+            <Textarea
+              label="Description (optional)"
+              placeholder="Value description"
+              error={errors.description?.message}
+              {...field}
+            />
+          )}
         />
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
