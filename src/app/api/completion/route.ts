@@ -77,7 +77,7 @@ const expenseSchema = z.object({
   description: z.string().describe('Cleaned up description preserving key information')
 })
 
-export const maxDuration = 300
+export const maxDuration = 60
 
 /**
  * Categorize expenses with Gemini 2.5 Flash (primary provider)
@@ -103,7 +103,7 @@ async function categorizeWithGemini(contextData: string, transactions: string, u
  */
 async function categorizeWithOpenAI(contextData: string, transactions: string, useTOON: boolean) {
   const { object } = await generateObject({
-    model: openai('gpt-4o') as AnyLanguageModel,
+    model: openai('gpt-5-nano') as AnyLanguageModel,
     output: 'array',
     schema: expenseSchema,
     system: systemPrompt,
