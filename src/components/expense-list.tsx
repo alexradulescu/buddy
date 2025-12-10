@@ -108,34 +108,30 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
             {filteredExpenses.length} {filteredExpenses.length === 1 ? 'item' : 'items'}
           </Text>
           <ScrollArea>
-            <Table highlightOnHover striped withTableBorder miw={700}>
+            <Table highlightOnHover striped withTableBorder miw={500} fz="xs" verticalSpacing="xs">
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th w={50}>#</Table.Th>
-                  <Table.Th w={120}>Date</Table.Th>
+                  <Table.Th w={90}>Date</Table.Th>
                   <Table.Th>Description</Table.Th>
                   <Table.Th>Category</Table.Th>
-                  <Table.Th ta="right" w={100}>Amount</Table.Th>
-                  <Table.Th w={100}>Actions</Table.Th>
+                  <Table.Th ta="right" w={80}>Amount</Table.Th>
+                  <Table.Th w={70}>Actions</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {filteredExpenses.map((expense, index) => (
+                {filteredExpenses.map((expense) => (
                   <Table.Tr key={expense.id}>
-                    <Table.Td ta="center" c="dimmed">
-                      {index + 1}
-                    </Table.Td>
                     <Table.Td>{format(new Date(expense.date), 'dd MMM yyyy')}</Table.Td>
                     <Table.Td>{expense.description}</Table.Td>
                     <Table.Td c="dimmed">{expense.category}</Table.Td>
                     <Table.Td ta="right" className="numeric-value">${Number(expense.amount).toFixed(2)}</Table.Td>
                     <Table.Td>
                       <Group gap="xs" wrap="nowrap">
-                        <Button size="xs" variant="subtle" onClick={() => setEditingExpense(expense)}>
-                          <Edit size={14} />
+                        <Button size="compact-xs" variant="subtle" onClick={() => setEditingExpense(expense)}>
+                          <Edit size={12} />
                         </Button>
-                        <Button size="xs" variant="subtle" color="red" onClick={() => handleDeleteClick(expense)}>
-                          <Trash size={14} />
+                        <Button size="compact-xs" variant="subtle" color="red" onClick={() => handleDeleteClick(expense)}>
+                          <Trash size={12} />
                         </Button>
                       </Group>
                     </Table.Td>

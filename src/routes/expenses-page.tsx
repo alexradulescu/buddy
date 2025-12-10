@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react'
 import { ExpenseList } from '@/components/expense-list'
-import { Card, Stack, Tabs, Group, NumberInput, Button } from '@mantine/core'
+import { Card, Stack, Tabs, Group, NumberInput, Button, SimpleGrid } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'
 import { ExpenseTable } from '@/components/expense-table'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { notifications } from '@mantine/notifications'
-import { ListIcon, SparklesIcon, TableIcon } from 'lucide-react'
+import { SparklesIcon, TableIcon } from 'lucide-react'
 
 export default function ExpensesPage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
@@ -102,35 +102,24 @@ export default function ExpensesPage() {
   }
 
   return (
-    <Stack gap="lg">
+    <SimpleGrid cols={2} spacing="md">
+      {/* Left Panel - Entry Methods */}
+      <Card withBorder p="lg">
+        <Tabs defaultValue="ai-import">
+          <Tabs.List>
+            <Tabs.Tab value="ai-import" leftSection={<SparklesIcon size={16} />}>
+              AI Import
+            </Tabs.Tab>
+            <Tabs.Tab value="manual-entry" leftSection={<TableIcon size={16} />}>
+              Manual
+            </Tabs.Tab>
+          </Tabs.List>
 
-      <Tabs defaultValue="list">
-        <Tabs.List>
-          <Tabs.Tab value="list" leftSection={<ListIcon size={16} />}>
-            View All Expenses
-          </Tabs.Tab>
-          <Tabs.Tab value="ai-import" leftSection={<SparklesIcon size={16} />}>
-            AI-Powered Import
-          </Tabs.Tab>
-          <Tabs.Tab value="manual-entry" leftSection={<TableIcon size={16} />}>
-            Manual Table Entry
-          </Tabs.Tab>
-        </Tabs.List>
-
-        <Tabs.Panel value="list" pt="md">
-          <Card withBorder p="lg">
-            <ExpenseList selectedYear={selectedYear} selectedMonth={selectedMonth} />
-          </Card>
-        </Tabs.Panel>
-
-        <Tabs.Panel value="ai-import" pt="md">
-          <Card withBorder p="lg">
+          <Tabs.Panel value="ai-import" pt="md">
             <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
-          </Card>
-        </Tabs.Panel>
+          </Tabs.Panel>
 
-        <Tabs.Panel value="manual-entry" pt="md">
-          <Card withBorder p="lg">
+          <Tabs.Panel value="manual-entry" pt="md">
             <Stack gap="md">
               <ExpenseTable
                 expenses={expenses}
@@ -149,9 +138,14 @@ export default function ExpensesPage() {
               </Group>
               <Button onClick={handleSaveExpenses} fullWidth>Save Expenses</Button>
             </Stack>
-          </Card>
-        </Tabs.Panel>
-      </Tabs>
-    </Stack>
+          </Tabs.Panel>
+        </Tabs>
+      </Card>
+
+      {/* Right Panel - Expense List */}
+      <Card withBorder p="lg">
+        <ExpenseList selectedYear={selectedYear} selectedMonth={selectedMonth} />
+      </Card>
+    </SimpleGrid>
   )
 }
