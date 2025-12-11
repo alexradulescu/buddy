@@ -138,6 +138,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
           color: 'green'
         })
       } catch (error) {
+        console.error('Category delete error:', error)
         notifications.show({
           title: 'Error',
           message: 'Failed to delete category',
@@ -177,6 +178,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
         await onUpdate(category.id, updateData)
       }
     } catch (error) {
+      console.error('Category save error:', error)
       notifications.show({
         title: 'Error',
         message: `Failed to save category: ${error}`,
@@ -261,11 +263,9 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
                     <>
                       <Table.Td>
                         <NumberInput
-                          value={(category as EditableExpenseCategory).maxBudget}
+                          value={(category as EditableExpenseCategory).maxBudget ?? 0}
                           onChange={(value) => {
-                            if (value !== '' && value !== undefined) {
-                              handleInputChange(index, 'maxBudget', Number(value))
-                            }
+                            handleInputChange(index, 'maxBudget', typeof value === 'number' ? value : 0)
                           }}
                           placeholder="Monthly budget"
                           decimalScale={2}
@@ -274,11 +274,9 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
                       </Table.Td>
                       <Table.Td>
                         <NumberInput
-                          value={(category as EditableExpenseCategory).maxAnnualBudget}
+                          value={(category as EditableExpenseCategory).maxAnnualBudget ?? 0}
                           onChange={(value) => {
-                            if (value !== '' && value !== undefined) {
-                              handleInputChange(index, 'maxAnnualBudget', Number(value))
-                            }
+                            handleInputChange(index, 'maxAnnualBudget', typeof value === 'number' ? value : 0)
                           }}
                           placeholder="Annual budget"
                           decimalScale={2}
@@ -298,11 +296,9 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
                     <>
                       <Table.Td>
                         <NumberInput
-                          value={(category as EditableIncomeCategory).targetAmount}
+                          value={(category as EditableIncomeCategory).targetAmount ?? 0}
                           onChange={(value) => {
-                            if (value !== '' && value !== undefined) {
-                              handleInputChange(index, 'targetAmount', Number(value))
-                            }
+                            handleInputChange(index, 'targetAmount', typeof value === 'number' ? value : 0)
                           }}
                           placeholder="Target amount"
                           decimalScale={2}

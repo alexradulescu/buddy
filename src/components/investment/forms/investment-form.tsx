@@ -54,6 +54,7 @@ export default function InvestmentForm({ investment, onSuccess }: InvestmentForm
         navigate('/investments')
       }
     } catch (error) {
+      console.error('Investment save error:', error)
       notifications.show({
         title: 'Error',
         message: 'There was an error saving your investment. Please try again.',

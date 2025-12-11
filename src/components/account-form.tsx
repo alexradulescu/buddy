@@ -56,6 +56,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({ initialData, onSubmit,
       reset()
       onSubmit()
     } catch (error) {
+      console.error('Account balance save error:', error)
       notifications.show({
         title: 'Error',
         message: 'An error occurred while saving the account balance.',

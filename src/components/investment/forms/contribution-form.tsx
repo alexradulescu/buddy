@@ -27,13 +27,13 @@ export default function ContributionForm({ investmentId, contribution, onSuccess
     }
   })
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: { amount: number; date: Date; description: string }) => {
     setIsSubmitting(true)
     try {
       const formattedData = {
-        amount: data.amount,
-        date: data.date.toISOString(),
-        description: data.description
+        amount: Number(data.amount) || 0,
+        date: (data.date instanceof Date ? data.date : new Date()).toISOString(),
+        description: data.description || ''
       }
 
       if (contribution) {
@@ -59,6 +59,7 @@ export default function ContributionForm({ investmentId, contribution, onSuccess
         onSuccess()
       }
     } catch (error) {
+      console.error('Contribution save error:', error)
       notifications.show({
         title: 'Error',
         message: 'There was an error saving your contribution. Please try again.',
@@ -90,7 +91,10 @@ export default function ContributionForm({ investmentId, contribution, onSuccess
               fixedDecimalScale
               prefix="$"
               error={errors.amount?.message}
-              {...field}
+              value={field.value}
+              onChange={(val) => field.onChange(typeof val === 'number' ? val : 0)}
+              onBlur={field.onBlur}
+              name={field.name}
             />
           )}
         />
@@ -104,9 +108,10 @@ export default function ContributionForm({ investmentId, contribution, onSuccess
               label="Date"
               placeholder="Select date"
               valueFormat="YYYY-MM-DD"
+              clearable={false}
               error={errors.date?.message}
               value={field.value}
-              onChange={(value) => field.onChange(value || new Date())}
+              onChange={(val) => field.onChange(val ?? new Date())}
             />
           )}
         />
