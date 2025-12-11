@@ -40,6 +40,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
     let hasError = false
     const newIncomes = tableIncomes.map((income, index) => {
       if (!income.amount || isNaN(Number(income.amount)) || Number(income.amount) <= 0) {
+        console.error('Income validation error: Invalid amount in row', index + 1, income.amount)
         notifications.show({
           title: 'Invalid income',
           message: `Invalid amount in row ${index + 1}`,
@@ -49,8 +50,9 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
         return null
       }
 
-      const incomeDate = new Date(income.date)
+      const incomeDate = income.date instanceof Date ? income.date : new Date(income.date)
       if (incomeDate.getFullYear() !== selectedYear || incomeDate.getMonth() !== selectedMonth) {
+        console.error('Income validation error: Invalid date in row', index + 1, income.date)
         notifications.show({
           title: 'Invalid date',
           message: `Income in row ${index + 1} is not for the selected month and year`,
@@ -61,10 +63,10 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
       }
 
       return {
-        amount: Number(income.amount),
+        amount: Number(income.amount) || 0,
         categoryId: income.categoryId || '',
         category: income.category || '',
-        date: income.date.toISOString().split('T')[0],
+        date: (income.date instanceof Date ? income.date : new Date(income.date)).toISOString().split('T')[0],
         description: income.description
       }
     })
@@ -86,7 +88,9 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
 
   const handleTableInputChange = (index: number, field: keyof TableIncome, value: string | Date | null) => {
     const updatedIncomes = [...tableIncomes]
-    updatedIncomes[index] = { ...updatedIncomes[index], [field]: value }
+    // Ensure date is never null
+    const safeValue = field === 'date' && value === null ? getDefaultDate(selectedYear, selectedMonth) : value
+    updatedIncomes[index] = { ...updatedIncomes[index], [field]: safeValue }
     setTableIncomes(updatedIncomes)
   }
 
@@ -173,8 +177,9 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
                 <Table.Td p={4}>
                   <DatePickerInput
                     value={income.date}
-                    onChange={(value) => handleTableInputChange(index, 'date', value)}
+                    onChange={(value) => handleTableInputChange(index, 'date', value ?? getDefaultDate(selectedYear, selectedMonth))}
                     valueFormat="YYYY-MM-DD"
+                    clearable={false}
                     styles={{ input: { borderRadius: 0 } }}
                   />
                 </Table.Td>
