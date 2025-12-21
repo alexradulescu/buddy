@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { Expense, ExpenseCategory, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
-import { ExpenseTable } from '@/components/expense-table'
-import { Button, Stack, Text, Textarea, Title } from '@mantine/core'
+import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
+import { Button, Stack, Textarea, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
+import { ExpenseTable } from '@/components/expense-table'
 
 interface ExpenseAiConverterProps {
   onExpensesGenerated: (expenses: Expense[]) => void
@@ -23,10 +23,10 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
 
     return expenses
       .filter(({ date }) => new Date(date) >= threeMonthsAgo)
-      .map(({ description, categoryId }) => ({
+      .map(({ description, categoryId, amount }) => ({
         description,
         categoryId,
-        amount: 0
+        amount: amount || 0
       }))
   }, [expenses])
 
@@ -52,18 +52,24 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
         },
         body: JSON.stringify({
           prompt: inputText,
-          expenseCategories: expenseCategories.map(cat => ({ id: cat.id, name: cat.name })),
+          expenseCategories: expenseCategories.map((cat) => ({ id: cat.id, name: cat.name })),
           historicalExpenses
         })
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
-        throw new Error(errorData.message || `Server error: ${response.status}`)
+        const errorText = await response.text().catch(() => 'Unknown error')
+        try {
+          const errorData = JSON.parse(errorText)
+          throw new Error(errorData.message || `Server error: ${response.status}`)
+        } catch {
+          throw new Error(errorText || `Server error: ${response.status}`)
+        }
       }
 
-      // Parse the JSON response
-      const expenses = await response.json()
+      // Parse the streaming text response
+      const text = await response.text()
+      const expenses = JSON.parse(text)
 
       if (expenses && Array.isArray(expenses) && expenses.length > 0) {
         const processedExpenses = expenses.map((expense) => ({
@@ -134,7 +140,9 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
     <Stack gap="md">
       {aiGeneratedExpenses.length > 0 ? (
         <Stack gap="md">
-          <Title order={3} size="h5">AI Generated Expenses</Title>
+          <Title order={3} size="h5">
+            AI Generated Expenses
+          </Title>
           <ExpenseTable
             expenses={aiGeneratedExpenses}
             expenseCategories={expenseCategories}
