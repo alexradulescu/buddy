@@ -45,12 +45,14 @@ export function TransactionForm({ type, open, onOpenChange, onSubmit, categories
     setIsSubmitting(true)
     try {
       await onSubmit({
-        amount: parseFloat(amount.toString()),
+        amount: Number(amount) || 0,
         description,
-        date: date.toISOString(),
+        date: (date instanceof Date ? date : new Date()).toISOString(),
         categoryId
       })
       onOpenChange(false)
+    } catch (error) {
+      console.error('Transaction save error:', error)
     } finally {
       setIsSubmitting(false)
     }
@@ -84,8 +86,9 @@ export function TransactionForm({ type, open, onOpenChange, onSubmit, categories
         <DatePickerInput
           label="Date"
           value={date}
-          onChange={(value) => setDate(value ? (typeof value === 'string' ? new Date(value) : value) : null)}
+          onChange={(value) => setDate(value ? (typeof value === 'string' ? new Date(value) : value) : new Date())}
           placeholder="Pick a date"
+          clearable={false}
           required
         />
 

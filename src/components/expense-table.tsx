@@ -49,8 +49,9 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                 <Table.Td p="xs">
                   <DateInput
                     value={new Date(expense.date)}
-                    onChange={(date) => onInputChange(index, 'date', date!)}
+                    onChange={(date) => onInputChange(index, 'date', date ?? new Date())}
                     valueFormat="DD MMM YY"
+                    clearable={false}
                     styles={{ input: { borderRadius: 0, padding: '8px' } }}
                   />
                 </Table.Td>

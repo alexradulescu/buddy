@@ -32,13 +32,15 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
     let hasError = false
     expenses.forEach((expense) => {
       if (!expense.amount || isNaN(Number(expense.amount)) || Number(expense.amount) <= 0) {
+        console.error('Expense validation error: Invalid amount', expense.description, expense.amount)
         setErrors((previousErrors) => [...previousErrors, `Invalid amount for expense: ${expense.description}`])
         hasError = true
         return
       }
 
       const expenseDate = new Date(expense.date)
-      if (expenseDate.getFullYear() !== selectedYear || expenseDate.getMonth() !== selectedMonth) {
+      if (isNaN(expenseDate.getTime()) || expenseDate.getFullYear() !== selectedYear || expenseDate.getMonth() !== selectedMonth) {
+        console.error('Expense validation error: Invalid date', expense.description, expense.date)
         setErrors((previousErrors) => [
           ...previousErrors,
           `Expense ${expense.description} is not for the selected month and year`
@@ -126,7 +128,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
           <Group gap="xs">
             <NumberInput
               value={rowsToAdd}
-              onChange={(value) => setRowsToAdd(Number(value))}
+              onChange={(value) => setRowsToAdd(Number(value) || 1)}
               min={1}
               style={{ width: '80px' }}
             />
