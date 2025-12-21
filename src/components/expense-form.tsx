@@ -38,8 +38,8 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
         return
       }
 
-      const expenseDate = expense.date instanceof Date ? expense.date : new Date(expense.date)
-      if (expenseDate.getFullYear() !== selectedYear || expenseDate.getMonth() !== selectedMonth) {
+      const expenseDate = new Date(expense.date)
+      if (isNaN(expenseDate.getTime()) || expenseDate.getFullYear() !== selectedYear || expenseDate.getMonth() !== selectedMonth) {
         console.error('Expense validation error: Invalid date', expense.description, expense.date)
         setErrors((previousErrors) => [
           ...previousErrors,
