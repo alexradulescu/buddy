@@ -2,9 +2,9 @@
 
 import React from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
-import { TrashIcon } from 'lucide-react'
-import { Button, NumberInput, Select, Stack, Table, Text, Textarea, ScrollArea } from '@mantine/core'
+import { Button, NumberInput, ScrollArea, Select, Stack, Table, Text, Textarea } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
+import { TrashIcon } from 'lucide-react'
 
 interface ExpenseTableProps {
   expenses: Expense[]
@@ -43,10 +43,10 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
           <Table.Tbody>
             {expenses.map((expense, index) => (
               <Table.Tr key={expense.id}>
-                <Table.Td ta="center" c="dimmed" p="xs">
+                <Table.Td ta="center" c="dimmed" p={0}>
                   {index + 1}
                 </Table.Td>
-                <Table.Td p="xs">
+                <Table.Td p={0}>
                   <DateInput
                     value={new Date(expense.date)}
                     onChange={(date) => onInputChange(index, 'date', date ?? new Date())}
@@ -55,7 +55,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                     styles={{ input: { borderRadius: 0, padding: '8px' } }}
                   />
                 </Table.Td>
-                <Table.Td p="xs">
+                <Table.Td p={0}>
                   <Textarea
                     value={expense.description}
                     onChange={(e) => onInputChange(index, 'description', e.target.value)}
@@ -64,7 +64,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                     styles={{ input: { borderRadius: 0, padding: '8px' } }}
                   />
                 </Table.Td>
-                <Table.Td p="xs">
+                <Table.Td p={0}>
                   <NumberInput
                     value={expense.amount}
                     onChange={(value) => onInputChange(index, 'amount', Number(value))}
@@ -74,7 +74,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                     styles={{ input: { borderRadius: 0, padding: '8px' } }}
                   />
                 </Table.Td>
-                <Table.Td p="xs">
+                <Table.Td p={0}>
                   <Select
                     value={expense.categoryId}
                     onChange={(value) => onInputChange(index, 'categoryId', value || '')}
@@ -89,15 +89,8 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                     searchable
                   />
                 </Table.Td>
-                <Table.Td p="xs">
-                  <Button
-                    variant="subtle"
-                    color="red"
-                    onClick={() => onDeleteRow(expense.id)}
-                    w="100%"
-                    h="100%"
-                    p={0}
-                  >
+                <Table.Td p={0}>
+                  <Button variant="subtle" color="red" onClick={() => onDeleteRow(expense.id)} w="100%" h="100%" p={0}>
                     <TrashIcon size={16} />
                   </Button>
                 </Table.Td>

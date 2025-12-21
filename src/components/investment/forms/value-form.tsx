@@ -102,10 +102,9 @@ export default function ValueForm({ investmentId, value, onSuccess, onCancel }: 
               placeholder="0.00"
               decimalScale={2}
               fixedDecimalScale
-              prefix="$"
               error={errors.value?.message}
               value={field.value}
-              onChange={(val) => field.onChange(typeof val === 'number' ? val : 0)}
+              onChange={(val) => field.onChange(val === '' ? 0 : Number(val))}
               onBlur={field.onBlur}
               name={field.name}
             />
