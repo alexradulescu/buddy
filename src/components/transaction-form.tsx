@@ -86,7 +86,7 @@ export function TransactionForm({ type, open, onOpenChange, onSubmit, categories
         <DatePickerInput
           label="Date"
           value={date}
-          onChange={(value) => setDate(value ?? new Date())}
+          onChange={(value) => setDate(value instanceof Date ? value : value ? new Date(value) : new Date())}
           placeholder="Pick a date"
           clearable={false}
           required
