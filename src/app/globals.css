@@ -31,6 +31,8 @@ textarea {
 .expense-spreadsheet {
   font-family: var(--font-system);
   font-size: 14px;
+  width: 100%;
+  min-width: 100%;
 }
 
 /* Table borders and cells */

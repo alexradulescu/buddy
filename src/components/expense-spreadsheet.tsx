@@ -233,14 +233,15 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
       <Text size="sm" c="dimmed">
         {expenses.length} {expenses.length === 1 ? 'item' : 'items'}
       </Text>
-      <div style={{ height: '50vh', overflow: 'auto' }}>
+      <div style={{ width: '100%', overflowX: 'auto' }}>
         <HotTable
           data={tableData}
           columns={columns}
           colHeaders={true}
           rowHeaders={false}
           licenseKey="non-commercial-and-evaluation"
-          height="100%"
+          height={400}
+          width="100%"
           stretchH="all"
           autoWrapRow={true}
           autoWrapCol={true}
