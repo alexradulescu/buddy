@@ -102,7 +102,7 @@ export default function ExpensesPage() {
   }
 
   return (
-    <SimpleGrid cols={2} spacing="md">
+    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
       {/* Left Panel - Entry Methods */}
       <Card withBorder p="lg">
         <Tabs defaultValue="ai-import">
