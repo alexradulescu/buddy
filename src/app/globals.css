@@ -43,7 +43,7 @@ textarea {
 
 .expense-spreadsheet td {
   border-color: #dee2e6 !important;
-  padding: 4px 6px !important;
+  padding: 0 !important;
 }
 
 .expense-spreadsheet th {
@@ -51,8 +51,9 @@ textarea {
   border-color: #dee2e6 !important;
   color: #495057;
   font-weight: 600;
-  padding: 6px !important;
+  padding: 0 !important;
   font-size: 12px;
+  vertical-align: middle;
 }
 
 /* Selected cell */

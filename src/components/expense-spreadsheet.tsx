@@ -58,8 +58,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
 
   // Transform expenses to Handsontable format
   const tableData = useMemo(() => {
-    return expenses.map((expense, index) => ({
-      rowNumber: index + 1,
+    return expenses.map((expense) => ({
       date: expense.date,
       description: expense.description,
       amount: expense.amount,
@@ -94,8 +93,8 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
         border: none;
         background: transparent;
         cursor: pointer;
-        font-size: 16px;
-        padding: 8px;
+        font-size: 14px;
+        padding: 2px;
         transition: background-color 0.2s;
       `
 
@@ -168,25 +167,12 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
   const columns: Handsontable.ColumnSettings[] = useMemo(
     () => [
       {
-        data: 'rowNumber',
-        title: '#',
-        width: 50,
-        readOnly: true,
-        className: 'htCenter htMiddle',
-        renderer: (instance, td, row, col, prop, value, cellProperties) => {
-          td.textContent = String(value)
-          td.style.color = '#868e96'
-          td.style.fontWeight = '500'
-          return td
-        }
-      },
-      {
         data: 'date',
         title: 'Date',
         type: 'date',
         dateFormat: 'YYYY-MM-DD',
         correctFormat: true,
-        width: 120,
+        width: 72,
         className: 'htMiddle'
       },
       {
@@ -203,7 +189,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
         numericFormat: {
           pattern: '0,0.00'
         },
-        width: 100,
+        width: 80,
         className: 'htMiddle htRight'
       },
       {
@@ -220,8 +206,9 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
       {
         data: 'id',
         title: 'Action',
-        width: 60,
+        width: 36,
         readOnly: true,
+        className: 'htMiddle htCenter',
         renderer: deleteButtonRenderer
       }
     ],
