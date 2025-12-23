@@ -46,8 +46,8 @@ export function YTDOverview({ compact = false }: YTDOverviewProps) {
       })
       .reduce((total, income) => total + (income.amount || 0), 0)
 
-    // YTD Spent: All expenses from Jan 1 to current month of current year
-    const ytdSpent = expenses
+    // YTD Expenses: All expenses from Jan 1 to current month of current year
+    const ytdExpenses = expenses
       .filter((expense) => {
         const expenseDate = new Date(expense.date)
         return (
@@ -56,6 +56,20 @@ export function YTDOverview({ compact = false }: YTDOverviewProps) {
         )
       })
       .reduce((total, expense) => total + (expense.amount || 0), 0)
+
+    // YTD Investment Contributions (to exclude from spent)
+    const ytdInvestmentContributions = investmentContributions
+      .filter((contribution) => {
+        const contributionDate = new Date(contribution.date)
+        return (
+          contributionDate.getFullYear() === currentYear &&
+          contributionDate.getMonth() <= currentMonth
+        )
+      })
+      .reduce((total, contribution) => total + (contribution.amount || 0), 0)
+
+    // YTD Spent: Expenses minus investments (money moved to investments isn't "spent")
+    const ytdSpent = ytdExpenses - ytdInvestmentContributions
 
     // YTD Budget: Sum of all non-archived category monthly budgets × (current month + 1)
     const monthsElapsed = currentMonth + 1
