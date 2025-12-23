@@ -6,6 +6,14 @@ import { AccountForm } from '@/components/account-form'
 import { AccountList } from '@/components/account-list'
 import { Button, Card, Modal, Stack, SimpleGrid, Group, Text, Title } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
+import { Calculator, Wallet } from 'lucide-react'
+
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+})
 
 const getPreviousMonthYear = (year: number, month: number) => {
   if (month === 0) {
@@ -61,58 +69,52 @@ export default function AccountsPage() {
   const realAccountsTotal = currentMonthBalance
   const discrepancy = realAccountsTotal - expectedAccountsTotal
 
-  return (
-    <Stack gap="xl">
+  const summaryMetrics = [
+    { label: 'Total Account Balances', value: currencyFormatter.format(currentMonthBalance) },
+    { label: 'Total Expenses', value: currencyFormatter.format(currentMonthExpenses) },
+    { label: 'Total Income', value: currencyFormatter.format(currentMonthIncome) },
+    { label: 'Expected Accounts Total', value: currencyFormatter.format(expectedAccountsTotal) },
+    { label: 'Real Accounts Total', value: currencyFormatter.format(realAccountsTotal) },
+    { label: 'Discrepancy', value: currencyFormatter.format(discrepancy), color: discrepancy >= 0 ? 'green.6' : 'red.6' }
+  ]
 
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
-        <Card shadow="sm" padding="0" radius="md" withBorder>
-          <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
-            <Title order={3} size="h5">Summary</Title>
-          </Card.Section>
-          <Card.Section inheritPadding py="md">
-            <Stack gap="sm">
-              <Group justify="space-between">
-                <Text c="dimmed">Total Account Balances</Text>
-                <Text>${currentMonthBalance.toFixed(2)}</Text>
-              </Group>
-              <Group justify="space-between">
-                <Text c="dimmed">Total Expenses</Text>
-                <Text>${currentMonthExpenses.toFixed(2)}</Text>
-              </Group>
-              <Group justify="space-between">
-                <Text c="dimmed">Total Income</Text>
-                <Text>${currentMonthIncome.toFixed(2)}</Text>
-              </Group>
-              <Group justify="space-between">
-                <Text c="dimmed">Expected Accounts Total</Text>
-                <Text>${expectedAccountsTotal.toFixed(2)}</Text>
-              </Group>
-              <Group justify="space-between">
-                <Text c="dimmed">Real Accounts Total</Text>
-                <Text>${realAccountsTotal.toFixed(2)}</Text>
-              </Group>
-            </Stack>
-          </Card.Section>
-          <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
-            <Group justify="space-between">
-              <Text c="dimmed">Discrepancy</Text>
-              <Text fw={600} c={discrepancy > 0 ? 'green.6' : 'red.6'}>
-                ${discrepancy.toFixed(2)}
-              </Text>
+  return (
+    <Stack gap="lg">
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
+        {/* Summary Card - matches YTD style */}
+        <Card shadow="sm" padding="md" radius="md" withBorder>
+          <Stack gap="md">
+            <Group gap="xs">
+              <Calculator size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
+              <Title order={4} c="dimmed">Summary</Title>
             </Group>
-          </Card.Section>
+            <Stack gap="xs">
+              {summaryMetrics.map((metric) => (
+                <Group key={metric.label} justify="space-between">
+                  <Text size="sm" c="dimmed">{metric.label}</Text>
+                  <Text size="sm" fw={600} className="numeric-value" c={metric.color}>
+                    {metric.value}
+                  </Text>
+                </Group>
+              ))}
+            </Stack>
+          </Stack>
         </Card>
 
-        <Card shadow="sm" padding="0" radius="md" withBorder>
-          <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
-            <Group justify="space-between">
-              <Title order={3} size="h5">Account Balances</Title>
-              <Button size="sm" onClick={() => setIsAddAccountDialogOpen(true)}>
+        {/* Account Balances Card - matches YTD style */}
+        <Card shadow="sm" padding="md" radius="md" withBorder>
+          <Stack gap="md">
+            <Group gap="xs" justify="space-between">
+              <Group gap="xs">
+                <Wallet size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
+                <Title order={4} c="dimmed">Account Balances</Title>
+              </Group>
+              <Button size="xs" onClick={() => setIsAddAccountDialogOpen(true)}>
                 Add
               </Button>
             </Group>
-          </Card.Section>
-          <AccountList selectedYear={selectedYear} selectedMonth={selectedMonth} />
+            <AccountList selectedYear={selectedYear} selectedMonth={selectedMonth} />
+          </Stack>
         </Card>
       </SimpleGrid>
 

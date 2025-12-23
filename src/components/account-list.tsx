@@ -2,10 +2,17 @@
 
 import React, { useState } from 'react'
 import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
-import { Edit2, MoreVertical, Trash2 } from 'lucide-react'
+import { Edit2, Trash2 } from 'lucide-react'
 import { AccountForm } from '@/components/account-form'
-import { Button, Modal, Menu, Divider } from '@mantine/core'
+import { Button, Modal, Group, Text, Stack } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
+
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+})
 
 interface AccountListProps {
   selectedYear: number
@@ -42,48 +49,30 @@ export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selected
 
   return (
     <>
-      <div style={{ padding: '1.5rem' }}>
-        {accountBalances.length === 0 ? (
-          <p style={{ textAlign: 'center', color: 'var(--mantine-color-dimmed)', padding: '1rem 0' }}>
-            No account balances for this month.
-          </p>
-        ) : (
-          <ul style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {accountBalances.map((balance) => (
-              <li key={balance.id}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div>
-                    <h3 style={{ fontWeight: 600 }}>{balance.title}</h3>
-                    <p style={{ fontSize: '0.875rem', color: 'var(--mantine-color-dimmed)' }}>ID: {balance.id}</p>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div style={{ textAlign: 'right', fontWeight: 600 }}>${balance.amount.toFixed(2)}</div>
-                    <Menu shadow="md" width={200}>
-                      <Menu.Target>
-                        <Button variant="subtle" size="compact-sm" p={0}>
-                          <MoreVertical size={16} />
-                          <span style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden' }}>
-                            Actions
-                          </span>
-                        </Button>
-                      </Menu.Target>
-                      <Menu.Dropdown>
-                        <Menu.Item leftSection={<Edit2 size={16} />} onClick={() => handleEdit(balance)}>
-                          Edit
-                        </Menu.Item>
-                        <Menu.Item leftSection={<Trash2 size={16} />} color="red" onClick={() => handleDelete(balance)}>
-                          Delete
-                        </Menu.Item>
-                      </Menu.Dropdown>
-                    </Menu>
-                  </div>
-                </div>
-                <Divider my="sm" />
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {accountBalances.length === 0 ? (
+        <Text ta="center" c="dimmed" py="md">
+          No account balances for this month.
+        </Text>
+      ) : (
+        <Stack gap="xs">
+          {accountBalances.map((balance) => (
+            <Group key={balance.id} justify="space-between" wrap="nowrap">
+              <Text size="sm" fw={500}>{balance.title}</Text>
+              <Group gap="xs" wrap="nowrap">
+                <Text size="sm" fw={600} className="numeric-value">
+                  {currencyFormatter.format(balance.amount)}
+                </Text>
+                <Button size="compact-xs" variant="subtle" onClick={() => handleEdit(balance)}>
+                  <Edit2 size={12} />
+                </Button>
+                <Button size="compact-xs" variant="subtle" color="red" onClick={() => handleDelete(balance)}>
+                  <Trash2 size={12} />
+                </Button>
+              </Group>
+            </Group>
+          ))}
+        </Stack>
+      )}
 
       <Modal
         opened={editingAccount !== null}
@@ -107,15 +96,15 @@ export const AccountList: React.FC<AccountListProps> = ({ selectedYear, selected
         title="Are you sure?"
         centered
       >
-        <p>This action cannot be undone. This will permanently delete the account balance.</p>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+        <Text size="sm">This action cannot be undone. This will permanently delete the account balance.</Text>
+        <Group justify="flex-end" gap="sm" mt="md">
           <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
             Cancel
           </Button>
           <Button color="red" onClick={confirmDelete}>
             Delete
           </Button>
-        </div>
+        </Group>
       </Modal>
     </>
   )
