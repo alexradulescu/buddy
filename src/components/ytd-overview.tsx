@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { Calendar, CreditCard, DollarSign, PiggyBank, TrendingUp, Wallet, BarChart2 } from 'lucide-react'
-import { SimpleGrid, Title, Stack, Card, Group, Text, Box } from '@mantine/core'
+import { SimpleGrid, Title, Stack, Group, Text } from '@mantine/core'
 import { OverviewCard } from '@/components/overview-card'
 import { useCategoryStore, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
@@ -135,19 +135,17 @@ export function YTDOverview({ compact = false }: YTDOverviewProps) {
     { label: 'Savings Rate', value: formatPercent(ytdData.ytdSavingsRate) }
   ]
 
-  // Compact view: single card with key-value pairs (for mobile)
+  // Compact view: key-value pairs without card wrapper (for mobile accordion)
   if (compact) {
     return (
-      <Card shadow="sm" padding="md" radius="md" withBorder>
-        <Stack gap="xs">
-          {metrics.map((metric) => (
-            <Group key={metric.label} justify="space-between">
-              <Text size="sm" c="dimmed">{metric.label}</Text>
-              <Text size="sm" fw={600} className="numeric-value">{metric.value}</Text>
-            </Group>
-          ))}
-        </Stack>
-      </Card>
+      <Stack gap="xs">
+        {metrics.map((metric) => (
+          <Group key={metric.label} justify="space-between">
+            <Text size="sm" c="dimmed">{metric.label}</Text>
+            <Text size="sm" fw={600} className="numeric-value">{metric.value}</Text>
+          </Group>
+        ))}
+      </Stack>
     )
   }
 
