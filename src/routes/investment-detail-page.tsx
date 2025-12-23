@@ -2,14 +2,20 @@
 
 import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
-import { ArrowLeft, Edit, Trash2 } from 'lucide-react'
+import { ArrowLeft, Edit, Trash2, TrendingUp, DollarSign } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router'
 import ContributionTable from '@/components/investment/contribution-table'
 import PerformanceGraph from '@/components/investment/performance-graph'
 import ValueTable from '@/components/investment/value-table'
-import { PageHeader } from '@/components/page-header'
-import { Button, Card, Tabs, Modal, Stack, Group, Title, Text, SimpleGrid, Center } from '@mantine/core'
+import { Button, Card, Modal, Stack, Group, Title, Text, SimpleGrid, Center } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
+
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+})
 
 export default function InvestmentDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -24,7 +30,6 @@ export default function InvestmentDetailPage() {
     deleteContribution,
     deleteValue
   } = useInvestmentStore()
-  const [activeTab, setActiveTab] = useState('contributions')
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
   // Find the investment by ID
@@ -113,14 +118,19 @@ export default function InvestmentDetailPage() {
 
   const formatCurrency = (amount: number | null) => {
     if (amount === null) return 'N/A'
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount)
+    return currencyFormatter.format(amount)
   }
 
+  const overviewMetrics = [
+    { label: 'Total Contributions', value: formatCurrency(totalContributions) },
+    { label: 'Current Value', value: formatCurrency(currentValue) },
+    { label: 'Profit/Loss', value: formatCurrency(profit), color: profit >= 0 ? 'green.6' : 'red.6' },
+    { label: 'Return', value: currentValue === null ? 'N/A' : `${profitPercentage.toFixed(2)}%`, color: profitPercentage >= 0 ? 'green.6' : 'red.6' }
+  ]
+
   return (
-    <Stack gap="xl">
+    <Stack gap="lg">
+      {/* Header with back button and actions */}
       <Group justify="space-between">
         <Button variant="subtle" size="sm" component={Link} to="/investments" leftSection={<ArrowLeft size={16} />}>
           Back to Investments
@@ -135,63 +145,45 @@ export default function InvestmentDetailPage() {
         </Group>
       </Group>
 
-      <PageHeader title={investment.name} description={investment.description || 'No description provided'} />
+      {/* Title and description */}
+      <Stack gap="xs">
+        <Title order={2}>{investment.name}</Title>
+        <Text c="dimmed" size="sm">{investment.description || 'No description provided'}</Text>
+      </Stack>
 
-      <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Card.Section withBorder inheritPadding py="xs">
-            <Text size="sm" fw={500}>Total Contributions</Text>
-          </Card.Section>
-          <Card.Section inheritPadding py="md">
-            <Text size="xl" fw={700} className="numeric-value">{formatCurrency(totalContributions)}</Text>
-          </Card.Section>
+      {/* Overview Card + Performance Chart - side by side */}
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
+        {/* Overview Card - YTD style */}
+        <Card shadow="sm" padding="md" radius="md" withBorder>
+          <Stack gap="md">
+            <Group gap="xs">
+              <DollarSign size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
+              <Title order={4} c="dimmed">Overview</Title>
+            </Group>
+            <Stack gap="xs">
+              {overviewMetrics.map((metric) => (
+                <Group key={metric.label} justify="space-between">
+                  <Text size="sm" c="dimmed">{metric.label}</Text>
+                  <Text size="sm" fw={600} className="numeric-value" c={metric.color}>
+                    {metric.value}
+                  </Text>
+                </Group>
+              ))}
+            </Stack>
+          </Stack>
         </Card>
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Card.Section withBorder inheritPadding py="xs">
-            <Text size="sm" fw={500}>Current Value</Text>
-          </Card.Section>
-          <Card.Section inheritPadding py="md">
-            <Text size="xl" fw={700} className="numeric-value">{formatCurrency(currentValue)}</Text>
-          </Card.Section>
-        </Card>
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Card.Section withBorder inheritPadding py="xs">
-            <Text size="sm" fw={500}>Profit/Loss</Text>
-          </Card.Section>
-          <Card.Section inheritPadding py="md">
-            <Text size="xl" fw={700} c={profit >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
-              {formatCurrency(profit)}
-            </Text>
-          </Card.Section>
-        </Card>
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
-          <Card.Section withBorder inheritPadding py="xs">
-            <Text size="sm" fw={500}>Return</Text>
-          </Card.Section>
-          <Card.Section inheritPadding py="md">
-            <Text size="xl" fw={700} c={profitPercentage >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
-              {currentValue === null ? 'N/A' : `${profitPercentage.toFixed(2)}%`}
-            </Text>
-          </Card.Section>
-        </Card>
+
+        {/* Performance Chart */}
+        <PerformanceGraph contributions={contributions} values={values} />
       </SimpleGrid>
 
-      <PerformanceGraph contributions={contributions} values={values} />
+      {/* Contributions & Values - side by side */}
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
+        <ContributionTable investmentId={id} contributions={contributions} onDelete={handleDeleteContribution} />
+        <ValueTable investmentId={id} values={values} onDelete={handleDeleteValue} />
+      </SimpleGrid>
 
-      <Tabs value={activeTab} onChange={(value) => setActiveTab(value || 'contributions')}>
-        <Tabs.List>
-          <Tabs.Tab value="contributions">Contributions</Tabs.Tab>
-          <Tabs.Tab value="values">Values</Tabs.Tab>
-        </Tabs.List>
-
-        <Tabs.Panel value="contributions" pt="md">
-          <ContributionTable investmentId={id} contributions={contributions} onDelete={handleDeleteContribution} />
-        </Tabs.Panel>
-        <Tabs.Panel value="values" pt="md">
-          <ValueTable investmentId={id} values={values} onDelete={handleDeleteValue} />
-        </Tabs.Panel>
-      </Tabs>
-
+      {/* Delete Confirmation Modal */}
       <Modal
         opened={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
