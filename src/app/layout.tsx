@@ -3,7 +3,7 @@ import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 import './globals.css'
 import { Suspense } from 'react'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps, createTheme } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 
@@ -19,6 +19,13 @@ const theme = createTheme({
 export const metadata: Metadata = {
   title: 'Buddy App',
   description: 'Personal finance management app'
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false
 }
 
 export default function RootLayout({

@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { Button, Stack, Textarea, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
-import { ExpenseTable } from '@/components/expense-table'
+import { ExpenseSpreadsheet } from '@/components/expense-spreadsheet'
 
 interface ExpenseAiConverterProps {
   onExpensesGenerated: (expenses: Expense[]) => void
@@ -143,7 +143,7 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
           <Title order={3} size="h5">
             AI Generated Expenses
           </Title>
-          <ExpenseTable
+          <ExpenseSpreadsheet
             expenses={aiGeneratedExpenses}
             expenseCategories={expenseCategories}
             onInputChange={handleExpenseChange}

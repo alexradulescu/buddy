@@ -5,7 +5,7 @@ import { ExpenseList } from '@/components/expense-list'
 import { Card, Stack, Tabs, Group, NumberInput, Button, SimpleGrid } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'
-import { ExpenseTable } from '@/components/expense-table'
+import { ExpenseSpreadsheet } from '@/components/expense-spreadsheet'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { notifications } from '@mantine/notifications'
 import { SparklesIcon, TableIcon } from 'lucide-react'
@@ -102,7 +102,7 @@ export default function ExpensesPage() {
   }
 
   return (
-    <SimpleGrid cols={2} spacing="md">
+    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
       {/* Left Panel - Entry Methods */}
       <Card withBorder p="lg">
         <Tabs defaultValue="ai-import">
@@ -121,7 +121,7 @@ export default function ExpensesPage() {
 
           <Tabs.Panel value="manual-entry" pt="md">
             <Stack gap="md">
-              <ExpenseTable
+              <ExpenseSpreadsheet
                 expenses={expenses}
                 expenseCategories={expenseCategories}
                 onInputChange={handleInputChange}

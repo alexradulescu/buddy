@@ -26,3 +26,112 @@ input[type="number"],
 textarea {
   field-sizing: content;
 }
+
+/* Handsontable Custom Styling - Match Mantine Theme */
+.expense-spreadsheet {
+  font-family: var(--font-system);
+  font-size: 13px;
+  width: 100%;
+  min-width: 100%;
+  line-height: 1.3;
+}
+
+/* Table borders and cells */
+.expense-spreadsheet .ht_master .wtHolder {
+  background: white;
+}
+
+.expense-spreadsheet td {
+  border-color: #dee2e6 !important;
+  padding: 0 2px !important;
+}
+
+.expense-spreadsheet th {
+  background: #f8f9fa !important;
+  border-color: #dee2e6 !important;
+  color: #495057;
+  font-weight: 600;
+  padding: 0 2px !important;
+  font-size: 12px;
+  vertical-align: middle;
+  text-align: inherit;
+}
+
+/* Selected cell */
+.expense-spreadsheet .ht__highlight {
+  background: #e7f5ff !important;
+}
+
+.expense-spreadsheet .area {
+  background: #d0ebff !important;
+}
+
+/* Current cell border */
+.expense-spreadsheet .current.area {
+  border: 2px solid #228be6 !important;
+}
+
+/* Numeric cells - use monospace */
+.expense-spreadsheet td.htRight {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Row headers (if enabled) */
+.expense-spreadsheet .ht__row_header {
+  background: #f8f9fa !important;
+  color: #868e96;
+}
+
+/* Dropdown arrow */
+.expense-spreadsheet .htAutocompleteArrow {
+  color: #868e96;
+}
+
+/* Input field when editing */
+.expense-spreadsheet .handsontableInput {
+  font-family: var(--font-system);
+  font-size: 13px;
+  padding: 2px 4px;
+  border: 2px solid #228be6 !important;
+  border-radius: 4px;
+}
+
+/* Date picker integration */
+.expense-spreadsheet input[type="text"] {
+  font-family: var(--font-system);
+}
+
+/* Dropdown menu styling */
+.handsontable .htDropdownMenu {
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+/* Autocomplete dropdown */
+.handsontable.listbox {
+  font-family: var(--font-system);
+  font-size: 13px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.handsontable.listbox .ht_master table {
+  border: none;
+}
+
+.handsontable.listbox td.current {
+  background: #e7f5ff !important;
+  color: #228be6;
+}
+
+/* Invalid cells */
+.expense-spreadsheet .htInvalid {
+  background: #fff5f5 !important;
+  border: 1px solid #fa5252 !important;
+}
+
+/* Read-only cells */
+.expense-spreadsheet .htDimmed {
+  color: #868e96;
+}
