@@ -7,6 +7,7 @@ import { ExpenseOverview } from '@/components/expense-overview'
 import { HomeOverview } from '@/components/home-overview'
 import { IncomeOverview } from '@/components/income-overview'
 import { InvestmentOverview } from '@/components/investment/investment-overview'
+import { YTDOverview } from '@/components/ytd-overview'
 import { PageHeader } from '@/components/page-header'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { Stack, Accordion, Box } from '@mantine/core'
@@ -45,6 +46,23 @@ export default function HomePage() {
 
   return (
     <Stack gap="lg">
+      {/* YTD Overview - Desktop: always visible */}
+      <Box visibleFrom="sm">
+        <YTDOverview />
+      </Box>
+
+      {/* YTD Overview - Mobile: collapsible (collapsed by default) */}
+      <Box hiddenFrom="sm">
+        <Accordion>
+          <Accordion.Item value="ytd">
+            <Accordion.Control>Year to Date Overview</Accordion.Control>
+            <Accordion.Panel>
+              <YTDOverview />
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+      </Box>
+
       <HomeOverview
         totalMonthlyIncomes={totalMonthlyIncomes}
         totalMonthlyExpenses={totalMonthlyExpenses}
@@ -52,7 +70,7 @@ export default function HomePage() {
         totalInvestmentValue={totalInvestmentValue}
       />
 
-      {/* Desktop view - regular stack */}
+      {/* Mobile view - regular stack */}
       <Box hiddenFrom="sm">
         <Stack gap="lg">
           <ExpenseOverview
@@ -73,7 +91,7 @@ export default function HomePage() {
         </Stack>
       </Box>
 
-      {/* Mobile view - accordion */}
+      {/* Desktop view - accordion for detailed sections */}
       <Box visibleFrom="sm">
         <Accordion multiple defaultValue={['expenses', 'incomes', 'investments']}>
           <Accordion.Item value="expenses">
