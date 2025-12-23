@@ -1,7 +1,8 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Card } from '@mantine/core'
+import { Card, Stack, Group, Title, Text } from '@mantine/core'
+import { TrendingUp } from 'lucide-react'
 import { InvestmentContribution, InvestmentValue } from '@/types/investment'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
@@ -81,64 +82,69 @@ export default function PerformanceGraph({ contributions, values }: PerformanceG
   // If there's no data, show a message
   if (chartData.length === 0 || (contributions.length === 0 && values.length === 0)) {
     return (
-      <Card shadow="sm" padding="0" radius="md" withBorder>
-        <Card.Section withBorder inheritPadding py="xs" style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>Performance</h3>
-        </Card.Section>
-        <Card.Section inheritPadding py="md" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '16rem' }}>
-          <p style={{ color: 'var(--mantine-color-dimmed)' }}>Add contributions and values to see performance data</p>
-        </Card.Section>
+      <Card shadow="sm" padding="md" radius="md" withBorder>
+        <Stack gap="md">
+          <Group gap="xs">
+            <TrendingUp size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
+            <Title order={4} c="dimmed">Performance</Title>
+          </Group>
+          <Stack align="center" justify="center" mih="10rem">
+            <Text c="dimmed" size="sm">Add contributions and values to see performance data</Text>
+          </Stack>
+        </Stack>
       </Card>
     )
   }
 
   return (
-    <Card shadow="sm" padding="0" radius="md" withBorder>
-      <Card.Section withBorder inheritPadding py="xs" style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}>
-        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>Performance</h3>
-      </Card.Section>
-      <Card.Section inheritPadding py="md">
-        <div style={{ height: '20rem' }}>
+    <Card shadow="sm" padding="md" radius="md" withBorder>
+      <Stack gap="md">
+        <Group gap="xs">
+          <TrendingUp size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
+          <Title order={4} c="dimmed">Performance</Title>
+        </Group>
+        <div style={{ height: '10rem' }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
               margin={{
                 top: 5,
-                right: 30,
-                left: 20,
+                right: 10,
+                left: 0,
                 bottom: 5,
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
+              <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} width={50} />
               <Tooltip
                 formatter={(value) => {
-                  // Ensure value is a number
                   const numValue = typeof value === 'string' ? parseFloat(value) :
                                   Array.isArray(value) ? parseFloat(value[0].toString()) :
                                   Number(value);
                   return [`$${numValue.toFixed(2)}`, undefined];
                 }}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: '12px' }} />
               <Line
                 type="monotone"
                 dataKey="contributions"
                 name="Contributions"
                 stroke="#8884d8"
-                activeDot={{ r: 8 }}
+                activeDot={{ r: 6 }}
+                strokeWidth={2}
               />
               <Line
                 type="monotone"
                 dataKey="value"
                 name="Value"
                 stroke="#82ca9d"
+                strokeWidth={2}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </Card.Section>
+      </Stack>
     </Card>
   )
 }

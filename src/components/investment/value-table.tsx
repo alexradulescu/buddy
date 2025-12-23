@@ -1,8 +1,8 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Edit, Trash2 } from 'lucide-react'
-import { Button, Card, Table, Group, Title, Text, Center } from '@mantine/core'
+import { Edit, Trash2, BarChart3 } from 'lucide-react'
+import { Button, Card, Table, Group, Title, Text, Center, Stack } from '@mantine/core'
 import { InvestmentValue } from '@/types/investment'
 import ValueForm from './forms/value-form'
 
@@ -50,18 +50,20 @@ export default function ValueTable({ investmentId, values, onDelete }: ValueTabl
   }
 
   return (
-    <Card shadow="sm" padding="0" radius="md" withBorder>
-      <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+    <Card shadow="sm" padding="md" radius="md" withBorder>
+      <Stack gap="md">
         <Group justify="space-between" align="center">
-          <Title order={3} size="lg">Values</Title>
+          <Group gap="xs">
+            <BarChart3 size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
+            <Title order={4} c="dimmed">Values</Title>
+          </Group>
           {!showForm && (
-            <Button size="sm" onClick={() => setShowForm(true)}>
-              Add Value
+            <Button size="xs" onClick={() => setShowForm(true)}>
+              Add
             </Button>
           )}
         </Group>
-      </Card.Section>
-      <Card.Section inheritPadding py="md">
+
         {showForm ? (
           <ValueForm
             investmentId={investmentId}
@@ -70,28 +72,30 @@ export default function ValueTable({ investmentId, values, onDelete }: ValueTabl
             onCancel={handleCancel}
           />
         ) : sortedValues.length > 0 ? (
-          <Table>
+          <Table striped highlightOnHover fz="xs" verticalSpacing="xs">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Date</Table.Th>
-                <Table.Th>Value</Table.Th>
+                <Table.Th ta="right">Value</Table.Th>
                 <Table.Th>Description</Table.Th>
-                <Table.Th ta="right">Actions</Table.Th>
+                <Table.Th ta="right" w={60}>Actions</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {sortedValues.map((value) => (
                 <Table.Tr key={value.id}>
                   <Table.Td>{formatDate(value.date)}</Table.Td>
-                  <Table.Td className="numeric-value">{formatCurrency(value.value)}</Table.Td>
-                  <Table.Td>{value.description || '-'}</Table.Td>
+                  <Table.Td ta="right" className="numeric-value">{formatCurrency(value.value)}</Table.Td>
+                  <Table.Td c="dimmed">{value.description || '-'}</Table.Td>
                   <Table.Td ta="right">
-                    <Button variant="subtle" size="compact-sm" onClick={() => handleEdit(value)}>
-                      <Edit size={16} />
-                    </Button>
-                    <Button variant="subtle" size="compact-sm" color="red" onClick={() => onDelete(value.id)}>
-                      <Trash2 size={16} />
-                    </Button>
+                    <Group gap="xs" wrap="nowrap" justify="flex-end">
+                      <Button variant="subtle" size="compact-xs" onClick={() => handleEdit(value)}>
+                        <Edit size={12} />
+                      </Button>
+                      <Button variant="subtle" size="compact-xs" color="red" onClick={() => onDelete(value.id)}>
+                        <Trash2 size={12} />
+                      </Button>
+                    </Group>
                   </Table.Td>
                 </Table.Tr>
               ))}
@@ -99,10 +103,10 @@ export default function ValueTable({ investmentId, values, onDelete }: ValueTabl
           </Table>
         ) : (
           <Center p="md">
-            <Text c="dimmed">No values recorded yet</Text>
+            <Text c="dimmed" size="sm">No values recorded yet</Text>
           </Center>
         )}
-      </Card.Section>
+      </Stack>
     </Card>
   )
 }

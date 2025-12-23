@@ -5,7 +5,7 @@ import { Income, useCategoryStore, useIncomeStore } from '@/stores/instantdb'
 import { format } from 'date-fns'
 import { Edit, Search, Trash } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Button, Card, TextInput, Select } from '@mantine/core'
+import { Button, Group, Stack, Text, TextInput, Select, Table, ScrollArea } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { DeleteConfirmation } from './delete-confirmation'
 import { TransactionForm } from './transaction-form'
@@ -87,18 +87,16 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
   }, [incomeCategories])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+    <Stack gap="md">
+      <Stack gap="sm">
         <TextInput
           placeholder="Search incomes..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           leftSection={<Search size={16} />}
         />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontSize: '0.875rem', color: 'var(--mantine-color-dimmed)', whiteSpace: 'nowrap' }}>
-            Filter by category:
-          </span>
+        <Group gap="sm" align="center">
+          <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>Filter:</Text>
           <Select
             value={selectedCategoryId || 'all'}
             onChange={(value) => setSelectedCategoryId(value === 'all' ? null : value)}
@@ -110,58 +108,52 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
                 label: category.name
               }))
             ]}
-            style={{ flex: 1 }}
+            flex={1}
           />
-        </div>
-      </div>
+        </Group>
+      </Stack>
 
       {filteredAndSortedIncomes.length === 0 ? (
-        <p style={{ textAlign: 'center', color: 'var(--mantine-color-dimmed)', padding: '1rem 0' }}>
-          No incomes found for this period.
-        </p>
+        <Text ta="center" c="dimmed" py="xl">No incomes found for this period.</Text>
       ) : (
-        <Card padding={0}>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {filteredAndSortedIncomes.map((income) => (
-              <li key={income.id} style={{ padding: '1rem', borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <h3 style={{ fontWeight: 600, margin: 0 }}>{income.description}</h3>
-                    <p style={{ fontSize: '0.875rem', color: 'var(--mantine-color-dimmed)', margin: 0 }}>
-                      {income.category}
-                    </p>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontWeight: 600, margin: 0 }}>${income.amount.toFixed(2)}</p>
-                    <p style={{ fontSize: '0.875rem', color: 'var(--mantine-color-dimmed)', margin: 0 }}>
-                      {format(new Date(income.date), 'dd MMM yyyy')}
-                    </p>
-                  </div>
-                </div>
-                <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                  <Button
-                    variant="subtle"
-                    size="sm"
-                    onClick={() => setEditingIncome(income)}
-                    color="blue"
-                    leftSection={<Edit size={16} />}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="subtle"
-                    size="sm"
-                    onClick={() => handleDeleteClick(income)}
-                    color="red"
-                    leftSection={<Trash size={16} />}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Card>
+        <Stack gap="sm">
+          <Text size="sm" c="dimmed">
+            {filteredAndSortedIncomes.length} {filteredAndSortedIncomes.length === 1 ? 'item' : 'items'}
+          </Text>
+          <ScrollArea>
+            <Table highlightOnHover striped withTableBorder miw={500} fz="xs" verticalSpacing="xs">
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th w={90}>Date</Table.Th>
+                  <Table.Th>Description</Table.Th>
+                  <Table.Th>Category</Table.Th>
+                  <Table.Th ta="right" w={80}>Amount</Table.Th>
+                  <Table.Th w={70}>Actions</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {filteredAndSortedIncomes.map((income) => (
+                  <Table.Tr key={income.id}>
+                    <Table.Td>{format(new Date(income.date), 'dd MMM yyyy')}</Table.Td>
+                    <Table.Td>{income.description}</Table.Td>
+                    <Table.Td c="dimmed">{income.category}</Table.Td>
+                    <Table.Td ta="right" className="numeric-value">${Number(income.amount).toFixed(2)}</Table.Td>
+                    <Table.Td>
+                      <Group gap="xs" wrap="nowrap">
+                        <Button size="compact-xs" variant="subtle" onClick={() => setEditingIncome(income)}>
+                          <Edit size={12} />
+                        </Button>
+                        <Button size="compact-xs" variant="subtle" color="red" onClick={() => handleDeleteClick(income)}>
+                          <Trash size={12} />
+                        </Button>
+                      </Group>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
+        </Stack>
       )}
 
       <DeleteConfirmation
@@ -189,6 +181,6 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
         categories={incomeCategories}
         initialData={editingIncome || undefined}
       />
-    </div>
+    </Stack>
   )
 }

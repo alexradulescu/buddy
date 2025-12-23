@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from 'react'
 import { InvestmentContribution } from '@/types/investment'
-import { Edit, Trash2 } from 'lucide-react'
-import { Button, Card, Table, Group, Title, Text, Center } from '@mantine/core'
+import { Edit, Trash2, PiggyBank } from 'lucide-react'
+import { Button, Card, Table, Group, Title, Text, Center, Stack } from '@mantine/core'
 import ContributionForm from './forms/contribution-form'
 
 interface ContributionTableProps {
@@ -50,18 +50,20 @@ export default function ContributionTable({ investmentId, contributions, onDelet
   }
 
   return (
-    <Card shadow="sm" padding="0" radius="md" withBorder>
-      <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
+    <Card shadow="sm" padding="md" radius="md" withBorder>
+      <Stack gap="md">
         <Group justify="space-between" align="center">
-          <Title order={3} size="lg">Contributions</Title>
+          <Group gap="xs">
+            <PiggyBank size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
+            <Title order={4} c="dimmed">Contributions</Title>
+          </Group>
           {!showForm && (
-            <Button size="sm" onClick={() => setShowForm(true)}>
-              Add Contribution
+            <Button size="xs" onClick={() => setShowForm(true)}>
+              Add
             </Button>
           )}
         </Group>
-      </Card.Section>
-      <Card.Section inheritPadding py="md">
+
         {showForm ? (
           <ContributionForm
             investmentId={investmentId}
@@ -70,28 +72,30 @@ export default function ContributionTable({ investmentId, contributions, onDelet
             onCancel={handleCancel}
           />
         ) : sortedContributions.length > 0 ? (
-          <Table>
+          <Table striped highlightOnHover fz="xs" verticalSpacing="xs">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Date</Table.Th>
-                <Table.Th>Amount</Table.Th>
+                <Table.Th ta="right">Amount</Table.Th>
                 <Table.Th>Description</Table.Th>
-                <Table.Th ta="right">Actions</Table.Th>
+                <Table.Th ta="right" w={60}>Actions</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {sortedContributions.map((contribution) => (
                 <Table.Tr key={contribution.id}>
                   <Table.Td>{formatDate(contribution.date)}</Table.Td>
-                  <Table.Td className="numeric-value">{formatCurrency(contribution.amount)}</Table.Td>
-                  <Table.Td>{contribution.description || '-'}</Table.Td>
+                  <Table.Td ta="right" className="numeric-value">{formatCurrency(contribution.amount)}</Table.Td>
+                  <Table.Td c="dimmed">{contribution.description || '-'}</Table.Td>
                   <Table.Td ta="right">
-                    <Button variant="subtle" size="compact-sm" onClick={() => handleEdit(contribution)}>
-                      <Edit size={16} />
-                    </Button>
-                    <Button variant="subtle" size="compact-sm" color="red" onClick={() => onDelete(contribution.id)}>
-                      <Trash2 size={16} />
-                    </Button>
+                    <Group gap="xs" wrap="nowrap" justify="flex-end">
+                      <Button variant="subtle" size="compact-xs" onClick={() => handleEdit(contribution)}>
+                        <Edit size={12} />
+                      </Button>
+                      <Button variant="subtle" size="compact-xs" color="red" onClick={() => onDelete(contribution.id)}>
+                        <Trash2 size={12} />
+                      </Button>
+                    </Group>
                   </Table.Td>
                 </Table.Tr>
               ))}
@@ -99,10 +103,10 @@ export default function ContributionTable({ investmentId, contributions, onDelet
           </Table>
         ) : (
           <Center p="md">
-            <Text c="dimmed">No contributions yet</Text>
+            <Text c="dimmed" size="sm">No contributions yet</Text>
           </Center>
         )}
-      </Card.Section>
+      </Stack>
     </Card>
   )
 }

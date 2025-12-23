@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { Income, IncomeCategory } from '@/stores/instantdb'
 import { NavLink } from 'react-router'
-import { Card, Table, Title, Text, Anchor, ScrollArea } from '@mantine/core'
+import { Table, Anchor, ScrollArea } from '@mantine/core'
 
 interface IncomeOverviewProps {
   incomes: Income[]
@@ -72,16 +72,8 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
   }
 
   return (
-    <Card withBorder padding="0">
-      <Card.Section withBorder inheritPadding py="sm">
-        <Title order={3} size="h4" mb={4}>Income Categories</Title>
-        <Text size="sm" c="dimmed">
-          Monthly income tracking and year-to-date overview
-        </Text>
-      </Card.Section>
-      <Card.Section>
-        <ScrollArea>
-          <Table striped highlightOnHover miw={600}>
+    <ScrollArea>
+      <Table striped highlightOnHover miw={600}>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Category</Table.Th>
@@ -117,8 +109,6 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
             })}
             </Table.Tbody>
           </Table>
-        </ScrollArea>
-      </Card.Section>
-    </Card>
+    </ScrollArea>
   )
 }

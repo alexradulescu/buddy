@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useCategoryStore } from '@/stores/instantdb'
-import { CategoryManager } from '@/components/category-manager'
+import { CategorySpreadsheet } from '@/components/category-spreadsheet'
 import { Stack } from '@mantine/core'
 
 export default function SettingsPage() {
@@ -17,24 +17,21 @@ export default function SettingsPage() {
   } = useCategoryStore()
 
   return (
-    <>
-      <Stack gap="xl">
-        <CategoryManager
-          type="expense"
-          categories={expenseCategories}
-          onAdd={addExpenseCategory}
-          onUpdate={updateExpenseCategory}
-          onDelete={removeExpenseCategory}
-        />
-        <CategoryManager
-          type="income"
-          categories={incomeCategories}
-          onAdd={addIncomeCategory}
-          onUpdate={updateIncomeCategory}
-          onDelete={removeIncomeCategory}
-        />
-        {/* <BackupRestore /> */}
-      </Stack>
-    </>
+    <Stack gap="xl">
+      <CategorySpreadsheet
+        type="expense"
+        categories={expenseCategories}
+        onAdd={addExpenseCategory}
+        onUpdate={updateExpenseCategory}
+        onDelete={removeExpenseCategory}
+      />
+      <CategorySpreadsheet
+        type="income"
+        categories={incomeCategories}
+        onAdd={addIncomeCategory}
+        onUpdate={updateIncomeCategory}
+        onDelete={removeIncomeCategory}
+      />
+    </Stack>
   )
 }

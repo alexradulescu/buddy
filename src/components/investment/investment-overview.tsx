@@ -1,8 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { TrendingUp } from 'lucide-react'
-import { Card, Table, Stack, SimpleGrid, Title, Text, Group, ScrollArea } from '@mantine/core'
+import { Table, Stack, SimpleGrid, Text, ScrollArea } from '@mantine/core'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 
 export function InvestmentOverview() {
@@ -66,66 +65,49 @@ export function InvestmentOverview() {
 
   return (
     <Stack gap="md">
-      <Card shadow="sm" padding="0" radius="md" withBorder>
-        <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
-          <Group gap="xs">
-            <TrendingUp size={20} />
-            <Title order={3} size="h5">Investment Summary</Title>
-          </Group>
-        </Card.Section>
-        <Card.Section inheritPadding py="md">
-          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-            <Stack gap="xs">
-              <Text size="sm" fw={500} c="dimmed">Total Value</Text>
-              <Text size="xl" fw={700} className="numeric-value">{formatCurrency(totalInvestmentValue)}</Text>
-            </Stack>
-            <Stack gap="xs">
-              <Text size="sm" fw={500} c="dimmed">Total Invested</Text>
-              <Text size="xl" fw={700} className="numeric-value">{formatCurrency(totalContributions)}</Text>
-            </Stack>
-            <Stack gap="xs">
-              <Text size="sm" fw={500} c="dimmed">Total P&L</Text>
-              <Text size="xl" fw={700} c={totalProfitLoss >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
-                {formatCurrency(totalProfitLoss)} ({profitLossPercentage.toFixed(2)}%)
-              </Text>
-            </Stack>
-          </SimpleGrid>
-        </Card.Section>
-      </Card>
+      <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+        <Stack gap="xs">
+          <Text size="sm" fw={500} c="dimmed">Total Value</Text>
+          <Text size="xl" fw={700} className="numeric-value">{formatCurrency(totalInvestmentValue)}</Text>
+        </Stack>
+        <Stack gap="xs">
+          <Text size="sm" fw={500} c="dimmed">Total Invested</Text>
+          <Text size="xl" fw={700} className="numeric-value">{formatCurrency(totalContributions)}</Text>
+        </Stack>
+        <Stack gap="xs">
+          <Text size="sm" fw={500} c="dimmed">Total P&L</Text>
+          <Text size="xl" fw={700} c={totalProfitLoss >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
+            {formatCurrency(totalProfitLoss)} ({profitLossPercentage.toFixed(2)}%)
+          </Text>
+        </Stack>
+      </SimpleGrid>
 
-      <Card shadow="sm" padding="0" radius="md" withBorder>
-        <Card.Section withBorder inheritPadding py="xs" bg="gray.0">
-          <Title order={3} size="h5">Active Investments</Title>
-        </Card.Section>
-        <Card.Section>
-          <ScrollArea>
-            <Table style={{ minWidth: 600 }}>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Name</Table.Th>
-                  <Table.Th ta="right">Current Value</Table.Th>
-                  <Table.Th ta="right">Total Invested</Table.Th>
-                  <Table.Th ta="right">P&L</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {investmentData.map((investment) => (
-                  <Table.Tr key={investment.id}>
-                    <Table.Td fw={500}>{investment.name}</Table.Td>
-                    <Table.Td ta="right" className="numeric-value">{formatCurrency(investment.currentValue)}</Table.Td>
-                    <Table.Td ta="right" className="numeric-value">{formatCurrency(investment.totalContributions)}</Table.Td>
-                    <Table.Td ta="right">
-                      <Text c={investment.profit >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
-                        {formatCurrency(investment.profit)} ({investment.profitPercentage.toFixed(2)}%)
-                      </Text>
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-          </ScrollArea>
-        </Card.Section>
-      </Card>
+      <ScrollArea>
+        <Table striped highlightOnHover style={{ minWidth: 600 }}>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Name</Table.Th>
+              <Table.Th ta="right">Current Value</Table.Th>
+              <Table.Th ta="right">Total Invested</Table.Th>
+              <Table.Th ta="right">P&L</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {investmentData.map((investment) => (
+              <Table.Tr key={investment.id}>
+                <Table.Td fw={500}>{investment.name}</Table.Td>
+                <Table.Td ta="right" className="numeric-value">{formatCurrency(investment.currentValue)}</Table.Td>
+                <Table.Td ta="right" className="numeric-value">{formatCurrency(investment.totalContributions)}</Table.Td>
+                <Table.Td ta="right">
+                  <Text c={investment.profit >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
+                    {formatCurrency(investment.profit)} ({investment.profitPercentage.toFixed(2)}%)
+                  </Text>
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </ScrollArea>
     </Stack>
   )
 }
