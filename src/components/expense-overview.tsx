@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { NavLink } from 'react-router'
-import { Anchor, Badge, Card, Table, Title, Text, Tooltip, ScrollArea } from '@mantine/core'
+import { Anchor, Badge, Table, ScrollArea } from '@mantine/core'
 
 // Utility functions moved outside component to prevent recreation
 const formatCurrency = (amount: number | undefined): string => {
@@ -101,16 +101,8 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
   )
 
   return (
-    <Card withBorder padding="0">
-      <Card.Section withBorder inheritPadding py="sm">
-        <Title order={3} size="h4" mb={4}>Expense Categories</Title>
-        <Text size="sm" c="dimmed">
-          Monthly budget tracking and year-to-date overview
-        </Text>
-      </Card.Section>
-      <Card.Section>
-        <ScrollArea>
-          <Table striped highlightOnHover miw={800}>
+    <ScrollArea>
+      <Table striped highlightOnHover miw={800}>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Category</Table.Th>
@@ -186,8 +178,6 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
               )}
             </Table.Tbody>
           </Table>
-        </ScrollArea>
-      </Card.Section>
-    </Card>
+    </ScrollArea>
   )
 }

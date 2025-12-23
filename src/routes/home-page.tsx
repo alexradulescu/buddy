@@ -8,9 +8,9 @@ import { HomeOverview } from '@/components/home-overview'
 import { IncomeOverview } from '@/components/income-overview'
 import { InvestmentOverview } from '@/components/investment/investment-overview'
 import { YTDOverview } from '@/components/ytd-overview'
-import { PageHeader } from '@/components/page-header'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
-import { Stack, Accordion, Box, Card } from '@mantine/core'
+import { Stack, Card, SimpleGrid } from '@mantine/core'
+import { Accordion } from '@mantine/core'
 
 export default function HomePage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
@@ -46,57 +46,21 @@ export default function HomePage() {
 
   return (
     <Stack gap="lg">
-      {/* YTD Overview - Desktop: always visible */}
-      <Box visibleFrom="sm">
+      {/* YTD and Monthly Overview side by side on desktop, stacked on mobile */}
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
         <YTDOverview />
-      </Box>
+        <HomeOverview
+          totalMonthlyIncomes={totalMonthlyIncomes}
+          totalMonthlyExpenses={totalMonthlyExpenses}
+          netIncome={netIncome}
+          totalInvestmentValue={totalInvestmentValue}
+        />
+      </SimpleGrid>
 
-      {/* YTD Overview - Mobile: collapsible inside a card */}
-      <Box hiddenFrom="sm">
-        <Card shadow="sm" padding={0} radius="md" withBorder>
-          <Accordion>
-            <Accordion.Item value="ytd" style={{ border: 'none' }}>
-              <Accordion.Control>Year to Date Overview</Accordion.Control>
-              <Accordion.Panel>
-                <YTDOverview compact />
-              </Accordion.Panel>
-            </Accordion.Item>
-          </Accordion>
-        </Card>
-      </Box>
-
-      <HomeOverview
-        totalMonthlyIncomes={totalMonthlyIncomes}
-        totalMonthlyExpenses={totalMonthlyExpenses}
-        netIncome={netIncome}
-        totalInvestmentValue={totalInvestmentValue}
-      />
-
-      {/* Mobile view - regular stack */}
-      <Box hiddenFrom="sm">
-        <Stack gap="lg">
-          <ExpenseOverview
-            expenses={expenses}
-            expenseCategories={expenseCategories}
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-          />
-
-          <IncomeOverview
-            incomes={incomes}
-            incomeCategories={incomeCategories}
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-          />
-
-          <InvestmentOverview />
-        </Stack>
-      </Box>
-
-      {/* Desktop view - accordion for detailed sections */}
-      <Box visibleFrom="sm">
-        <Accordion multiple defaultValue={['expenses', 'incomes', 'investments']}>
-          <Accordion.Item value="expenses">
+      {/* Expense Categories in Card with Accordion */}
+      <Card shadow="sm" padding={0} radius="md" withBorder>
+        <Accordion defaultValue="expenses">
+          <Accordion.Item value="expenses" style={{ border: 'none' }}>
             <Accordion.Control>Expense Categories</Accordion.Control>
             <Accordion.Panel>
               <ExpenseOverview
@@ -107,8 +71,13 @@ export default function HomePage() {
               />
             </Accordion.Panel>
           </Accordion.Item>
+        </Accordion>
+      </Card>
 
-          <Accordion.Item value="incomes">
+      {/* Income Categories in Card with Accordion */}
+      <Card shadow="sm" padding={0} radius="md" withBorder>
+        <Accordion defaultValue="incomes">
+          <Accordion.Item value="incomes" style={{ border: 'none' }}>
             <Accordion.Control>Income Categories</Accordion.Control>
             <Accordion.Panel>
               <IncomeOverview
@@ -119,15 +88,20 @@ export default function HomePage() {
               />
             </Accordion.Panel>
           </Accordion.Item>
+        </Accordion>
+      </Card>
 
-          <Accordion.Item value="investments">
+      {/* Investments in Card with Accordion */}
+      <Card shadow="sm" padding={0} radius="md" withBorder>
+        <Accordion defaultValue="investments">
+          <Accordion.Item value="investments" style={{ border: 'none' }}>
             <Accordion.Control>Investments</Accordion.Control>
             <Accordion.Panel>
               <InvestmentOverview />
             </Accordion.Panel>
           </Accordion.Item>
         </Accordion>
-      </Box>
+      </Card>
     </Stack>
   )
 }

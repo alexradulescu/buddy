@@ -1,9 +1,8 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Calendar, CreditCard, DollarSign, PiggyBank, TrendingUp, Wallet, BarChart2 } from 'lucide-react'
-import { SimpleGrid, Title, Stack, Group, Text } from '@mantine/core'
-import { OverviewCard } from '@/components/overview-card'
+import { Calendar } from 'lucide-react'
+import { Card, Title, Stack, Group, Text } from '@mantine/core'
 import { useCategoryStore, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 
@@ -20,11 +19,7 @@ const percentFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 1
 })
 
-interface YTDOverviewProps {
-  compact?: boolean
-}
-
-export function YTDOverview({ compact = false }: YTDOverviewProps) {
+export function YTDOverview() {
   const currentDate = new Date()
   const currentYear = currentDate.getFullYear()
   const currentMonth = currentDate.getMonth() // 0-indexed
@@ -135,64 +130,22 @@ export function YTDOverview({ compact = false }: YTDOverviewProps) {
     { label: 'Savings Rate', value: formatPercent(ytdData.ytdSavingsRate) }
   ]
 
-  // Compact view: key-value pairs without card wrapper (for mobile accordion)
-  if (compact) {
-    return (
-      <Stack gap="xs">
-        {metrics.map((metric) => (
-          <Group key={metric.label} justify="space-between">
-            <Text size="sm" c="dimmed">{metric.label}</Text>
-            <Text size="sm" fw={600} className="numeric-value">{metric.value}</Text>
-          </Group>
-        ))}
-      </Stack>
-    )
-  }
-
-  // Full view: cards with icons (for desktop)
   return (
-    <Stack gap="sm">
-      <Title order={4} c="dimmed">
-        <Calendar size={16} style={{ display: 'inline', marginRight: 8, verticalAlign: 'middle' }} />
-        Year to Date ({currentYear})
-      </Title>
-      <SimpleGrid cols={{ base: 2, xs: 2, sm: 3, md: 4, lg: 7 }} spacing="md">
-        <OverviewCard
-          title="YTD Budget"
-          value={formatCurrency(ytdData.ytdBudget)}
-          icon={<Wallet size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
-        />
-        <OverviewCard
-          title="YTD Spent"
-          value={formatCurrency(ytdData.ytdSpent)}
-          icon={<CreditCard size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
-        />
-        <OverviewCard
-          title="YTD Income"
-          value={formatCurrency(ytdData.ytdIncome)}
-          icon={<DollarSign size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
-        />
-        <OverviewCard
-          title="Total Invested"
-          value={formatCurrency(ytdData.totalInvested)}
-          icon={<PiggyBank size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
-        />
-        <OverviewCard
-          title="Investment Value"
-          value={formatCurrency(ytdData.totalInvestmentValue)}
-          icon={<TrendingUp size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
-        />
-        <OverviewCard
-          title="YTD Savings"
-          value={formatCurrency(ytdData.ytdSavings)}
-          icon={<PiggyBank size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
-        />
-        <OverviewCard
-          title="Savings Rate"
-          value={formatPercent(ytdData.ytdSavingsRate)}
-          icon={<BarChart2 size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
-        />
-      </SimpleGrid>
-    </Stack>
+    <Card shadow="sm" padding="md" radius="md" withBorder>
+      <Stack gap="md">
+        <Group gap="xs">
+          <Calendar size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
+          <Title order={4} c="dimmed">Year to Date ({currentYear})</Title>
+        </Group>
+        <Stack gap="xs">
+          {metrics.map((metric) => (
+            <Group key={metric.label} justify="space-between">
+              <Text size="sm" c="dimmed">{metric.label}</Text>
+              <Text size="sm" fw={600} className="numeric-value">{metric.value}</Text>
+            </Group>
+          ))}
+        </Stack>
+      </Stack>
+    </Card>
   )
 }
