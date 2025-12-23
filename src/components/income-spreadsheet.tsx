@@ -3,69 +3,77 @@
 import React, { useCallback, useMemo } from 'react'
 import { HotTable } from '@handsontable/react'
 import { registerAllModules } from 'handsontable/registry'
-import { Stack, Text, Button } from '@mantine/core'
-import { TrashIcon } from 'lucide-react'
-import { Expense, ExpenseCategory } from '@/stores/instantdb'
+import { Stack, Text } from '@mantine/core'
 import Handsontable from 'handsontable'
 import 'handsontable/dist/handsontable.full.min.css'
 
 // Register Handsontable modules
 registerAllModules()
 
-interface ExpenseSpreadsheetProps {
-  expenses: Expense[]
-  expenseCategories: ExpenseCategory[]
-  onInputChange: (
-    index: number,
-    field: 'amount' | 'categoryId' | 'date' | 'description',
-    value: string | number | Date
-  ) => void
-  onDeleteRow: (id: string) => void
+interface Income {
+  id?: string
+  amount: number | string
+  categoryId: string
+  category: string
+  date: Date | string
+  description: string
 }
 
-export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
-  expenses,
-  expenseCategories,
+interface IncomeCategory {
+  id: string
+  title: string
+  isArchived: boolean
+}
+
+interface IncomeSpreadsheetProps {
+  incomes: Income[]
+  incomeCategories: IncomeCategory[]
+  onInputChange: (index: number, field: string, value: string | Date | null) => void
+  onDeleteRow: (index: number) => void
+}
+
+export const IncomeSpreadsheet: React.FC<IncomeSpreadsheetProps> = ({
+  incomes,
+  incomeCategories,
   onInputChange,
   onDeleteRow
 }) => {
-
   // Create category lookup maps
-  const categoryIdToName = useMemo(() => {
+  const categoryIdToTitle = useMemo(() => {
     const map = new Map<string, string>()
-    expenseCategories.forEach((cat) => {
+    incomeCategories.forEach((cat) => {
       if (!cat.isArchived) {
-        map.set(cat.id, cat.name)
+        map.set(cat.id, cat.title)
       }
     })
     return map
-  }, [expenseCategories])
+  }, [incomeCategories])
 
-  const categoryNameToId = useMemo(() => {
+  const categoryTitleToId = useMemo(() => {
     const map = new Map<string, string>()
-    expenseCategories.forEach((cat) => {
+    incomeCategories.forEach((cat) => {
       if (!cat.isArchived) {
-        map.set(cat.name, cat.id)
+        map.set(cat.title, cat.id)
       }
     })
     return map
-  }, [expenseCategories])
+  }, [incomeCategories])
 
-  // Get active category names for dropdown
-  const categoryNames = useMemo(() => {
-    return expenseCategories.filter((cat) => !cat.isArchived).map((cat) => cat.name)
-  }, [expenseCategories])
+  // Get active category titles for dropdown
+  const categoryTitles = useMemo(() => {
+    return incomeCategories.filter((cat) => !cat.isArchived).map((cat) => cat.title)
+  }, [incomeCategories])
 
-  // Transform expenses to Handsontable format
+  // Transform incomes to Handsontable format
   const tableData = useMemo(() => {
-    return expenses.map((expense) => ({
-      date: expense.date,
-      description: expense.description,
-      amount: expense.amount,
-      category: categoryIdToName.get(expense.categoryId) || '',
-      id: expense.id
+    return incomes.map((income, index) => ({
+      date: income.date instanceof Date ? income.date.toISOString().split('T')[0] : income.date,
+      description: income.description,
+      category: categoryIdToTitle.get(income.categoryId) || '',
+      amount: income.amount,
+      rowIndex: index
     }))
-  }, [expenses, categoryIdToName])
+  }, [incomes, categoryIdToTitle])
 
   // Custom renderer for delete button
   const deleteButtonRenderer = useCallback(
@@ -81,7 +89,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
       // Clear existing content
       td.innerHTML = ''
       td.style.padding = '0'
-      td.style.textAlign = 'center'
+      td.style.textAlign = 'left'
       td.style.verticalAlign = 'middle'
 
       // Create delete button
@@ -96,6 +104,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
         font-size: 14px;
         padding: 2px;
         transition: background-color 0.2s;
+        text-align: left;
       `
 
       button.addEventListener('mouseenter', () => {
@@ -109,16 +118,13 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
       button.addEventListener('click', (e) => {
         e.preventDefault()
         e.stopPropagation()
-        const expenseId = expenses[row]?.id
-        if (expenseId) {
-          onDeleteRow(expenseId)
-        }
+        onDeleteRow(row)
       })
 
       td.appendChild(button)
       return td
     },
-    [expenses, onDeleteRow]
+    [onDeleteRow]
   )
 
   // Handle cell changes
@@ -129,13 +135,9 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
       changes.forEach(([row, prop, oldValue, newValue]) => {
         if (oldValue === newValue) return
 
-        const expense = expenses[row]
-        if (!expense) return
-
         switch (prop) {
           case 'date':
             if (newValue) {
-              // Convert date to ISO string
               const dateObj = typeof newValue === 'string' ? new Date(newValue) : newValue
               onInputChange(row, 'date', dateObj)
             }
@@ -146,21 +148,18 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
             break
 
           case 'amount':
-            const amount = Number(newValue)
-            if (!isNaN(amount)) {
-              onInputChange(row, 'amount', amount)
-            }
+            onInputChange(row, 'amount', String(newValue || ''))
             break
 
           case 'category':
-            // Convert category name back to ID
-            const categoryId = categoryNameToId.get(String(newValue)) || ''
+            // Convert category title back to ID
+            const categoryId = categoryTitleToId.get(String(newValue)) || ''
             onInputChange(row, 'categoryId', categoryId)
             break
         }
       })
     },
-    [expenses, onInputChange, categoryNameToId]
+    [onInputChange, categoryTitleToId]
   )
 
   // Column definitions
@@ -186,7 +185,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
         data: 'category',
         title: 'Category',
         type: 'dropdown',
-        source: categoryNames,
+        source: categoryTitles,
         width: 150,
         className: 'htMiddle htLeft',
         filter: true,
@@ -204,7 +203,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
         className: 'htMiddle htRight'
       },
       {
-        data: 'id',
+        data: 'rowIndex',
         title: 'Action',
         width: 36,
         readOnly: true,
@@ -212,13 +211,13 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
         renderer: deleteButtonRenderer
       }
     ],
-    [categoryNames, deleteButtonRenderer]
+    [categoryTitles, deleteButtonRenderer]
   )
 
   return (
     <Stack gap="sm">
       <Text size="sm" c="dimmed">
-        {expenses.length} {expenses.length === 1 ? 'item' : 'items'}
+        {incomes.length} {incomes.length === 1 ? 'item' : 'items'}
       </Text>
       <div style={{ width: '100%', overflowX: 'auto' }}>
         <HotTable

@@ -2,10 +2,9 @@
 
 import React, { useState } from 'react'
 import { useCategoryStore, useIncomeStore } from '@/stores/instantdb'
-import { TrashIcon } from 'lucide-react'
-import { Button, TextInput, NumberInput, Select, Table } from '@mantine/core'
-import { DatePickerInput } from '@mantine/dates'
+import { Button, NumberInput, Group, Stack } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
+import { IncomeSpreadsheet } from '@/components/income-spreadsheet'
 
 interface IncomeFormProps {
   selectedYear: number
@@ -13,16 +12,17 @@ interface IncomeFormProps {
 }
 
 interface TableIncome {
+  id: string
   amount: string
   categoryId: string
   category: string
-  date: Date
+  date: Date | string
   description: string
 }
 
 export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMonth }) => {
   const [tableIncomes, setTableIncomes] = useState<TableIncome[]>([
-    { amount: '', categoryId: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
+    { id: crypto.randomUUID(), amount: '', categoryId: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
   ])
   const [rowsToAdd, setRowsToAdd] = useState(1)
   const { addIncome } = useIncomeStore()
@@ -76,7 +76,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
         if (income) addIncome(income)
       })
       setTableIncomes([
-        { amount: '', categoryId: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
+        { id: crypto.randomUUID(), amount: '', categoryId: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
       ])
       notifications.show({
         title: 'Incomes added',
@@ -86,7 +86,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
     }
   }
 
-  const handleTableInputChange = (index: number, field: keyof TableIncome, value: string | Date | null) => {
+  const handleTableInputChange = (index: number, field: string, value: string | Date | null) => {
     const updatedIncomes = [...tableIncomes]
     // Ensure date is never null
     const safeValue = field === 'date' && value === null ? getDefaultDate(selectedYear, selectedMonth) : value
@@ -94,20 +94,11 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
     setTableIncomes(updatedIncomes)
   }
 
-  const handleTableKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      setTableIncomes([
-        ...tableIncomes,
-        { amount: '', categoryId: '', category: '', date: getDefaultDate(selectedYear, selectedMonth), description: '' }
-      ])
-    }
-  }
-
   const addRows = () => {
     const newRows: TableIncome[] = Array(rowsToAdd)
       .fill(null)
       .map(() => ({
+        id: crypto.randomUUID(),
         amount: '',
         categoryId: '',
         category: '',
@@ -118,104 +109,27 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
   }
 
   const deleteRow = (index: number) => {
-    const updatedIncomes = tableIncomes.filter((_, i) => i !== index)
-    setTableIncomes(updatedIncomes)
+    setTableIncomes(tableIncomes.filter((_, i) => i !== index))
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div style={{ overflowX: 'auto' }}>
-        <Table withTableBorder withColumnBorders>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th style={{ width: '110px' }}>Amount</Table.Th>
-              <Table.Th style={{ width: '130px' }}>Category</Table.Th>
-              <Table.Th style={{ width: '130px' }}>Date</Table.Th>
-              <Table.Th style={{ width: '150px' }}>Description</Table.Th>
-              <Table.Th style={{ width: '50px' }}></Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {tableIncomes.map((income, index) => (
-              <Table.Tr key={index}>
-                <Table.Td p={4}>
-                  <NumberInput
-                    value={income.amount}
-                    onChange={(value) => handleTableInputChange(index, 'amount', value?.toString() || '')}
-                    onKeyDown={(e) => handleTableKeyDown(e, index)}
-                    decimalScale={2}
-                    min={0}
-                    required
-                    styles={{ input: { borderRadius: 0 } }}
-                  />
-                </Table.Td>
-                <Table.Td p={4}>
-                  <Select
-                    value={income.categoryId || null}
-                    onChange={(value) => {
-                      const updatedIncomes = [...tableIncomes]
-                      updatedIncomes[index] = { ...updatedIncomes[index], categoryId: value || '' }
-
-                      const selectedCategory = incomeCategories.find((cat) => cat.id === value)
-
-                      if (selectedCategory) {
-                        updatedIncomes[index].category = selectedCategory.title
-                      }
-
-                      setTableIncomes(updatedIncomes)
-                    }}
-                    placeholder="Select category"
-                    data={incomeCategories
-                      .filter((category) => !category.isArchived)
-                      .map((category) => ({
-                        value: category.id,
-                        label: category.title
-                      }))}
-                    styles={{ input: { borderRadius: 0 } }}
-                  />
-                </Table.Td>
-                <Table.Td p={4}>
-                  <DatePickerInput
-                    value={income.date}
-                    onChange={(value) => handleTableInputChange(index, 'date', value ?? getDefaultDate(selectedYear, selectedMonth))}
-                    valueFormat="YYYY-MM-DD"
-                    clearable={false}
-                    styles={{ input: { borderRadius: 0 } }}
-                  />
-                </Table.Td>
-                <Table.Td p={4}>
-                  <TextInput
-                    value={income.description}
-                    onChange={(e) => handleTableInputChange(index, 'description', e.target.value)}
-                    onKeyDown={(e) => handleTableKeyDown(e, index)}
-                    styles={{ input: { borderRadius: 0 } }}
-                  />
-                </Table.Td>
-                <Table.Td p={4}>
-                  <Button
-                    variant="subtle"
-                    onClick={() => deleteRow(index)}
-                    p={0}
-                    style={{ width: '100%', height: '100%' }}
-                  >
-                    <TrashIcon size={16} />
-                  </Button>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <Stack gap="md">
+      <IncomeSpreadsheet
+        incomes={tableIncomes}
+        incomeCategories={incomeCategories}
+        onInputChange={handleTableInputChange}
+        onDeleteRow={deleteRow}
+      />
+      <Group gap="sm">
         <NumberInput
           value={rowsToAdd}
           onChange={(value) => setRowsToAdd(Number(value) || 1)}
           min={1}
-          style={{ width: '80px' }}
+          w={80}
         />
         <Button onClick={addRows}>Add Rows</Button>
-      </div>
-      <Button onClick={handleTableAddIncomes}>Save Incomes</Button>
-    </div>
+      </Group>
+      <Button onClick={handleTableAddIncomes} fullWidth>Save Incomes</Button>
+    </Stack>
   )
 }
