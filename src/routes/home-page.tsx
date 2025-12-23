@@ -57,7 +57,7 @@ export default function HomePage() {
           <Accordion.Item value="ytd">
             <Accordion.Control>Year to Date Overview</Accordion.Control>
             <Accordion.Panel>
-              <YTDOverview />
+              <YTDOverview compact />
             </Accordion.Panel>
           </Accordion.Item>
         </Accordion>

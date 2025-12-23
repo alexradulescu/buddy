@@ -2,12 +2,29 @@
 
 import { useMemo } from 'react'
 import { Calendar, CreditCard, DollarSign, PiggyBank, TrendingUp, Wallet, BarChart2 } from 'lucide-react'
-import { SimpleGrid, Title, Stack } from '@mantine/core'
+import { SimpleGrid, Title, Stack, Card, Group, Text, Box } from '@mantine/core'
 import { OverviewCard } from '@/components/overview-card'
 import { useCategoryStore, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 
-export function YTDOverview() {
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+})
+
+const percentFormatter = new Intl.NumberFormat('en-US', {
+  style: 'percent',
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1
+})
+
+interface YTDOverviewProps {
+  compact?: boolean
+}
+
+export function YTDOverview({ compact = false }: YTDOverviewProps) {
   const currentDate = new Date()
   const currentYear = currentDate.getFullYear()
   const currentMonth = currentDate.getMonth() // 0-indexed
@@ -64,7 +81,7 @@ export function YTDOverview() {
     const ytdSavings = ytdIncome - ytdSpent
 
     // YTD Savings Rate
-    const ytdSavingsRate = ytdIncome > 0 ? (ytdSavings / ytdIncome) * 100 : 0
+    const ytdSavingsRate = ytdIncome > 0 ? ytdSavings / ytdIncome : 0
 
     return {
       ytdIncome,
@@ -87,9 +104,40 @@ export function YTDOverview() {
   ])
 
   const formatCurrency = (amount: number): string => {
-    return `$${amount.toFixed(2)}`
+    return currencyFormatter.format(amount)
   }
 
+  const formatPercent = (value: number): string => {
+    return percentFormatter.format(value)
+  }
+
+  const metrics = [
+    { label: 'YTD Budget', value: formatCurrency(ytdData.ytdBudget) },
+    { label: 'YTD Spent', value: formatCurrency(ytdData.ytdSpent) },
+    { label: 'YTD Income', value: formatCurrency(ytdData.ytdIncome) },
+    { label: 'Total Invested', value: formatCurrency(ytdData.totalInvested) },
+    { label: 'Investment Value', value: formatCurrency(ytdData.totalInvestmentValue) },
+    { label: 'YTD Savings', value: formatCurrency(ytdData.ytdSavings) },
+    { label: 'Savings Rate', value: formatPercent(ytdData.ytdSavingsRate) }
+  ]
+
+  // Compact view: single card with key-value pairs (for mobile)
+  if (compact) {
+    return (
+      <Card shadow="sm" padding="md" radius="md" withBorder>
+        <Stack gap="xs">
+          {metrics.map((metric) => (
+            <Group key={metric.label} justify="space-between">
+              <Text size="sm" c="dimmed">{metric.label}</Text>
+              <Text size="sm" fw={600} className="numeric-value">{metric.value}</Text>
+            </Group>
+          ))}
+        </Stack>
+      </Card>
+    )
+  }
+
+  // Full view: cards with icons (for desktop)
   return (
     <Stack gap="sm">
       <Title order={4} c="dimmed">
@@ -129,7 +177,7 @@ export function YTDOverview() {
         />
         <OverviewCard
           title="Savings Rate"
-          value={`${ytdData.ytdSavingsRate.toFixed(1)}%`}
+          value={formatPercent(ytdData.ytdSavingsRate)}
           icon={<BarChart2 size={16} style={{ color: 'var(--mantine-color-dimmed)' }} />}
         />
       </SimpleGrid>
