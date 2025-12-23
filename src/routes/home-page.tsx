@@ -10,7 +10,7 @@ import { InvestmentOverview } from '@/components/investment/investment-overview'
 import { YTDOverview } from '@/components/ytd-overview'
 import { PageHeader } from '@/components/page-header'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
-import { Stack, Accordion, Box } from '@mantine/core'
+import { Stack, Accordion, Box, Card } from '@mantine/core'
 
 export default function HomePage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
@@ -51,16 +51,18 @@ export default function HomePage() {
         <YTDOverview />
       </Box>
 
-      {/* YTD Overview - Mobile: collapsible (collapsed by default) */}
+      {/* YTD Overview - Mobile: collapsible inside a card */}
       <Box hiddenFrom="sm">
-        <Accordion>
-          <Accordion.Item value="ytd">
-            <Accordion.Control>Year to Date Overview</Accordion.Control>
-            <Accordion.Panel>
-              <YTDOverview compact />
-            </Accordion.Panel>
-          </Accordion.Item>
-        </Accordion>
+        <Card shadow="sm" padding={0} radius="md" withBorder>
+          <Accordion>
+            <Accordion.Item value="ytd" style={{ border: 'none' }}>
+              <Accordion.Control>Year to Date Overview</Accordion.Control>
+              <Accordion.Panel>
+                <YTDOverview compact />
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
+        </Card>
       </Box>
 
       <HomeOverview
