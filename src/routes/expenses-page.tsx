@@ -102,37 +102,37 @@ export default function ExpensesPage() {
   }
 
   return (
-    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
       {/* Left Panel - Entry Methods */}
-      <Card withBorder p="lg">
+      <Card>
         <Tabs defaultValue="ai-import">
           <Tabs.List>
-            <Tabs.Tab value="ai-import" leftSection={<SparklesIcon size={16} />}>
+            <Tabs.Tab value="ai-import" leftSection={<SparklesIcon size={14} />}>
               AI Import
             </Tabs.Tab>
-            <Tabs.Tab value="manual-entry" leftSection={<TableIcon size={16} />}>
+            <Tabs.Tab value="manual-entry" leftSection={<TableIcon size={14} />}>
               Manual
             </Tabs.Tab>
           </Tabs.List>
 
-          <Tabs.Panel value="ai-import" pt="md">
+          <Tabs.Panel value="ai-import" pt="sm">
             <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
           </Tabs.Panel>
 
-          <Tabs.Panel value="manual-entry" pt="md">
-            <Stack gap="md">
+          <Tabs.Panel value="manual-entry" pt="sm">
+            <Stack gap="sm">
               <ExpenseSpreadsheet
                 expenses={expenses}
                 expenseCategories={expenseCategories}
                 onInputChange={handleInputChange}
                 onDeleteRow={deleteRow}
               />
-              <Group gap="sm">
+              <Group gap="xs">
                 <NumberInput
                   value={rowsToAdd}
                   onChange={(value) => setRowsToAdd(Number(value))}
                   min={1}
-                  w={80}
+                  w={60}
                 />
                 <Button onClick={addRows}>Add Rows</Button>
               </Group>
@@ -143,7 +143,7 @@ export default function ExpensesPage() {
       </Card>
 
       {/* Right Panel - Expense List */}
-      <Card withBorder p="lg">
+      <Card>
         <ExpenseList selectedYear={selectedYear} selectedMonth={selectedMonth} />
       </Card>
     </SimpleGrid>

@@ -45,9 +45,9 @@ export default function HomePage() {
     }, 0)
 
   return (
-    <Stack gap="lg">
+    <Stack gap="md">
       {/* YTD and Monthly Overview side by side on desktop, stacked on mobile */}
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
         <YTDOverview />
         <HomeOverview
           totalMonthlyIncomes={totalMonthlyIncomes}
@@ -58,9 +58,9 @@ export default function HomePage() {
       </SimpleGrid>
 
       {/* Expense Categories in Card with Accordion */}
-      <Card shadow="sm" padding={0} radius="md" withBorder>
+      <Card padding={0}>
         <Accordion defaultValue="expenses">
-          <Accordion.Item value="expenses" style={{ border: 'none' }}>
+          <Accordion.Item value="expenses">
             <Accordion.Control>Expense Categories</Accordion.Control>
             <Accordion.Panel>
               <ExpenseOverview
@@ -75,9 +75,9 @@ export default function HomePage() {
       </Card>
 
       {/* Income Categories in Card with Accordion */}
-      <Card shadow="sm" padding={0} radius="md" withBorder>
+      <Card padding={0}>
         <Accordion defaultValue="incomes">
-          <Accordion.Item value="incomes" style={{ border: 'none' }}>
+          <Accordion.Item value="incomes">
             <Accordion.Control>Income Categories</Accordion.Control>
             <Accordion.Panel>
               <IncomeOverview
@@ -92,9 +92,9 @@ export default function HomePage() {
       </Card>
 
       {/* Investments in Card with Accordion */}
-      <Card shadow="sm" padding={0} radius="md" withBorder>
+      <Card padding={0}>
         <Accordion defaultValue="investments">
-          <Accordion.Item value="investments" style={{ border: 'none' }}>
+          <Accordion.Item value="investments">
             <Accordion.Control>Investments</Accordion.Control>
             <Accordion.Panel>
               <InvestmentOverview />

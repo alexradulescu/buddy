@@ -5,7 +5,7 @@ import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { Investment } from '@/types/investment'
 import { useForm, Controller } from 'react-hook-form'
 import { useNavigate } from 'react-router'
-import { Button, Card, TextInput, Textarea, Switch } from '@mantine/core'
+import { Button, Card, TextInput, Textarea, Switch, Stack, Group, Text, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 
 interface InvestmentFormProps {
@@ -66,14 +66,10 @@ export default function InvestmentForm({ investment, onSuccess }: InvestmentForm
   }
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
-      <Card.Section withBorder inheritPadding py="md">
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>
-          {investment ? 'Edit Investment' : 'Add Investment'}
-        </h2>
-      </Card.Section>
+    <Card>
+      <Title order={5} mb="sm">{investment ? 'Edit Investment' : 'Add Investment'}</Title>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Card.Section inheritPadding py="md" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <Stack gap="sm">
           <Controller
             name="name"
             control={control}
@@ -105,29 +101,32 @@ export default function InvestmentForm({ investment, onSuccess }: InvestmentForm
             name="isActive"
             control={control}
             render={({ field }) => (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', border: '1px solid var(--mantine-color-gray-3)', borderRadius: 'var(--mantine-radius-md)' }}>
-                <div>
-                  <div style={{ fontWeight: 500 }}>Active</div>
-                  <div style={{ fontSize: '0.875rem', color: 'var(--mantine-color-dimmed)' }}>
-                    Mark this investment as active or inactive
-                  </div>
-                </div>
+              <Group
+                justify="space-between"
+                p="xs"
+                style={{ border: '1px solid var(--mantine-color-gray-3)', borderRadius: 'var(--mantine-radius-sm)' }}
+              >
+                <Stack gap={0}>
+                  <Text size="sm" fw={500}>Active</Text>
+                  <Text size="xs" c="dimmed">Mark this investment as active or inactive</Text>
+                </Stack>
                 <Switch
                   checked={field.value}
                   onChange={field.onChange}
                 />
-              </div>
+              </Group>
             )}
           />
-        </Card.Section>
-        <Card.Section withBorder inheritPadding py="md" style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button variant="outline" onClick={() => navigate('/investments')}>
-            Cancel
-          </Button>
-          <Button type="submit" loading={isSubmitting}>
-            {investment ? 'Update' : 'Create'}
-          </Button>
-        </Card.Section>
+
+          <Group justify="space-between" mt="xs">
+            <Button variant="subtle" color="gray" onClick={() => navigate('/investments')}>
+              Cancel
+            </Button>
+            <Button type="submit" loading={isSubmitting}>
+              {investment ? 'Update' : 'Create'}
+            </Button>
+          </Group>
+        </Stack>
       </form>
     </Card>
   )

@@ -131,20 +131,18 @@ export function YTDOverview() {
   ]
 
   return (
-    <Card shadow="sm" padding="md" radius="md" withBorder>
-      <Stack gap="md">
-        <Group gap="xs">
-          <Calendar size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
-          <Title order={4} c="dimmed">Year to Date ({currentYear})</Title>
-        </Group>
-        <Stack gap="xs">
-          {metrics.map((metric) => (
-            <Group key={metric.label} justify="space-between">
-              <Text size="sm" c="dimmed">{metric.label}</Text>
-              <Text size="sm" fw={600} className="numeric-value">{metric.value}</Text>
-            </Group>
-          ))}
-        </Stack>
+    <Card>
+      <Group gap="xs" mb="xs">
+        <Calendar size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+        <Title order={5}>Year to Date ({currentYear})</Title>
+      </Group>
+      <Stack gap={4}>
+        {metrics.map((metric) => (
+          <Group key={metric.label} justify="space-between" gap="xs">
+            <Text size="sm" c="dimmed">{metric.label}</Text>
+            <Text size="sm" fw={600} className="numeric-value">{metric.value}</Text>
+          </Group>
+        ))}
       </Stack>
     </Card>
   )

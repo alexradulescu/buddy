@@ -424,64 +424,60 @@ export const CategorySpreadsheet: React.FC<CategorySpreadsheetProps> = ({
 
   return (
     <>
-      <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Card.Section withBorder inheritPadding py="md">
-          <Group justify="space-between">
-            <Text fw={700} size="lg">
-              {type === 'expense' ? 'Expense Categories' : 'Income Categories'}
-            </Text>
-            <Group gap="sm">
-              <Button variant="outline" onClick={handleAddRow} leftSection={<Plus size={16} />}>
-                Add Row
-              </Button>
-              <Button onClick={handleSaveChanges} disabled={!hasChanges} leftSection={<Save size={16} />}>
-                Save Changes
-              </Button>
-            </Group>
+      <Card>
+        <Group justify="space-between" mb="sm">
+          <Text fw={600}>
+            {type === 'expense' ? 'Expense Categories' : 'Income Categories'}
+          </Text>
+          <Group gap="xs">
+            <Button variant="default" onClick={handleAddRow} leftSection={<Plus size={14} />}>
+              Add Row
+            </Button>
+            <Button onClick={handleSaveChanges} disabled={!hasChanges} leftSection={<Save size={14} />}>
+              Save Changes
+            </Button>
           </Group>
-        </Card.Section>
+        </Group>
 
-        <Card.Section inheritPadding py="md">
-          <Stack gap="sm">
-            <Text size="sm" c="dimmed">
-              {editableCategories.length} {editableCategories.length === 1 ? 'category' : 'categories'}
-            </Text>
-            <div style={{ width: '100%', overflowX: 'auto' }}>
-              <HotTable
-                ref={hotRef}
-                data={tableData}
-                columns={columns}
-                colHeaders={true}
-                rowHeaders={false}
-                licenseKey="non-commercial-and-evaluation"
-                height="auto"
-                width="100%"
-                stretchH="all"
-                autoWrapRow={true}
-                autoWrapCol={true}
-                enterMoves={{ row: 1, col: 0 }}
-                tabMoves={{ row: 0, col: 1 }}
-                copyPaste={true}
-                manualColumnResize={true}
-                className="category-spreadsheet"
-                afterChange={handleAfterChange}
-                customBorders={false}
-                outsideClickDeselects={false}
-              />
-            </div>
-          </Stack>
-        </Card.Section>
+        <Stack gap="xs">
+          <Text size="xs" c="dimmed">
+            {editableCategories.length} {editableCategories.length === 1 ? 'category' : 'categories'}
+          </Text>
+          <div style={{ width: '100%', overflowX: 'auto' }}>
+            <HotTable
+              ref={hotRef}
+              data={tableData}
+              columns={columns}
+              colHeaders={true}
+              rowHeaders={false}
+              licenseKey="non-commercial-and-evaluation"
+              height="auto"
+              width="100%"
+              stretchH="all"
+              autoWrapRow={true}
+              autoWrapCol={true}
+              enterMoves={{ row: 1, col: 0 }}
+              tabMoves={{ row: 0, col: 1 }}
+              copyPaste={true}
+              manualColumnResize={true}
+              className="category-spreadsheet"
+              afterChange={handleAfterChange}
+              customBorders={false}
+              outsideClickDeselects={false}
+            />
+          </div>
+        </Stack>
       </Card>
 
       <Modal
         opened={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
-        title="Are you absolutely sure?"
+        title="Delete Category"
         centered
       >
         <Text size="sm">This action cannot be undone. This will permanently delete the category.</Text>
-        <Group justify="flex-end" gap="sm" mt="md">
-          <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+        <Group justify="flex-end" gap="xs" mt="sm">
+          <Button variant="subtle" color="gray" onClick={() => setIsDeleteDialogOpen(false)}>
             Cancel
           </Button>
           <Button color="red" onClick={confirmDelete}>

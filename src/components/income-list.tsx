@@ -87,16 +87,16 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
   }, [incomeCategories])
 
   return (
-    <Stack gap="md">
-      <Stack gap="sm">
+    <Stack gap="sm">
+      <Stack gap="xs">
         <TextInput
           placeholder="Search incomes..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          leftSection={<Search size={16} />}
+          leftSection={<Search size={14} />}
         />
-        <Group gap="sm" align="center">
-          <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>Filter:</Text>
+        <Group gap="xs" align="center">
+          <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>Filter:</Text>
           <Select
             value={selectedCategoryId || 'all'}
             onChange={(value) => setSelectedCategoryId(value === 'all' ? null : value)}
@@ -114,21 +114,21 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
       </Stack>
 
       {filteredAndSortedIncomes.length === 0 ? (
-        <Text ta="center" c="dimmed" py="xl">No incomes found for this period.</Text>
+        <Text ta="center" c="dimmed" py="md" size="sm">No incomes found for this period.</Text>
       ) : (
-        <Stack gap="sm">
-          <Text size="sm" c="dimmed">
+        <Stack gap="xs">
+          <Text size="xs" c="dimmed">
             {filteredAndSortedIncomes.length} {filteredAndSortedIncomes.length === 1 ? 'item' : 'items'}
           </Text>
           <ScrollArea>
-            <Table highlightOnHover striped withTableBorder miw={500} fz="xs" verticalSpacing="xs">
+            <Table miw={450}>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th w={90}>Date</Table.Th>
+                  <Table.Th w={80}>Date</Table.Th>
                   <Table.Th>Description</Table.Th>
                   <Table.Th>Category</Table.Th>
-                  <Table.Th ta="right" w={80}>Amount</Table.Th>
-                  <Table.Th w={70}>Actions</Table.Th>
+                  <Table.Th ta="right" w={70}>Amount</Table.Th>
+                  <Table.Th w={60}>Actions</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -139,8 +139,8 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
                     <Table.Td c="dimmed">{income.category}</Table.Td>
                     <Table.Td ta="right" className="numeric-value">${Number(income.amount).toFixed(2)}</Table.Td>
                     <Table.Td>
-                      <Group gap="xs" wrap="nowrap">
-                        <Button size="compact-xs" variant="subtle" onClick={() => setEditingIncome(income)}>
+                      <Group gap={4} wrap="nowrap">
+                        <Button size="compact-xs" variant="subtle" color="gray" onClick={() => setEditingIncome(income)}>
                           <Edit size={12} />
                         </Button>
                         <Button size="compact-xs" variant="subtle" color="red" onClick={() => handleDeleteClick(income)}>

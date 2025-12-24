@@ -17,7 +17,7 @@ export default function SettingsPage() {
   } = useCategoryStore()
 
   return (
-    <Stack gap="xl">
+    <Stack gap="md">
       <CategorySpreadsheet
         type="expense"
         categories={expenseCategories}
