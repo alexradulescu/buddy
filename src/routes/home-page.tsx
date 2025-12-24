@@ -9,11 +9,14 @@ import { IncomeOverview } from '@/components/income-overview'
 import { InvestmentOverview } from '@/components/investment/investment-overview'
 import { YTDOverview } from '@/components/ytd-overview'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
-import { Stack, Card, SimpleGrid } from '@mantine/core'
+import { useDashboardExport } from '@/hooks/use-dashboard-export'
+import { Stack, Card, SimpleGrid, Group, Button } from '@mantine/core'
 import { Accordion } from '@mantine/core'
+import { Download } from 'lucide-react'
 
 export default function HomePage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
+  const { exportToCSV } = useDashboardExport()
 
   const { data: { expenseCategories = [], incomeCategories = [] } = {} } = useCategoryStore()
   const { data: { expenses = [] } = {} } = useExpenseStore()
@@ -46,6 +49,17 @@ export default function HomePage() {
 
   return (
     <Stack gap="md">
+      {/* Export Button */}
+      <Group justify="flex-end">
+        <Button
+          leftSection={<Download size={16} />}
+          variant="light"
+          onClick={exportToCSV}
+        >
+          Export CSV
+        </Button>
+      </Group>
+
       {/* YTD and Monthly Overview side by side on desktop, stacked on mobile */}
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
         <YTDOverview />
