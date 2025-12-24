@@ -82,69 +82,67 @@ export default function PerformanceGraph({ contributions, values }: PerformanceG
   // If there's no data, show a message
   if (chartData.length === 0 || (contributions.length === 0 && values.length === 0)) {
     return (
-      <Card shadow="sm" padding="md" radius="md" withBorder>
-        <Stack gap="md">
-          <Group gap="xs">
-            <TrendingUp size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
-            <Title order={4} c="dimmed">Performance</Title>
-          </Group>
-          <Stack align="center" justify="center" mih="10rem">
-            <Text c="dimmed" size="sm">Add contributions and values to see performance data</Text>
-          </Stack>
+      <Card>
+        <Group gap="xs" mb="xs">
+          <TrendingUp size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+          <Title order={5}>Performance</Title>
+        </Group>
+        <Stack align="center" justify="center" mih="8rem">
+          <Text c="dimmed" size="sm">Add contributions and values to see performance data</Text>
         </Stack>
       </Card>
     )
   }
 
   return (
-    <Card shadow="sm" padding="md" radius="md" withBorder>
-      <Stack gap="md">
-        <Group gap="xs">
-          <TrendingUp size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
-          <Title order={4} c="dimmed">Performance</Title>
-        </Group>
-        <div style={{ height: '10rem' }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={chartData}
-              margin={{
-                top: 5,
-                right: 10,
-                left: 0,
-                bottom: 5,
+    <Card>
+      <Group gap="xs" mb="xs">
+        <TrendingUp size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+        <Title order={5}>Performance</Title>
+      </Group>
+      <div style={{ height: '9rem' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={chartData}
+            margin={{
+              top: 5,
+              right: 10,
+              left: 0,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" />
+            <XAxis dataKey="month" tick={{ fontSize: 10 }} stroke="var(--mantine-color-gray-5)" />
+            <YAxis tick={{ fontSize: 10 }} width={50} stroke="var(--mantine-color-gray-5)" />
+            <Tooltip
+              formatter={(value) => {
+                const numValue = typeof value === 'string' ? parseFloat(value) :
+                                Array.isArray(value) ? parseFloat(value[0].toString()) :
+                                Number(value);
+                return [`$${numValue.toFixed(2)}`, undefined];
               }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-              <YAxis tick={{ fontSize: 10 }} width={50} />
-              <Tooltip
-                formatter={(value) => {
-                  const numValue = typeof value === 'string' ? parseFloat(value) :
-                                  Array.isArray(value) ? parseFloat(value[0].toString()) :
-                                  Number(value);
-                  return [`$${numValue.toFixed(2)}`, undefined];
-                }}
-              />
-              <Legend wrapperStyle={{ fontSize: '12px' }} />
-              <Line
-                type="monotone"
-                dataKey="contributions"
-                name="Contributions"
-                stroke="#8884d8"
-                activeDot={{ r: 6 }}
-                strokeWidth={2}
-              />
-              <Line
-                type="monotone"
-                dataKey="value"
-                name="Value"
-                stroke="#82ca9d"
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </Stack>
+            />
+            <Legend wrapperStyle={{ fontSize: '11px' }} />
+            <Line
+              type="monotone"
+              dataKey="contributions"
+              name="Contributions"
+              stroke="#8884d8"
+              activeDot={{ r: 4 }}
+              strokeWidth={1.5}
+              dot={{ r: 2 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="value"
+              name="Value"
+              stroke="#82ca9d"
+              strokeWidth={1.5}
+              dot={{ r: 2 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </Card>
   )
 }

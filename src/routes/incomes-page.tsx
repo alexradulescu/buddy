@@ -10,14 +10,14 @@ export default function IncomesPage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
 
   return (
-    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
       {/* Left Panel - Add Income Form */}
-      <Card withBorder p="lg">
+      <Card>
         <IncomeForm selectedYear={selectedYear} selectedMonth={selectedMonth} />
       </Card>
 
       {/* Right Panel - Income List */}
-      <Card withBorder p="lg">
+      <Card>
         <IncomeList selectedYear={selectedYear} selectedMonth={selectedMonth} />
       </Card>
     </SimpleGrid>

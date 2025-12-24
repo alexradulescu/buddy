@@ -11,7 +11,7 @@ export default function InvestmentsPage() {
   const { investments } = useInvestmentStore()
 
   return (
-    <Stack gap="xl">
+    <Stack gap="md">
       <PageHeader
         title="Investments"
         description="Track and manage your investments"
@@ -23,11 +23,11 @@ export default function InvestmentsPage() {
       />
 
       {investments.length === 0 ? (
-        <Card withBorder shadow="sm" radius="md" p="xl">
+        <Card p="lg">
           <Center>
-            <Stack align="center" gap="md">
-              <Title order={3} size="h4">No investments yet</Title>
-              <Text c="dimmed">Get started by adding your first investment</Text>
+            <Stack align="center" gap="sm">
+              <Title order={4}>No investments yet</Title>
+              <Text size="sm" c="dimmed">Get started by adding your first investment</Text>
               <Button component={Link} to="/investments/new" leftSection={<Plus size={16} />}>
                 Add Investment
               </Button>
@@ -35,7 +35,7 @@ export default function InvestmentsPage() {
           </Center>
         </Card>
       ) : (
-        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="sm">
           {investments.map((investment) => (
             <InvestmentCard key={investment.id} investment={investment} />
           ))}

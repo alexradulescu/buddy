@@ -75,16 +75,16 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
   const uniqueCategories = expenseCategories.map(({ id, name }) => ({ id, name }))
 
   return (
-    <Stack gap="md">
-      <Stack gap="sm">
+    <Stack gap="sm">
+      <Stack gap="xs">
         <TextInput
           placeholder="Search expenses..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          leftSection={<Search size={16} />}
+          leftSection={<Search size={14} />}
         />
-        <Group gap="sm" align="center">
-          <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>Filter:</Text>
+        <Group gap="xs" align="center">
+          <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>Filter:</Text>
           <Select
             placeholder="All categories"
             value={selectedCategoryId || 'all'}
@@ -101,21 +101,21 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
         </Group>
       </Stack>
       {filteredExpenses.length === 0 ? (
-        <Text ta="center" c="dimmed" py="xl">No expenses found for this period.</Text>
+        <Text ta="center" c="dimmed" py="md" size="sm">No expenses found for this period.</Text>
       ) : (
-        <Stack gap="sm">
-          <Text size="sm" c="dimmed">
+        <Stack gap="xs">
+          <Text size="xs" c="dimmed">
             {filteredExpenses.length} {filteredExpenses.length === 1 ? 'item' : 'items'}
           </Text>
           <ScrollArea>
-            <Table highlightOnHover striped withTableBorder miw={500} fz="xs" verticalSpacing="xs">
+            <Table miw={450}>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th w={90}>Date</Table.Th>
+                  <Table.Th w={80}>Date</Table.Th>
                   <Table.Th>Description</Table.Th>
                   <Table.Th>Category</Table.Th>
-                  <Table.Th ta="right" w={80}>Amount</Table.Th>
-                  <Table.Th w={70}>Actions</Table.Th>
+                  <Table.Th ta="right" w={70}>Amount</Table.Th>
+                  <Table.Th w={60}>Actions</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -126,8 +126,8 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
                     <Table.Td c="dimmed">{expense.category}</Table.Td>
                     <Table.Td ta="right" className="numeric-value">${Number(expense.amount).toFixed(2)}</Table.Td>
                     <Table.Td>
-                      <Group gap="xs" wrap="nowrap">
-                        <Button size="compact-xs" variant="subtle" onClick={() => setEditingExpense(expense)}>
+                      <Group gap={4} wrap="nowrap">
+                        <Button size="compact-xs" variant="subtle" color="gray" onClick={() => setEditingExpense(expense)}>
                           <Edit size={12} />
                         </Button>
                         <Button size="compact-xs" variant="subtle" color="red" onClick={() => handleDeleteClick(expense)}>

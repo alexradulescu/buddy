@@ -50,63 +50,61 @@ export default function ContributionTable({ investmentId, contributions, onDelet
   }
 
   return (
-    <Card shadow="sm" padding="md" radius="md" withBorder>
-      <Stack gap="md">
-        <Group justify="space-between" align="center">
-          <Group gap="xs">
-            <PiggyBank size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
-            <Title order={4} c="dimmed">Contributions</Title>
-          </Group>
-          {!showForm && (
-            <Button size="xs" onClick={() => setShowForm(true)}>
-              Add
-            </Button>
-          )}
+    <Card>
+      <Group justify="space-between" align="center" mb="xs">
+        <Group gap="xs">
+          <PiggyBank size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+          <Title order={5}>Contributions</Title>
         </Group>
-
-        {showForm ? (
-          <ContributionForm
-            investmentId={investmentId}
-            contribution={editingContribution}
-            onSuccess={handleSuccess}
-            onCancel={handleCancel}
-          />
-        ) : sortedContributions.length > 0 ? (
-          <Table striped highlightOnHover fz="xs" verticalSpacing="xs">
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Date</Table.Th>
-                <Table.Th ta="right">Amount</Table.Th>
-                <Table.Th>Description</Table.Th>
-                <Table.Th ta="right" w={60}>Actions</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {sortedContributions.map((contribution) => (
-                <Table.Tr key={contribution.id}>
-                  <Table.Td>{formatDate(contribution.date)}</Table.Td>
-                  <Table.Td ta="right" className="numeric-value">{formatCurrency(contribution.amount)}</Table.Td>
-                  <Table.Td c="dimmed">{contribution.description || '-'}</Table.Td>
-                  <Table.Td ta="right">
-                    <Group gap="xs" wrap="nowrap" justify="flex-end">
-                      <Button variant="subtle" size="compact-xs" onClick={() => handleEdit(contribution)}>
-                        <Edit size={12} />
-                      </Button>
-                      <Button variant="subtle" size="compact-xs" color="red" onClick={() => onDelete(contribution.id)}>
-                        <Trash2 size={12} />
-                      </Button>
-                    </Group>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        ) : (
-          <Center p="md">
-            <Text c="dimmed" size="sm">No contributions yet</Text>
-          </Center>
+        {!showForm && (
+          <Button size="xs" onClick={() => setShowForm(true)}>
+            Add
+          </Button>
         )}
-      </Stack>
+      </Group>
+
+      {showForm ? (
+        <ContributionForm
+          investmentId={investmentId}
+          contribution={editingContribution}
+          onSuccess={handleSuccess}
+          onCancel={handleCancel}
+        />
+      ) : sortedContributions.length > 0 ? (
+        <Table>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Date</Table.Th>
+              <Table.Th ta="right">Amount</Table.Th>
+              <Table.Th>Description</Table.Th>
+              <Table.Th ta="right" w={60}>Actions</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {sortedContributions.map((contribution) => (
+              <Table.Tr key={contribution.id}>
+                <Table.Td>{formatDate(contribution.date)}</Table.Td>
+                <Table.Td ta="right" className="numeric-value">{formatCurrency(contribution.amount)}</Table.Td>
+                <Table.Td c="dimmed">{contribution.description || '-'}</Table.Td>
+                <Table.Td ta="right">
+                  <Group gap={4} wrap="nowrap" justify="flex-end">
+                    <Button variant="subtle" size="compact-xs" color="gray" onClick={() => handleEdit(contribution)}>
+                      <Edit size={12} />
+                    </Button>
+                    <Button variant="subtle" size="compact-xs" color="red" onClick={() => onDelete(contribution.id)}>
+                      <Trash2 size={12} />
+                    </Button>
+                  </Group>
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      ) : (
+        <Center py="sm">
+          <Text c="dimmed" size="sm">No contributions yet</Text>
+        </Center>
+      )}
     </Card>
   )
 }

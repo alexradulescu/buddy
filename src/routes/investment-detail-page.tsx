@@ -129,47 +129,45 @@ export default function InvestmentDetailPage() {
   ]
 
   return (
-    <Stack gap="lg">
+    <Stack gap="md">
       {/* Header with back button and actions */}
       <Group justify="space-between">
-        <Button variant="subtle" size="sm" component={Link} to="/investments" leftSection={<ArrowLeft size={16} />}>
+        <Button variant="subtle" color="gray" component={Link} to="/investments" leftSection={<ArrowLeft size={14} />}>
           Back to Investments
         </Button>
         <Group gap="xs">
-          <Button variant="outline" size="sm" component={Link} to={`/investments/${id}/edit`} leftSection={<Edit size={16} />}>
+          <Button variant="default" component={Link} to={`/investments/${id}/edit`} leftSection={<Edit size={14} />}>
             Edit
           </Button>
-          <Button variant="filled" color="red" size="sm" onClick={() => setDeleteModalOpen(true)} leftSection={<Trash2 size={16} />}>
+          <Button color="red" onClick={() => setDeleteModalOpen(true)} leftSection={<Trash2 size={14} />}>
             Delete
           </Button>
         </Group>
       </Group>
 
       {/* Title and description */}
-      <Stack gap="xs">
-        <Title order={2}>{investment.name}</Title>
+      <Stack gap={2}>
+        <Title order={3}>{investment.name}</Title>
         <Text c="dimmed" size="sm">{investment.description || 'No description provided'}</Text>
       </Stack>
 
       {/* Overview Card + Performance Chart - side by side */}
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
-        {/* Overview Card - YTD style */}
-        <Card shadow="sm" padding="md" radius="md" withBorder>
-          <Stack gap="md">
-            <Group gap="xs">
-              <DollarSign size={18} style={{ color: 'var(--mantine-color-dimmed)' }} />
-              <Title order={4} c="dimmed">Overview</Title>
-            </Group>
-            <Stack gap="xs">
-              {overviewMetrics.map((metric) => (
-                <Group key={metric.label} justify="space-between">
-                  <Text size="sm" c="dimmed">{metric.label}</Text>
-                  <Text size="sm" fw={600} className="numeric-value" c={metric.color}>
-                    {metric.value}
-                  </Text>
-                </Group>
-              ))}
-            </Stack>
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
+        {/* Overview Card */}
+        <Card>
+          <Group gap="xs" mb="xs">
+            <DollarSign size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
+            <Title order={5}>Overview</Title>
+          </Group>
+          <Stack gap={4}>
+            {overviewMetrics.map((metric) => (
+              <Group key={metric.label} justify="space-between" gap="xs">
+                <Text size="sm" c="dimmed">{metric.label}</Text>
+                <Text size="sm" fw={600} className="numeric-value" c={metric.color}>
+                  {metric.value}
+                </Text>
+              </Group>
+            ))}
           </Stack>
         </Card>
 
@@ -178,7 +176,7 @@ export default function InvestmentDetailPage() {
       </SimpleGrid>
 
       {/* Contributions & Values - side by side */}
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
         <ContributionTable investmentId={id} contributions={contributions} onDelete={handleDeleteContribution} />
         <ValueTable investmentId={id} values={values} onDelete={handleDeleteValue} />
       </SimpleGrid>
@@ -190,12 +188,12 @@ export default function InvestmentDetailPage() {
         title="Delete Investment"
         centered
       >
-        <Stack gap="md">
-          <Text>
+        <Stack gap="sm">
+          <Text size="sm">
             Are you sure you want to delete this investment? This action cannot be undone.
           </Text>
           <Group justify="flex-end" gap="xs">
-            <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+            <Button variant="subtle" color="gray" onClick={() => setDeleteModalOpen(false)}>
               Cancel
             </Button>
             <Button color="red" onClick={handleDeleteInvestment}>
