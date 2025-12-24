@@ -306,15 +306,7 @@ export function useDashboardExport() {
     })
     lines.push('') // Blank line separator
 
-    // SECTION 4: Investments Overview
-    lines.push('SECTION: Investments Overview')
-    lines.push(createCSVRow(['Metric', 'Value']))
-    lines.push(createCSVRow(['Total Value', formatNumberForCSV(investmentData.totalValue)]))
-    lines.push(createCSVRow(['Total Invested', formatNumberForCSV(investmentData.totalInvested)]))
-    lines.push(createCSVRow(['Total P&L', `${formatNumberForCSV(investmentData.totalPL)} (${formatPercentValueForCSV(investmentData.totalPLPercentage)})`]))
-    lines.push('') // Blank line separator
-
-    // SECTION 5: Investments Table
+    // SECTION 4: Investments Table
     lines.push('SECTION: Investments')
     lines.push(createCSVRow(['Name', 'Current Value', 'Total Invested', 'P&L', 'P&L %']))
     investmentData.rows.forEach((inv) => {
