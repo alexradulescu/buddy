@@ -30,7 +30,10 @@ export default function ExpensesPage() {
     const errors: string[] = []
 
     expenses.forEach((expense) => {
-      if (!expense.amount || isNaN(Number(expense.amount)) || Number(expense.amount) <= 0) {
+      const amount = Number(expense.amount)
+      // Allow negative amounts for reimbursements, but not zero
+      // AI converter already blocks negatives via Zod schema in the API
+      if (isNaN(amount) || amount === 0) {
         errors.push(`Invalid amount for expense: ${expense.description}`)
         hasError = true
         return
