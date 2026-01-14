@@ -5,6 +5,7 @@ import { Calendar } from 'lucide-react'
 import { Card, Title, Stack, Group, Text } from '@mantine/core'
 import { useCategoryStore, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
+import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -20,9 +21,7 @@ const percentFormatter = new Intl.NumberFormat('en-US', {
 })
 
 export function YTDOverview() {
-  const currentDate = new Date()
-  const currentYear = currentDate.getFullYear()
-  const currentMonth = currentDate.getMonth() // 0-indexed
+  const { selectedYear, selectedMonth } = useSharedQueryParams()
 
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
   const { data: { expenses = [] } = {} } = useExpenseStore()
@@ -30,24 +29,24 @@ export function YTDOverview() {
   const { investments, investmentContributions, getLatestValue } = useInvestmentStore()
 
   const ytdData = useMemo(() => {
-    // YTD Income: All income from Jan 1 to current month of current year
+    // YTD Income: All income from Jan 1 to selected month of selected year
     const ytdIncome = incomes
       .filter((income) => {
         const incomeDate = new Date(income.date)
         return (
-          incomeDate.getFullYear() === currentYear &&
-          incomeDate.getMonth() <= currentMonth
+          incomeDate.getFullYear() === selectedYear &&
+          incomeDate.getMonth() <= selectedMonth
         )
       })
       .reduce((total, income) => total + (income.amount || 0), 0)
 
-    // YTD Expenses: All expenses from Jan 1 to current month of current year
+    // YTD Expenses: All expenses from Jan 1 to selected month of selected year
     const ytdExpenses = expenses
       .filter((expense) => {
         const expenseDate = new Date(expense.date)
         return (
-          expenseDate.getFullYear() === currentYear &&
-          expenseDate.getMonth() <= currentMonth
+          expenseDate.getFullYear() === selectedYear &&
+          expenseDate.getMonth() <= selectedMonth
         )
       })
       .reduce((total, expense) => total + (expense.amount || 0), 0)
@@ -57,8 +56,8 @@ export function YTDOverview() {
       .filter((contribution) => {
         const contributionDate = new Date(contribution.date)
         return (
-          contributionDate.getFullYear() === currentYear &&
-          contributionDate.getMonth() <= currentMonth
+          contributionDate.getFullYear() === selectedYear &&
+          contributionDate.getMonth() <= selectedMonth
         )
       })
       .reduce((total, contribution) => total + (contribution.amount || 0), 0)
@@ -66,8 +65,8 @@ export function YTDOverview() {
     // YTD Spent: Expenses minus investments (money moved to investments isn't "spent")
     const ytdSpent = ytdExpenses - ytdInvestmentContributions
 
-    // YTD Budget: Sum of all non-archived category monthly budgets × (current month + 1)
-    const monthsElapsed = currentMonth + 1
+    // YTD Budget: Sum of all non-archived category monthly budgets × (selected month + 1)
+    const monthsElapsed = selectedMonth + 1
     const ytdBudget = expenseCategories
       .filter((category) => !category.isArchived)
       .reduce((total, category) => total + (category.maxBudget || 0), 0) * monthsElapsed
@@ -108,8 +107,8 @@ export function YTDOverview() {
     investments,
     investmentContributions,
     getLatestValue,
-    currentYear,
-    currentMonth
+    selectedYear,
+    selectedMonth
   ])
 
   const formatCurrency = (amount: number): string => {
@@ -134,7 +133,7 @@ export function YTDOverview() {
     <Card>
       <Group gap="xs" mb="xs">
         <Calendar size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
-        <Title order={5}>Year to Date ({currentYear})</Title>
+        <Title order={5}>Year to Date ({selectedYear})</Title>
       </Group>
       <Stack gap={4}>
         {metrics.map((metric) => (
