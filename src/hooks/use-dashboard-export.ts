@@ -25,39 +25,35 @@ export function useDashboardExport() {
 
   // Compute YTD data (same logic as ytd-overview.tsx)
   const ytdData = useMemo(() => {
-    const currentDate = new Date()
-    const currentYear = currentDate.getFullYear()
-    const currentMonth = currentDate.getMonth()
-
-    // YTD Income
+    // YTD Income: All income from Jan 1 to selected month of selected year
     const ytdIncome = incomes
       .filter((income) => {
         const incomeDate = new Date(income.date)
         return (
-          incomeDate.getFullYear() === currentYear &&
-          incomeDate.getMonth() <= currentMonth
+          incomeDate.getFullYear() === selectedYear &&
+          incomeDate.getMonth() <= selectedMonth
         )
       })
       .reduce((total, income) => total + (income.amount || 0), 0)
 
-    // YTD Expenses
+    // YTD Expenses: All expenses from Jan 1 to selected month of selected year
     const ytdExpenses = expenses
       .filter((expense) => {
         const expenseDate = new Date(expense.date)
         return (
-          expenseDate.getFullYear() === currentYear &&
-          expenseDate.getMonth() <= currentMonth
+          expenseDate.getFullYear() === selectedYear &&
+          expenseDate.getMonth() <= selectedMonth
         )
       })
       .reduce((total, expense) => total + (expense.amount || 0), 0)
 
-    // YTD Investment Contributions
+    // YTD Investment Contributions (to exclude from spent)
     const ytdInvestmentContributions = investmentContributions
       .filter((contribution) => {
         const contributionDate = new Date(contribution.date)
         return (
-          contributionDate.getFullYear() === currentYear &&
-          contributionDate.getMonth() <= currentMonth
+          contributionDate.getFullYear() === selectedYear &&
+          contributionDate.getMonth() <= selectedMonth
         )
       })
       .reduce((total, contribution) => total + (contribution.amount || 0), 0)
@@ -65,8 +61,8 @@ export function useDashboardExport() {
     // YTD Spent (expenses minus investments)
     const ytdSpent = ytdExpenses - ytdInvestmentContributions
 
-    // YTD Budget
-    const monthsElapsed = currentMonth + 1
+    // YTD Budget: Sum of all non-archived category monthly budgets × (selected month + 1)
+    const monthsElapsed = selectedMonth + 1
     const ytdBudget = expenseCategories
       .filter((category) => !category.isArchived)
       .reduce((total, category) => total + (category.maxBudget || 0), 0) * monthsElapsed
@@ -100,7 +96,7 @@ export function useDashboardExport() {
       ytdSavings,
       ytdSavingsRate
     }
-  }, [incomes, expenses, expenseCategories, investments, investmentContributions, getLatestValue])
+  }, [incomes, expenses, expenseCategories, investments, investmentContributions, getLatestValue, selectedYear, selectedMonth])
 
   // Compute expense categories data (same logic as expense-overview.tsx)
   const expenseCategoriesData = useMemo(() => {
