@@ -69,7 +69,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                     value={expense.amount}
                     onChange={(value) => onInputChange(index, 'amount', Number(value))}
                     decimalScale={2}
-                    min={0}
+                    allowNegative
                     required
                     styles={{ input: { borderRadius: 0, padding: '8px' } }}
                   />
