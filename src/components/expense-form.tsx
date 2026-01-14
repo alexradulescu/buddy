@@ -28,13 +28,13 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
     return new Date(year, month, 15)
   }
 
-  const addExpenses = (expenses: Expense[], allowNegative: boolean = false) => {
+  const addExpenses = (expenses: Expense[]) => {
     let hasError = false
     expenses.forEach((expense) => {
       const amount = Number(expense.amount)
-      const isValidAmount = allowNegative
-        ? !isNaN(amount) && amount !== 0
-        : !isNaN(amount) && amount > 0
+      // Allow negative amounts for reimbursements, but not zero
+      // AI converter already blocks negatives via Zod schema in the API
+      const isValidAmount = !isNaN(amount) && amount !== 0
 
       if (!isValidAmount) {
         console.error('Expense validation error: Invalid amount', expense.description, expense.amount)
@@ -81,7 +81,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
   }
 
   const handleAddExpenses = () => {
-    addExpenses(expenses, true) // Allow negative amounts for manual entry (reimbursements)
+    addExpenses(expenses)
   }
 
   const handleInputChange = (index: number, field: keyof Expense, value: string | number | Date) => {
