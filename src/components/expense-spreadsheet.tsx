@@ -67,6 +67,36 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
     }))
   }, [expenses, categoryIdToName])
 
+  // Custom renderer for amount column (green for negative/reimbursements)
+  const amountRenderer = useCallback(
+    (
+      instance: Handsontable,
+      td: HTMLTableCellElement,
+      row: number,
+      col: number,
+      prop: string | number,
+      value: any,
+      cellProperties: Handsontable.CellProperties
+    ) => {
+      const numValue = Number(value)
+      const formattedValue = !isNaN(numValue) ? numValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : value
+
+      td.innerHTML = formattedValue
+      td.style.textAlign = 'right'
+
+      if (!isNaN(numValue) && numValue < 0) {
+        td.style.color = 'var(--mantine-color-green-6)'
+        td.style.fontWeight = '500'
+      } else {
+        td.style.color = ''
+        td.style.fontWeight = ''
+      }
+
+      return td
+    },
+    []
+  )
+
   // Custom renderer for delete button
   const deleteButtonRenderer = useCallback(
     (
@@ -197,11 +227,9 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
         data: 'amount',
         title: 'Amount',
         type: 'numeric',
-        numericFormat: {
-          pattern: '0,0.00'
-        },
         width: 80,
-        className: 'htMiddle htRight'
+        className: 'htMiddle htRight',
+        renderer: amountRenderer
       },
       {
         data: 'id',
@@ -212,7 +240,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
         renderer: deleteButtonRenderer
       }
     ],
-    [categoryNames, deleteButtonRenderer]
+    [categoryNames, deleteButtonRenderer, amountRenderer]
   )
 
   return (

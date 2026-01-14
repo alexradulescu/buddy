@@ -124,7 +124,9 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
                     <Table.Td>{format(new Date(expense.date), 'dd MMM yyyy')}</Table.Td>
                     <Table.Td>{expense.description}</Table.Td>
                     <Table.Td c="dimmed">{expense.category}</Table.Td>
-                    <Table.Td ta="right" className="numeric-value">${Number(expense.amount).toFixed(2)}</Table.Td>
+                    <Table.Td ta="right" className="numeric-value" c={expense.amount < 0 ? 'green.6' : undefined}>
+                      ${Number(expense.amount).toFixed(2)}
+                    </Table.Td>
                     <Table.Td>
                       <Group gap={4} wrap="nowrap">
                         <Button size="compact-xs" variant="subtle" color="gray" onClick={() => setEditingExpense(expense)}>

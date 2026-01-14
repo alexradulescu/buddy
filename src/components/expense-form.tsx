@@ -28,10 +28,15 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
     return new Date(year, month, 15)
   }
 
-  const addExpenses = (expenses: Expense[]) => {
+  const addExpenses = (expenses: Expense[], allowNegative: boolean = false) => {
     let hasError = false
     expenses.forEach((expense) => {
-      if (!expense.amount || isNaN(Number(expense.amount)) || Number(expense.amount) <= 0) {
+      const amount = Number(expense.amount)
+      const isValidAmount = allowNegative
+        ? !isNaN(amount) && amount !== 0
+        : !isNaN(amount) && amount > 0
+
+      if (!isValidAmount) {
         console.error('Expense validation error: Invalid amount', expense.description, expense.amount)
         setErrors((previousErrors) => [...previousErrors, `Invalid amount for expense: ${expense.description}`])
         hasError = true
@@ -76,7 +81,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ selectedYear, selected
   }
 
   const handleAddExpenses = () => {
-    addExpenses(expenses)
+    addExpenses(expenses, true) // Allow negative amounts for manual entry (reimbursements)
   }
 
   const handleInputChange = (index: number, field: keyof Expense, value: string | number | Date) => {
