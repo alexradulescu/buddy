@@ -21,13 +21,15 @@ interface ExpenseSpreadsheetProps {
     value: string | number | Date
   ) => void
   onDeleteRow: (id: string) => void
+  duplicateIds?: Set<string>
 }
 
 export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
   expenses,
   expenseCategories,
   onInputChange,
-  onDeleteRow
+  onDeleteRow,
+  duplicateIds
 }) => {
 
   // Create category lookup maps
@@ -193,6 +195,20 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
     [expenses, onInputChange, categoryNameToId]
   )
 
+  // Cell properties callback for duplicate row highlighting
+  const getCellProperties = useCallback(
+    (row: number, col: number): Handsontable.CellMeta => {
+      const expense = expenses[row]
+      if (expense && duplicateIds?.has(expense.id)) {
+        return {
+          className: 'duplicate-row'
+        }
+      }
+      return {}
+    },
+    [expenses, duplicateIds]
+  )
+
   // Column definitions
   const columns: Handsontable.ColumnSettings[] = useMemo(
     () => [
@@ -267,6 +283,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
           manualColumnResize={true}
           className="expense-spreadsheet"
           afterChange={handleAfterChange}
+          cells={getCellProperties}
           // Styling
           customBorders={false}
           outsideClickDeselects={false}
