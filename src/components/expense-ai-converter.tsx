@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { Button, Stack, Textarea, Title } from '@mantine/core'
+import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { notifications } from '@mantine/notifications'
 import { ExpenseSpreadsheet } from '@/components/expense-spreadsheet'
 
@@ -13,9 +14,32 @@ interface ExpenseAiConverterProps {
 export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpensesGenerated }) => {
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
   const { data: { expenses = [] } = {} } = useExpenseStore()
+  const { selectedYear, selectedMonth } = useSharedQueryParams()
   const [aiGeneratedExpenses, setAiGeneratedExpenses] = useState<Expense[]>([])
   const [inputText, setInputText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  // Get existing expenses for the selected month to check for duplicates
+  const existingMonthExpenses = useMemo(() => {
+    return expenses.filter((expense) => {
+      const expenseDate = new Date(expense.date)
+      return expenseDate.getFullYear() === selectedYear && expenseDate.getMonth() === selectedMonth
+    })
+  }, [expenses, selectedYear, selectedMonth])
+
+  // Find AI-generated expenses that might be duplicates (same date + amount)
+  const duplicateIds = useMemo(() => {
+    const duplicates = new Set<string>()
+    aiGeneratedExpenses.forEach((aiExpense) => {
+      const isDuplicate = existingMonthExpenses.some(
+        (existing) => existing.date === aiExpense.date && existing.amount === aiExpense.amount
+      )
+      if (isDuplicate) {
+        duplicates.add(aiExpense.id)
+      }
+    })
+    return duplicates
+  }, [aiGeneratedExpenses, existingMonthExpenses])
 
   const historicalExpenses = useMemo(() => {
     const threeMonthsAgo = new Date()
@@ -148,6 +172,7 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
             expenseCategories={expenseCategories}
             onInputChange={handleExpenseChange}
             onDeleteRow={handleDeleteExpense}
+            duplicateIds={duplicateIds}
           />
           <Button onClick={handleSaveExpenses}>Save Processed Expenses</Button>
           <Button color="red" onClick={handleReset}>

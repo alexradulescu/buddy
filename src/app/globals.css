@@ -145,6 +145,11 @@ textarea {
   border: 1px solid #fa5252 !important;
 }
 
+/* Duplicate row highlight - potential duplicate expenses */
+.expense-spreadsheet .duplicate-row {
+  background-color: #fee2e2 !important;
+}
+
 /* Read-only cells */
 .expense-spreadsheet .htDimmed,
 .category-spreadsheet .htDimmed {
