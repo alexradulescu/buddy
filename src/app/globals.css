@@ -1,133 +1,240 @@
-/* Modern Font Stacks - https://modernfontstacks.com */
-:root {
-  --font-system: system-ui, sans-serif;
-  --font-humanist: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+/* Art Deco Minimalist Design System */
+/* Typography: Refined geometric elegance */
 
-  /* Semantic colors for consistent usage */
-  --color-positive: var(--mantine-color-green-6);
-  --color-negative: var(--mantine-color-red-6);
-  --color-muted: var(--mantine-color-gray-6);
-  --color-border: var(--mantine-color-gray-3);
-  --color-bg-subtle: var(--mantine-color-gray-0);
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Art Deco Color Palette */
+  --color-ivory: #FAF8F5;
+  --color-cream: #F5F2ED;
+  --color-parchment: #EDE9E3;
+  --color-gold: #C4A052;
+  --color-gold-light: #D4B976;
+  --color-gold-muted: rgba(196, 160, 82, 0.12);
+  --color-charcoal: #1C1C1C;
+  --color-graphite: #3D3D3D;
+  --color-slate: #6B6B6B;
+  --color-silver: #9A9A9A;
+  --color-border: rgba(28, 28, 28, 0.08);
+  --color-border-strong: rgba(28, 28, 28, 0.15);
+
+  /* Semantic Colors */
+  --color-positive: #4A7C59;
+  --color-positive-bg: rgba(74, 124, 89, 0.08);
+  --color-negative: #A65D57;
+  --color-negative-bg: rgba(166, 93, 87, 0.08);
+  --color-muted: var(--color-slate);
+  --color-bg-subtle: var(--color-cream);
+
+  /* Typography */
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+
+  /* Spacing rhythm */
+  --rhythm: 8px;
+}
+
+/* Smooth rendering */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  background-color: var(--color-ivory);
 }
 
 body {
-  font-family: var(--font-system);
+  font-family: var(--font-body);
+  background-color: var(--color-ivory);
+  color: var(--color-charcoal);
+  letter-spacing: -0.01em;
 }
 
-/* Humanist font for headlines and page titles */
+/* Elegant display typography for headlines */
 h1, h2, h3, h4, h5, h6,
-.font-humanist {
-  font-family: var(--font-humanist);
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-charcoal);
 }
 
-/* Monospace font for numeric values and inputs */
+/* Refined body text */
+.font-body {
+  font-family: var(--font-body);
+}
+
+/* Monospace for numeric precision */
 input[type="number"],
 .font-mono,
 .numeric-value {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 textarea {
   field-sizing: content;
 }
 
-/* Subtle hover effect for clickable cards */
+/* Elegant card hover effect */
 .hover-card {
-  transition: background-color 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .hover-card:hover {
-  background-color: var(--mantine-color-gray-0);
+  background-color: var(--color-cream);
+  border-color: var(--color-gold-muted);
 }
 
-/* Handsontable Custom Styling - Match Mantine Theme */
-.expense-spreadsheet {
-  font-family: var(--font-system);
+/* Art Deco decorative line */
+.art-deco-line {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--color-gold) 20%,
+    var(--color-gold) 80%,
+    transparent 100%
+  );
+}
+
+/* Scrollable zones with elegant fade */
+.scrollable-zone {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+.scrollable-zone::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-zone::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollable-zone::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-strong);
+  border-radius: 3px;
+}
+
+.scrollable-zone::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-slate);
+}
+
+/* Handsontable Custom Styling - Art Deco Theme */
+.expense-spreadsheet,
+.category-spreadsheet {
+  font-family: var(--font-body);
   font-size: 13px;
   width: 100%;
   min-width: 100%;
-  line-height: 1.3;
+  line-height: 1.4;
 }
 
-/* Table borders and cells */
-.expense-spreadsheet .ht_master .wtHolder {
-  background: white;
+/* Table backgrounds */
+.expense-spreadsheet .ht_master .wtHolder,
+.category-spreadsheet .ht_master .wtHolder {
+  background: var(--color-ivory);
 }
 
-.expense-spreadsheet td {
-  border-color: #dee2e6 !important;
-  padding: 0 2px !important;
+.expense-spreadsheet td,
+.category-spreadsheet td {
+  border-color: var(--color-border) !important;
+  padding: 0 4px !important;
+  color: var(--color-charcoal);
 }
 
-.expense-spreadsheet th {
-  background: #f8f9fa !important;
-  border-color: #dee2e6 !important;
-  color: #495057;
+.expense-spreadsheet th,
+.category-spreadsheet th {
+  background: var(--color-cream) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-graphite);
+  font-family: var(--font-body);
   font-weight: 600;
-  padding: 0 2px !important;
-  font-size: 12px;
+  padding: 6px 4px !important;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   vertical-align: middle;
   text-align: inherit;
 }
 
-/* Selected cell */
-.expense-spreadsheet .ht__highlight {
-  background: #e7f5ff !important;
+/* Selected cell - golden highlight */
+.expense-spreadsheet .ht__highlight,
+.category-spreadsheet .ht__highlight {
+  background: var(--color-gold-muted) !important;
 }
 
-.expense-spreadsheet .area {
-  background: #d0ebff !important;
+.expense-spreadsheet .area,
+.category-spreadsheet .area {
+  background: rgba(196, 160, 82, 0.18) !important;
 }
 
-/* Current cell border */
-.expense-spreadsheet .current.area {
-  border: 2px solid #228be6 !important;
+/* Current cell border - gold accent */
+.expense-spreadsheet .current.area,
+.category-spreadsheet .current.area {
+  border: 2px solid var(--color-gold) !important;
 }
 
-/* Numeric cells - use monospace */
-.expense-spreadsheet td.htRight {
+/* Numeric cells - refined monospace */
+.expense-spreadsheet td.htRight,
+.category-spreadsheet td.htRight {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
-/* Row headers (if enabled) */
-.expense-spreadsheet .ht__row_header {
-  background: #f8f9fa !important;
-  color: #868e96;
+/* Row headers */
+.expense-spreadsheet .ht__row_header,
+.category-spreadsheet .ht__row_header {
+  background: var(--color-cream) !important;
+  color: var(--color-slate);
+  font-size: 11px;
 }
 
 /* Dropdown arrow */
-.expense-spreadsheet .htAutocompleteArrow {
-  color: #868e96;
+.expense-spreadsheet .htAutocompleteArrow,
+.category-spreadsheet .htAutocompleteArrow {
+  color: var(--color-slate);
 }
 
 /* Input field when editing */
-.expense-spreadsheet .handsontableInput {
-  font-family: var(--font-system);
+.expense-spreadsheet .handsontableInput,
+.category-spreadsheet .handsontableInput {
+  font-family: var(--font-body);
   font-size: 13px;
-  padding: 2px 4px;
-  border: 2px solid #228be6 !important;
-  border-radius: 4px;
+  padding: 4px 6px;
+  border: 2px solid var(--color-gold) !important;
+  border-radius: 2px;
+  background: var(--color-ivory);
+  color: var(--color-charcoal);
 }
 
 /* Date picker integration */
-.expense-spreadsheet input[type="text"] {
-  font-family: var(--font-system);
+.expense-spreadsheet input[type="text"],
+.category-spreadsheet input[type="text"] {
+  font-family: var(--font-body);
 }
 
 /* Dropdown menu styling */
 .handsontable .htDropdownMenu {
-  font-family: var(--font-system);
+  font-family: var(--font-body);
   font-size: 13px;
+  background: var(--color-ivory);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: 0 4px 12px rgba(28, 28, 28, 0.08);
 }
 
 /* Autocomplete dropdown */
 .handsontable.listbox {
-  font-family: var(--font-system);
+  font-family: var(--font-body);
   font-size: 13px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-ivory);
+  box-shadow: 0 4px 12px rgba(28, 28, 28, 0.08);
 }
 
 .handsontable.listbox .ht_master table {
@@ -135,65 +242,145 @@ textarea {
 }
 
 .handsontable.listbox td.current {
-  background: #e7f5ff !important;
-  color: #228be6;
+  background: var(--color-gold-muted) !important;
+  color: var(--color-charcoal);
 }
 
 /* Invalid cells */
-.expense-spreadsheet .htInvalid {
-  background: #fff5f5 !important;
-  border: 1px solid #fa5252 !important;
+.expense-spreadsheet .htInvalid,
+.category-spreadsheet .htInvalid {
+  background: var(--color-negative-bg) !important;
+  border: 1px solid var(--color-negative) !important;
 }
 
-/* Duplicate row highlight - potential duplicate expenses */
+/* Duplicate row highlight */
 .expense-spreadsheet .duplicate-row {
-  background-color: #fee2e2 !important;
+  background-color: var(--color-negative-bg) !important;
 }
 
 /* Read-only cells */
 .expense-spreadsheet .htDimmed,
 .category-spreadsheet .htDimmed {
-  color: #868e96;
+  color: var(--color-slate);
+  font-style: italic;
 }
 
-/* Category spreadsheet uses same styling as expense spreadsheet */
-.category-spreadsheet {
-  font-family: var(--font-system);
-  font-size: 13px;
-  width: 100%;
-  min-width: 100%;
-  line-height: 1.3;
+/* Mantine overrides for art deco theme */
+.mantine-Card-root {
+  background-color: var(--color-ivory);
+  border-color: var(--color-border) !important;
 }
 
-.category-spreadsheet td {
-  border-color: #dee2e6 !important;
-  padding: 0 4px !important;
+.mantine-Table-thead {
+  background-color: var(--color-cream);
 }
 
-.category-spreadsheet th {
-  background: #f8f9fa !important;
-  border-color: #dee2e6 !important;
-  color: #495057;
-  font-weight: 600;
-  padding: 4px !important;
+.mantine-Table-th {
+  font-family: var(--font-body) !important;
+  text-transform: uppercase;
+  font-size: 11px !important;
+  letter-spacing: 0.06em;
+  color: var(--color-graphite) !important;
+  border-bottom: 1px solid var(--color-border-strong) !important;
+}
+
+.mantine-Table-tr:hover {
+  background-color: var(--color-gold-muted) !important;
+}
+
+/* Input styling */
+.mantine-Input-input {
+  background-color: var(--color-ivory);
+  border-color: var(--color-border-strong);
+  color: var(--color-charcoal);
+}
+
+.mantine-Input-input:focus {
+  border-color: var(--color-gold);
+}
+
+/* Button refinements */
+.mantine-Button-root[data-variant="filled"] {
+  background-color: var(--color-charcoal);
+}
+
+.mantine-Button-root[data-variant="filled"]:hover {
+  background-color: var(--color-graphite);
+}
+
+.mantine-Button-root[data-variant="light"] {
+  background-color: var(--color-gold-muted);
+  color: var(--color-charcoal);
+}
+
+.mantine-Button-root[data-variant="default"] {
+  border-color: var(--color-border-strong);
+  background-color: var(--color-ivory);
+}
+
+.mantine-Button-root[data-variant="default"]:hover {
+  background-color: var(--color-cream);
+}
+
+/* Badge styling */
+.mantine-Badge-root {
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 10px;
+}
+
+/* Modal backdrop */
+.mantine-Modal-overlay {
+  background-color: rgba(28, 28, 28, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.mantine-Modal-content {
+  background-color: var(--color-ivory);
+}
+
+/* Select dropdown */
+.mantine-Select-dropdown,
+.mantine-Combobox-dropdown {
+  background-color: var(--color-ivory);
+  border-color: var(--color-border-strong);
+  box-shadow: 0 4px 16px rgba(28, 28, 28, 0.08);
+}
+
+.mantine-Select-option[data-selected],
+.mantine-Combobox-option[data-selected] {
+  background-color: var(--color-gold-muted);
+  color: var(--color-charcoal);
+}
+
+/* DatePicker styling */
+.mantine-DatePicker-day[data-selected] {
+  background-color: var(--color-charcoal);
+}
+
+.mantine-MonthPickerInput-input {
+  background-color: var(--color-ivory);
+}
+
+/* Accordion refinement */
+.mantine-Accordion-control {
+  background-color: var(--color-cream);
+}
+
+.mantine-Accordion-control:hover {
+  background-color: var(--color-parchment);
+}
+
+/* Tooltip */
+.mantine-Tooltip-tooltip {
+  background-color: var(--color-charcoal);
+  font-family: var(--font-body);
   font-size: 12px;
-  vertical-align: middle;
-  text-align: inherit;
 }
 
-.category-spreadsheet .ht__highlight {
-  background: #e7f5ff !important;
-}
-
-.category-spreadsheet .handsontableInput {
-  font-family: var(--font-system);
-  font-size: 13px;
-  padding: 2px 4px;
-  border: 2px solid #228be6 !important;
-  border-radius: 4px;
-}
-
-.category-spreadsheet td.htRight {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+/* Notification styling */
+.mantine-Notification-root {
+  background-color: var(--color-ivory);
+  border: 1px solid var(--color-border-strong);
 }

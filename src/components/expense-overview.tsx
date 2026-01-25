@@ -15,9 +15,10 @@ const getRowBackgroundColor = (currentAmount: number, budget: number | undefined
   const difference = budget - currentAmount
   const percentageDifference = (difference / budget) * 100
 
-  if (percentageDifference > 20) return { backgroundColor: 'var(--mantine-color-green-1)' }
-  if (percentageDifference >= 0) return { backgroundColor: 'var(--mantine-color-orange-1)' }
-  return { backgroundColor: 'var(--mantine-color-red-1)' }
+  // Art deco muted colors
+  if (percentageDifference > 20) return { backgroundColor: 'rgba(74, 124, 89, 0.08)' }
+  if (percentageDifference >= 0) return { backgroundColor: 'rgba(196, 160, 82, 0.08)' }
+  return { backgroundColor: 'rgba(166, 93, 87, 0.08)' }
 }
 
 interface ExpenseOverviewProps {
@@ -101,7 +102,7 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
   )
 
   return (
-    <ScrollArea>
+    <ScrollArea className="scrollable-zone">
       <Table striped highlightOnHover miw={800}>
             <Table.Thead>
               <Table.Tr>
@@ -135,18 +136,37 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                           pathname: '/expenses',
                           search: `?month=${selectedMonth}&year=${selectedYear}&categoryExpense=${category.id}`
                         }}
-                        c="blue.6"
                         underline="hover"
+                        style={{
+                          color: '#C4A052',
+                          fontWeight: 500,
+                        }}
                       >
                         {category.name}
                       </Anchor>
                     </Table.Td>
-                    <Table.Td ta="right" className="numeric-value" c={currentMonthlyExpense > (category.maxBudget || 0) ? 'red.6' : undefined}>
+                    <Table.Td
+                      ta="right"
+                      className="numeric-value"
+                      style={{
+                        color: currentMonthlyExpense > (category.maxBudget || 0) ? '#A65D57' : undefined
+                      }}
+                    >
                       {formatCurrency(currentMonthlyExpense)}
                     </Table.Td>
                     <Table.Td ta="right" className="numeric-value">
                       {monthlyDifference !== undefined && (
-                        <Badge size="xs" color={monthlyDifference >= 0 ? 'gray' : 'red'} variant="light" mr="xs">
+                        <Badge
+                          size="xs"
+                          variant="light"
+                          mr="xs"
+                          styles={{
+                            root: {
+                              backgroundColor: monthlyDifference >= 0 ? 'rgba(74, 124, 89, 0.12)' : 'rgba(166, 93, 87, 0.12)',
+                              color: monthlyDifference >= 0 ? '#4A7C59' : '#A65D57',
+                            }
+                          }}
+                        >
                           {monthlyDifference >= 0 ? '+' : '-'}
                           {formatCurrency(Math.abs(monthlyDifference))}
                         </Badge>
@@ -157,7 +177,17 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                     <Table.Td ta="right" className="numeric-value">{formatCurrency(currentYearToDateExpense)}</Table.Td>
                     <Table.Td ta="right" className="numeric-value">
                       {yearToDateDifference !== undefined && (
-                        <Badge size="xs" color={yearToDateDifference >= 0 ? 'gray' : 'red'} variant="light" mr="xs">
+                        <Badge
+                          size="xs"
+                          variant="light"
+                          mr="xs"
+                          styles={{
+                            root: {
+                              backgroundColor: yearToDateDifference >= 0 ? 'rgba(74, 124, 89, 0.12)' : 'rgba(166, 93, 87, 0.12)',
+                              color: yearToDateDifference >= 0 ? '#4A7C59' : '#A65D57',
+                            }
+                          }}
+                        >
                           {yearToDateDifference >= 0 ? '+' : '-'}
                           {formatCurrency(Math.abs(yearToDateDifference))}
                         </Badge>
@@ -166,7 +196,17 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                     </Table.Td>
                     <Table.Td ta="right" className="numeric-value">
                       {annualDifference !== undefined && (
-                        <Badge size="xs" color={annualDifference >= 0 ? 'gray' : 'red'} variant="light" mr="xs">
+                        <Badge
+                          size="xs"
+                          variant="light"
+                          mr="xs"
+                          styles={{
+                            root: {
+                              backgroundColor: annualDifference >= 0 ? 'rgba(74, 124, 89, 0.12)' : 'rgba(166, 93, 87, 0.12)',
+                              color: annualDifference >= 0 ? '#4A7C59' : '#A65D57',
+                            }
+                          }}
+                        >
                           {annualDifference >= 0 ? '+' : '-'}
                           {formatCurrency(Math.abs(annualDifference))}
                         </Badge>

@@ -72,7 +72,7 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
   }
 
   return (
-    <ScrollArea>
+    <ScrollArea className="scrollable-zone">
       <Table striped highlightOnHover miw={600}>
             <Table.Thead>
               <Table.Tr>
@@ -95,15 +95,36 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
                         pathname: '/incomes',
                         search: `?month=${selectedMonth}&year=${selectedYear}&categoryIncome=${category.id}`
                       }}
-                      c="blue.6"
                       underline="hover"
+                      style={{
+                        color: '#C4A052',
+                        fontWeight: 500,
+                      }}
                     >
                       {category.title}
                     </Anchor>
                   </Table.Td>
-                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.monthlyIncome)}</Table.Td>
-                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.yearToDateIncome)}</Table.Td>
-                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.annualIncome)}</Table.Td>
+                  <Table.Td
+                    ta="right"
+                    className="numeric-value"
+                    style={{ color: data.monthlyIncome > 0 ? '#4A7C59' : undefined }}
+                  >
+                    {formatCurrency(data.monthlyIncome)}
+                  </Table.Td>
+                  <Table.Td
+                    ta="right"
+                    className="numeric-value"
+                    style={{ color: data.yearToDateIncome > 0 ? '#4A7C59' : undefined }}
+                  >
+                    {formatCurrency(data.yearToDateIncome)}
+                  </Table.Td>
+                  <Table.Td
+                    ta="right"
+                    className="numeric-value"
+                    style={{ color: data.annualIncome > 0 ? '#4A7C59' : undefined }}
+                  >
+                    {formatCurrency(data.annualIncome)}
+                  </Table.Td>
                 </Table.Tr>
               )
             })}

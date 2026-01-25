@@ -3,7 +3,7 @@ import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { HydrationBoundary } from '@/components/hydration-boundary'
 import { DesktopNav, MobileNav } from '@/components/navigation'
 import { AppHeader } from '@/components/app-header'
-import { AppShell, Group } from '@mantine/core'
+import { AppShell, Group, Box } from '@mantine/core'
 
 export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -21,21 +21,28 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
           }}
           padding="md"
           withBorder={false}
+          styles={{
+            root: {
+              backgroundColor: '#FAF8F5',
+            },
+          }}
         >
-          {/* Header with page title and month picker */}
+          {/* Header with elegant border */}
           <AppShell.Header
-            style={(theme) => ({
-              borderBottom: `1px solid ${theme.colors.gray[2]}`
-            })}
+            style={{
+              backgroundColor: '#FAF8F5',
+              borderBottom: '1px solid rgba(28, 28, 28, 0.06)',
+            }}
           >
             <AppHeader />
           </AppShell.Header>
 
-          {/* Desktop sidebar navigation */}
+          {/* Desktop sidebar with subtle accent */}
           <AppShell.Navbar
-            style={(theme) => ({
-              borderRight: `1px solid ${theme.colors.gray[2]}`
-            })}
+            style={{
+              backgroundColor: '#F5F2ED',
+              borderRight: '1px solid rgba(28, 28, 28, 0.06)',
+            }}
           >
             <DesktopNav />
           </AppShell.Navbar>
@@ -43,21 +50,28 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
           {/* Mobile bottom navigation */}
           <AppShell.Footer
             hiddenFrom="sm"
-            style={(theme) => ({
-              borderTop: `1px solid ${theme.colors.gray[2]}`,
+            style={{
+              backgroundColor: '#FAF8F5',
+              borderTop: '1px solid rgba(28, 28, 28, 0.06)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
-            })}
+            }}
           >
             <Group gap={0} h="100%" align="center" style={{ width: '100%' }}>
               <MobileNav />
             </Group>
           </AppShell.Footer>
 
-          {/* Main content area */}
-          <AppShell.Main bg="gray.0">
-            {children}
+          {/* Main content area with scrollable zone */}
+          <AppShell.Main
+            style={{
+              backgroundColor: '#F5F2ED',
+            }}
+          >
+            <Box className="scrollable-zone" style={{ height: '100%' }}>
+              {children}
+            </Box>
           </AppShell.Main>
         </AppShell>
       </HydrationBoundary>
