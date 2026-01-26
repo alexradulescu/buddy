@@ -64,7 +64,7 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
 
   return (
     <ScrollArea className="scrollable-zone">
-      <Table striped highlightOnHover miw={600} style={{ fontSize: '14px' }}>
+      <Table striped highlightOnHover miw={600} fz="sm">
         <Table.Thead>
           <Table.Tr>
             <Table.Th pl="md">Category</Table.Th>

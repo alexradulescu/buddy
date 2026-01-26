@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { NavLink } from 'react-router'
-import { Anchor, Badge, Table, ScrollArea } from '@mantine/core'
+import { Anchor, Badge, Table, ScrollArea, Stack, Text } from '@mantine/core'
 
 const formatCurrency = (amount: number | undefined): string => {
   return amount !== undefined ? `$${amount.toFixed(2)}` : 'N/A'
@@ -90,7 +90,7 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
 
   return (
     <ScrollArea className="scrollable-zone">
-      <Table striped highlightOnHover miw={800} style={{ fontSize: '14px' }}>
+      <Table striped highlightOnHover miw={800} fz="sm">
         <Table.Thead>
           <Table.Tr>
             <Table.Th pl="md">Category</Table.Th>
@@ -138,8 +138,8 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                   {formatCurrency(currentMonthlyExpense)}
                 </Table.Td>
                 <Table.Td ta="right" className="numeric-value">
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                    <span>{formatCurrency(category.maxBudget)}</span>
+                  <Stack gap={0} align="flex-end">
+                    <Text fz="sm">{formatCurrency(category.maxBudget)}</Text>
                     {monthlyDifference !== undefined && (
                       <Badge
                         size="xs"
@@ -155,13 +155,13 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                         {formatCurrency(Math.abs(monthlyDifference))}
                       </Badge>
                     )}
-                  </div>
+                  </Stack>
                 </Table.Td>
 
                 <Table.Td ta="right" className="numeric-value">{formatCurrency(currentYearToDateExpense)}</Table.Td>
                 <Table.Td ta="right" className="numeric-value">
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                    <span>{formatCurrency(yearToDateBudget)}</span>
+                  <Stack gap={0} align="flex-end">
+                    <Text fz="sm">{formatCurrency(yearToDateBudget)}</Text>
                     {yearToDateDifference !== undefined && (
                       <Badge
                         size="xs"
@@ -177,11 +177,11 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                         {formatCurrency(Math.abs(yearToDateDifference))}
                       </Badge>
                     )}
-                  </div>
+                  </Stack>
                 </Table.Td>
                 <Table.Td ta="right" className="numeric-value" pr="md">
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                    <span>{formatCurrency(annualBudget)}</span>
+                  <Stack gap={0} align="flex-end">
+                    <Text fz="sm">{formatCurrency(annualBudget)}</Text>
                     {annualDifference !== undefined && (
                       <Badge
                         size="xs"
@@ -197,7 +197,7 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                         {formatCurrency(Math.abs(annualDifference))}
                       </Badge>
                     )}
-                  </div>
+                  </Stack>
                 </Table.Td>
               </Table.Tr>
             )
