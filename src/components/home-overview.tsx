@@ -40,49 +40,20 @@ export function HomeOverview({ totalMonthlyIncomes, totalMonthlyExpenses, netInc
   ]
 
   return (
-    <Card
-      style={{
-        backgroundColor: '#FAF8F5',
-        borderColor: 'rgba(28, 28, 28, 0.06)',
-      }}
-    >
-      {/* Header with decorative line */}
+    <Card>
       <Group gap="xs" mb="sm">
-        <Box style={{ color: '#C4A052' }}>
+        <Box style={{ color: '#52B788' }}>
           <Calendar size={14} strokeWidth={1.5} />
         </Box>
-        <Title
-          order={5}
-          style={{
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontWeight: 500,
-            letterSpacing: '0.02em',
-            color: '#1C1C1C',
-          }}
-        >
+        <Title order={5} fw={600}>
           {monthName} {selectedYear}
         </Title>
       </Group>
 
-      {/* Decorative separator */}
-      <Box
-        mb="sm"
-        style={{
-          height: '1px',
-          background: 'linear-gradient(90deg, rgba(196, 160, 82, 0.3), rgba(196, 160, 82, 0.1), transparent)',
-        }}
-      />
-
       <Stack gap={6}>
         {metrics.map((metric) => (
           <Group key={metric.label} justify="space-between" gap="xs">
-            <Text
-              size="sm"
-              style={{
-                color: '#6B6B6B',
-                letterSpacing: '0.01em',
-              }}
-            >
+            <Text size="sm" c="dimmed">
               {metric.label}
             </Text>
             <Text
@@ -90,7 +61,7 @@ export function HomeOverview({ totalMonthlyIncomes, totalMonthlyExpenses, netInc
               fw={600}
               className="numeric-value"
               style={{
-                color: metric.isPositive ? '#4A7C59' : metric.isNegative ? '#A65D57' : '#1C1C1C',
+                color: metric.isPositive ? '#2D6A4F' : metric.isNegative ? '#D64550' : undefined,
               }}
             >
               {metric.value}

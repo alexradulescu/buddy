@@ -41,21 +41,11 @@ export function AppHeader() {
 
   return (
     <Group justify="space-between" h="100%" px="md">
-      {/* Title with elegant serif typography */}
-      <Title
-        order={1}
-        size="h4"
-        style={{
-          fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontWeight: 500,
-          letterSpacing: '0.04em',
-          color: '#1C1C1C',
-        }}
-      >
+      <Title order={1} size="h4" fw={600}>
         {title}
       </Title>
 
-      {/* Month picker with refined styling */}
+      {/* Month picker */}
       <Group gap={0} wrap="nowrap">
         <ActionIcon
           variant="subtle"
@@ -65,26 +55,26 @@ export function AppHeader() {
           radius={0}
           styles={{
             root: {
-              borderTopLeftRadius: '3px',
-              borderBottomLeftRadius: '3px',
-              border: '1px solid rgba(28, 28, 28, 0.1)',
+              borderTopLeftRadius: '8px',
+              borderBottomLeftRadius: '8px',
+              border: '1px solid #E5E9EB',
               borderRight: 'none',
-              backgroundColor: '#FAF8F5',
-              color: '#6B6B6B',
+              backgroundColor: '#FFFFFF',
+              color: '#6F767E',
               '&:hover': {
-                backgroundColor: 'rgba(196, 160, 82, 0.08)',
-                color: '#C4A052',
+                backgroundColor: 'rgba(82, 183, 136, 0.1)',
+                color: '#1B4332',
               },
             }
           }}
         >
-          <ChevronLeft size={14} strokeWidth={1.5} />
+          <ChevronLeft size={16} strokeWidth={1.5} />
         </ActionIcon>
 
         <Box
           style={{
-            borderTop: '1px solid rgba(28, 28, 28, 0.1)',
-            borderBottom: '1px solid rgba(28, 28, 28, 0.1)',
+            borderTop: '1px solid #E5E9EB',
+            borderBottom: '1px solid #E5E9EB',
           }}
         >
           <MonthPickerInput
@@ -103,18 +93,13 @@ export function AppHeader() {
                 border: 'none',
                 borderRadius: 0,
                 textAlign: 'center',
-                fontFamily: "'DM Sans', sans-serif",
                 fontSize: '13px',
                 fontWeight: 500,
-                letterSpacing: '0.02em',
-                color: '#1C1C1C',
-                backgroundColor: '#FAF8F5',
+                color: '#1A1D1F',
+                backgroundColor: '#FFFFFF',
                 height: '34px',
                 minHeight: '34px',
                 padding: '0 4px',
-                '&:focus': {
-                  backgroundColor: 'rgba(196, 160, 82, 0.08)',
-                },
               }
             }}
           />
@@ -128,20 +113,20 @@ export function AppHeader() {
           radius={0}
           styles={{
             root: {
-              borderTopRightRadius: '3px',
-              borderBottomRightRadius: '3px',
-              border: '1px solid rgba(28, 28, 28, 0.1)',
+              borderTopRightRadius: '8px',
+              borderBottomRightRadius: '8px',
+              border: '1px solid #E5E9EB',
               borderLeft: 'none',
-              backgroundColor: '#FAF8F5',
-              color: '#6B6B6B',
+              backgroundColor: '#FFFFFF',
+              color: '#6F767E',
               '&:hover': {
-                backgroundColor: 'rgba(196, 160, 82, 0.08)',
-                color: '#C4A052',
+                backgroundColor: 'rgba(82, 183, 136, 0.1)',
+                color: '#1B4332',
               },
             }
           }}
         >
-          <ChevronRight size={14} strokeWidth={1.5} />
+          <ChevronRight size={16} strokeWidth={1.5} />
         </ActionIcon>
       </Group>
     </Group>

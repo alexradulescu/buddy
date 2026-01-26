@@ -23,25 +23,25 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
           withBorder={false}
           styles={{
             root: {
-              backgroundColor: '#FAF8F5',
+              backgroundColor: '#F8FAFB',
             },
           }}
         >
-          {/* Header with elegant border */}
+          {/* Header */}
           <AppShell.Header
             style={{
-              backgroundColor: '#FAF8F5',
-              borderBottom: '1px solid rgba(28, 28, 28, 0.06)',
+              backgroundColor: '#FFFFFF',
+              borderBottom: '1px solid #E5E9EB',
             }}
           >
             <AppHeader />
           </AppShell.Header>
 
-          {/* Desktop sidebar with subtle accent */}
+          {/* Desktop sidebar */}
           <AppShell.Navbar
             style={{
-              backgroundColor: '#F5F2ED',
-              borderRight: '1px solid rgba(28, 28, 28, 0.06)',
+              backgroundColor: '#FFFFFF',
+              borderRight: '1px solid #E5E9EB',
             }}
           >
             <DesktopNav />
@@ -51,8 +51,8 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
           <AppShell.Footer
             hiddenFrom="sm"
             style={{
-              backgroundColor: '#FAF8F5',
-              borderTop: '1px solid rgba(28, 28, 28, 0.06)',
+              backgroundColor: '#FFFFFF',
+              borderTop: '1px solid #E5E9EB',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
@@ -63,10 +63,10 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
             </Group>
           </AppShell.Footer>
 
-          {/* Main content area with scrollable zone */}
+          {/* Main content */}
           <AppShell.Main
             style={{
-              backgroundColor: '#F5F2ED',
+              backgroundColor: '#F8FAFB',
             }}
           >
             <Box className="scrollable-zone" style={{ height: '100%' }}>

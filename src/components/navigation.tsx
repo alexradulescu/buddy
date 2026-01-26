@@ -26,8 +26,8 @@ export function DesktopNav() {
   const pathname = location.pathname
 
   return (
-    <Stack gap="sm" p="sm" align="center">
-      {/* Logo with art deco gold accent */}
+    <Stack gap="xs" p="xs" align="center">
+      {/* Logo */}
       <UnstyledButton
         component={NavLink}
         to={{
@@ -40,24 +40,15 @@ export function DesktopNav() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: '3px',
-          backgroundColor: '#1C1C1C',
-          color: '#C4A052',
-          transition: 'all 0.2s ease',
+          borderRadius: '8px',
+          backgroundColor: '#1B4332',
+          color: '#FFFFFF',
         }}
       >
-        <Package2 size={16} strokeWidth={1.5} />
+        <Package2 size={18} strokeWidth={1.5} />
       </UnstyledButton>
 
-      {/* Decorative separator */}
-      <Box
-        w={20}
-        h={1}
-        my={4}
-        style={{
-          background: 'linear-gradient(90deg, transparent, rgba(196, 160, 82, 0.4), transparent)',
-        }}
-      />
+      <Box w={24} h={1} my={4} style={{ backgroundColor: '#E5E9EB' }} />
 
       {navItems.map((item) => {
         const isActive = pathname === item.href
@@ -75,11 +66,10 @@ export function DesktopNav() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: '3px',
-                color: isActive ? '#C4A052' : '#6B6B6B',
-                backgroundColor: isActive ? 'rgba(196, 160, 82, 0.12)' : 'transparent',
-                border: isActive ? '1px solid rgba(196, 160, 82, 0.2)' : '1px solid transparent',
-                transition: 'all 0.2s ease',
+                borderRadius: '8px',
+                color: isActive ? '#1B4332' : '#6F767E',
+                backgroundColor: isActive ? 'rgba(82, 183, 136, 0.15)' : 'transparent',
+                transition: 'all 0.15s ease',
               }}
             >
               <item.icon size={18} strokeWidth={isActive ? 2 : 1.5} />
@@ -115,12 +105,11 @@ export function MobileNav() {
               justifyContent: 'center',
               flex: 1,
               padding: `${rem(8)} ${rem(8)} ${rem(4)}`,
-              color: isActive ? '#C4A052' : '#6B6B6B',
-              transition: 'all 0.2s ease',
+              color: isActive ? '#1B4332' : '#6F767E',
+              transition: 'all 0.15s ease',
               position: 'relative',
             }}
           >
-            {/* Active indicator line */}
             {isActive && (
               <Box
                 style={{
@@ -129,9 +118,9 @@ export function MobileNav() {
                   left: '50%',
                   transform: 'translateX(-50%)',
                   width: '24px',
-                  height: '2px',
-                  backgroundColor: '#C4A052',
-                  borderRadius: '1px',
+                  height: '3px',
+                  backgroundColor: '#52B788',
+                  borderRadius: '2px',
                 }}
               />
             )}
@@ -139,10 +128,7 @@ export function MobileNav() {
             <Text
               size="xs"
               fw={isActive ? 600 : 400}
-              style={{
-                letterSpacing: '0.02em',
-                fontSize: '10px',
-              }}
+              style={{ fontSize: '10px' }}
             >
               {item.label}
             </Text>

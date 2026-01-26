@@ -11,15 +11,7 @@ interface OverviewCardProps {
 
 export const OverviewCard: React.FC<OverviewCardProps> = ({ title, value, icon }) => {
   return (
-    <Card
-      padding="md"
-      radius="sm"
-      withBorder
-      style={{
-        backgroundColor: '#FAF8F5',
-        borderColor: 'rgba(28, 28, 28, 0.06)',
-      }}
-    >
+    <Card padding="md" radius="md" withBorder>
       <Group justify="space-between" align="center" mb="xs">
         <Tooltip label={title}>
           <Text
@@ -27,26 +19,18 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({ title, value, icon }
             fw={600}
             style={{
               textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              color: '#6B6B6B',
+              letterSpacing: '0.03em',
+              color: '#6F767E',
             }}
           >
             {title}
           </Text>
         </Tooltip>
-        <Box style={{ color: '#C4A052' }}>
+        <Box style={{ color: '#52B788' }}>
           {icon}
         </Box>
       </Group>
-      <Text
-        size="xl"
-        fw={500}
-        className="numeric-value"
-        style={{
-          color: '#1C1C1C',
-          letterSpacing: '-0.02em',
-        }}
-      >
+      <Text size="xl" fw={600} className="numeric-value">
         {value}
       </Text>
     </Card>
