@@ -3,13 +3,15 @@ import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { HydrationBoundary } from '@/components/hydration-boundary'
 import { DesktopNav, MobileNav } from '@/components/navigation'
 import { AppHeader } from '@/components/app-header'
-import { AppShell, Group } from '@mantine/core'
+import { HeaderActionProvider } from '@/contexts/header-action-context'
+import { AppShell, Group, Box } from '@mantine/core'
 
 export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <NuqsAdapter>
       <HydrationBoundary>
-        <AppShell
+        <HeaderActionProvider>
+          <AppShell
           header={{ height: 60 }}
           navbar={{
             width: 56,
@@ -17,25 +19,32 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
             collapsed: { mobile: true }
           }}
           footer={{
-            height: 64
+            height: 'calc(64px + env(safe-area-inset-bottom, 0px))'
           }}
           padding="md"
           withBorder={false}
+          styles={{
+            root: {
+              backgroundColor: '#F8FAFB',
+            },
+          }}
         >
-          {/* Header with page title and month picker */}
+          {/* Header */}
           <AppShell.Header
-            style={(theme) => ({
-              borderBottom: `1px solid ${theme.colors.gray[2]}`
-            })}
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderBottom: '1px solid #E5E9EB',
+            }}
           >
             <AppHeader />
           </AppShell.Header>
 
-          {/* Desktop sidebar navigation */}
+          {/* Desktop sidebar */}
           <AppShell.Navbar
-            style={(theme) => ({
-              borderRight: `1px solid ${theme.colors.gray[2]}`
-            })}
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRight: '1px solid #E5E9EB',
+            }}
           >
             <DesktopNav />
           </AppShell.Navbar>
@@ -43,23 +52,32 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
           {/* Mobile bottom navigation */}
           <AppShell.Footer
             hiddenFrom="sm"
-            style={(theme) => ({
-              borderTop: `1px solid ${theme.colors.gray[2]}`,
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderTop: '1px solid #E5E9EB',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            })}
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+            }}
           >
             <Group gap={0} h="100%" align="center" style={{ width: '100%' }}>
               <MobileNav />
             </Group>
           </AppShell.Footer>
 
-          {/* Main content area */}
-          <AppShell.Main bg="gray.0">
-            {children}
+          {/* Main content */}
+          <AppShell.Main
+            style={{
+              backgroundColor: '#F8FAFB',
+            }}
+          >
+            <Box className="scrollable-zone" style={{ height: '100%' }}>
+              {children}
+            </Box>
           </AppShell.Main>
-        </AppShell>
+          </AppShell>
+        </HeaderActionProvider>
       </HydrationBoundary>
     </NuqsAdapter>
   )

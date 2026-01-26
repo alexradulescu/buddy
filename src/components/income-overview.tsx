@@ -21,12 +21,9 @@ type CategorySummary = {
 type CategoryData = Record<string, CategorySummary>
 
 export function IncomeOverview({ incomes, incomeCategories, selectedYear, selectedMonth }: IncomeOverviewProps) {
-  // Preprocess all data in a single pass
   const categoryData = useMemo(() => {
-    // Initialize data structure for all categories
     const data: CategoryData = {}
 
-    // Initialize with zero values for all categories
     incomeCategories.forEach((category) => {
       data[category.id] = {
         monthlyIncome: 0,
@@ -35,28 +32,22 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
       }
     })
 
-    // Process all incomes in a single loop
     incomes.forEach((income) => {
       const categoryId = income.categoryId
       const amount = income.amount || 0
 
-      // Skip if category doesn't exist in our data structure
       if (!data[categoryId]) return
 
       const itemDate = new Date(income.date)
       const itemYear = itemDate.getUTCFullYear()
       const itemMonth = itemDate.getUTCMonth()
 
-      // Only process if it's in the selected year
       if (itemYear === selectedYear) {
-        // Add to annual income for this category
         data[categoryId].annualIncome += amount
 
-        // If month is <= selected month, add to year-to-date
         if (itemMonth <= selectedMonth) {
           data[categoryId].yearToDateIncome += amount
 
-          // If it's the exact month, add to monthly income
           if (itemMonth === selectedMonth) {
             data[categoryId].monthlyIncome += amount
           }
@@ -72,43 +63,64 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
   }
 
   return (
-    <ScrollArea>
-      <Table striped highlightOnHover miw={600}>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Category</Table.Th>
-                <Table.Th ta="right">Current</Table.Th>
-                <Table.Th ta="right">Year-to-Date</Table.Th>
-                <Table.Th ta="right">Annual</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {incomeCategories.map((category) => {
-              const data = categoryData[category.id] || { monthlyIncome: 0, yearToDateIncome: 0, annualIncome: 0 }
+    <ScrollArea className="scrollable-zone">
+      <Table striped highlightOnHover miw={600} fz="sm">
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th pl="md">Category</Table.Th>
+            <Table.Th ta="right">Current</Table.Th>
+            <Table.Th ta="right">Year-to-Date</Table.Th>
+            <Table.Th ta="right" pr="md">Annual</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {incomeCategories.map((category) => {
+            const data = categoryData[category.id] || { monthlyIncome: 0, yearToDateIncome: 0, annualIncome: 0 }
 
-              return (
-                <Table.Tr key={category.id}>
-                  <Table.Td fw={500}>
-                    <Anchor
-                      component={NavLink}
-                      to={{
-                        pathname: '/incomes',
-                        search: `?month=${selectedMonth}&year=${selectedYear}&categoryIncome=${category.id}`
-                      }}
-                      c="blue.6"
-                      underline="hover"
-                    >
-                      {category.title}
-                    </Anchor>
-                  </Table.Td>
-                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.monthlyIncome)}</Table.Td>
-                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.yearToDateIncome)}</Table.Td>
-                  <Table.Td ta="right" className="numeric-value">{formatCurrency(data.annualIncome)}</Table.Td>
-                </Table.Tr>
-              )
-            })}
-            </Table.Tbody>
-          </Table>
+            return (
+              <Table.Tr key={category.id}>
+                <Table.Td fw={500} pl="md">
+                  <Anchor
+                    component={NavLink}
+                    to={{
+                      pathname: '/incomes',
+                      search: `?month=${selectedMonth}&year=${selectedYear}&categoryIncome=${category.id}`
+                    }}
+                    underline="hover"
+                    fz="sm"
+                    fw={500}
+                    c="forest.7"
+                  >
+                    {category.title}
+                  </Anchor>
+                </Table.Td>
+                <Table.Td
+                  ta="right"
+                  className="numeric-value"
+                  style={{ color: data.monthlyIncome > 0 ? '#2D6A4F' : undefined }}
+                >
+                  {formatCurrency(data.monthlyIncome)}
+                </Table.Td>
+                <Table.Td
+                  ta="right"
+                  className="numeric-value"
+                  style={{ color: data.yearToDateIncome > 0 ? '#2D6A4F' : undefined }}
+                >
+                  {formatCurrency(data.yearToDateIncome)}
+                </Table.Td>
+                <Table.Td
+                  ta="right"
+                  className="numeric-value"
+                  pr="md"
+                  style={{ color: data.annualIncome > 0 ? '#2D6A4F' : undefined }}
+                >
+                  {formatCurrency(data.annualIncome)}
+                </Table.Td>
+              </Table.Tr>
+            )
+          })}
+        </Table.Tbody>
+      </Table>
     </ScrollArea>
   )
 }

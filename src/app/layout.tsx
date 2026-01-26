@@ -7,27 +7,44 @@ import type { Metadata, Viewport } from 'next'
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps, createTheme } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 
-// Modern Font Stacks - https://modernfontstacks.com
-// Dense, data-focused design with no shadows
+// Clean Finance Dashboard Theme
 const theme = createTheme({
-  // Typography
-  fontFamily: 'system-ui, sans-serif',
-  fontFamilyMonospace: "ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace",
+  // Typography - Clean, readable Inter
+  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  fontFamilyMonospace: "'JetBrains Mono', ui-monospace, monospace",
   headings: {
-    fontFamily: "Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif",
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
     fontWeight: '600',
   },
 
-  // Remove all shadows for flat design
+  // Green Finance Color Palette
+  colors: {
+    forest: [
+      '#E9F5EF', // 0
+      '#D3EBE0', // 1
+      '#A8D7C1', // 2
+      '#74C69D', // 3
+      '#52B788', // 4 - accent
+      '#40916C', // 5
+      '#2D6A4F', // 6 - primary light
+      '#1B4332', // 7 - primary
+      '#143728', // 8
+      '#0D2818', // 9
+    ],
+  },
+  primaryColor: 'forest',
+  primaryShade: 7,
+
+  // Subtle shadows
   shadows: {
-    xs: 'none',
-    sm: 'none',
-    md: 'none',
-    lg: 'none',
-    xl: 'none',
+    xs: '0 1px 2px rgba(0, 0, 0, 0.04)',
+    sm: '0 1px 3px rgba(0, 0, 0, 0.06)',
+    md: '0 4px 6px rgba(0, 0, 0, 0.06)',
+    lg: '0 10px 15px rgba(0, 0, 0, 0.06)',
+    xl: '0 20px 25px rgba(0, 0, 0, 0.08)',
   },
 
-  // Tight spacing for data density
+  // Spacing
   spacing: {
     xs: '4px',
     sm: '8px',
@@ -36,79 +53,141 @@ const theme = createTheme({
     xl: '24px',
   },
 
-  // Consistent radius
+  // Rounded corners
   radius: {
-    xs: '2px',
-    sm: '4px',
-    md: '6px',
-    lg: '8px',
-    xl: '12px',
+    xs: '4px',
+    sm: '6px',
+    md: '8px',
+    lg: '12px',
+    xl: '16px',
   },
-  defaultRadius: 'sm',
+  defaultRadius: 'md',
 
-  // Component defaults for consistency
+  // Component defaults
   components: {
     Card: {
       defaultProps: {
         padding: 'sm',
-        radius: 'sm',
+        radius: 'md',
         withBorder: true,
       },
       styles: {
         root: {
-          borderColor: 'var(--mantine-color-gray-3)',
+          borderColor: '#E5E9EB',
+          backgroundColor: '#FFFFFF',
         },
       },
     },
     Table: {
       defaultProps: {
         highlightOnHover: true,
-        verticalSpacing: '4px',
+        verticalSpacing: '6px',
         horizontalSpacing: 'xs',
         fz: 'sm',
       },
       styles: {
         th: {
           fontWeight: 600,
-          fontSize: 'var(--mantine-font-size-xs)',
-          color: 'var(--mantine-color-gray-7)',
-          paddingTop: '6px',
-          paddingBottom: '6px',
+          fontSize: '11px',
+          textTransform: 'uppercase' as const,
+          letterSpacing: '0.03em',
+          color: '#6F767E',
+          paddingTop: '8px',
+          paddingBottom: '8px',
+          backgroundColor: '#F8FAFB',
+          borderBottom: '1px solid #E5E9EB',
         },
         td: {
-          paddingTop: '4px',
-          paddingBottom: '4px',
+          paddingTop: '6px',
+          paddingBottom: '6px',
+          borderBottom: '1px solid #F0F3F4',
         },
       },
     },
     Button: {
       defaultProps: {
-        radius: 'sm',
+        radius: 'md',
         size: 'sm',
+      },
+      styles: {
+        root: {
+          fontWeight: 500,
+        },
       },
     },
     TextInput: {
       defaultProps: {
-        radius: 'sm',
+        radius: 'md',
         size: 'sm',
+      },
+      styles: {
+        input: {
+          backgroundColor: '#FFFFFF',
+          borderColor: '#E5E9EB',
+          '&:focus': {
+            borderColor: '#52B788',
+          },
+        },
+        label: {
+          fontWeight: 500,
+          fontSize: '12px',
+          color: '#6F767E',
+          marginBottom: '4px',
+        },
       },
     },
     Select: {
       defaultProps: {
-        radius: 'sm',
+        radius: 'md',
         size: 'sm',
+      },
+      styles: {
+        input: {
+          backgroundColor: '#FFFFFF',
+          borderColor: '#E5E9EB',
+        },
+        label: {
+          fontWeight: 500,
+          fontSize: '12px',
+          color: '#6F767E',
+          marginBottom: '4px',
+        },
       },
     },
     NumberInput: {
       defaultProps: {
-        radius: 'sm',
+        radius: 'md',
         size: 'sm',
+      },
+      styles: {
+        input: {
+          backgroundColor: '#FFFFFF',
+          borderColor: '#E5E9EB',
+        },
+        label: {
+          fontWeight: 500,
+          fontSize: '12px',
+          color: '#6F767E',
+          marginBottom: '4px',
+        },
       },
     },
     Textarea: {
       defaultProps: {
-        radius: 'sm',
+        radius: 'md',
         size: 'sm',
+      },
+      styles: {
+        input: {
+          backgroundColor: '#FFFFFF',
+          borderColor: '#E5E9EB',
+        },
+        label: {
+          fontWeight: 500,
+          fontSize: '12px',
+          color: '#6F767E',
+          marginBottom: '4px',
+        },
       },
     },
     Badge: {
@@ -117,26 +196,51 @@ const theme = createTheme({
         size: 'sm',
         variant: 'light',
       },
+      styles: {
+        root: {
+          textTransform: 'uppercase' as const,
+          letterSpacing: '0.02em',
+          fontWeight: 600,
+          fontSize: '10px',
+        },
+      },
     },
     Accordion: {
       styles: {
         control: {
-          paddingTop: '8px',
-          paddingBottom: '8px',
-          fontWeight: 600,
+          paddingTop: '10px',
+          paddingBottom: '10px',
+          fontWeight: 500,
+          backgroundColor: '#F8FAFB',
+          '&:hover': {
+            backgroundColor: 'rgba(82, 183, 136, 0.1)',
+          },
         },
         content: {
-          padding: '8px',
+          padding: '12px',
+          backgroundColor: '#FFFFFF',
         },
         item: {
-          borderBottom: 'none',
+          borderBottom: '1px solid #E5E9EB',
         },
       },
     },
     Modal: {
       defaultProps: {
-        radius: 'sm',
+        radius: 'md',
         padding: 'md',
+      },
+      styles: {
+        content: {
+          backgroundColor: '#FFFFFF',
+        },
+        header: {
+          backgroundColor: '#FFFFFF',
+        },
+        title: {
+          fontWeight: 600,
+          fontSize: '18px',
+        },
       },
     },
     Stack: {
@@ -144,19 +248,57 @@ const theme = createTheme({
         gap: 'sm',
       },
     },
+    Title: {
+      styles: {
+        root: {
+          fontWeight: 600,
+          color: '#1A1D1F',
+        },
+      },
+    },
+    Text: {
+      styles: {
+        root: {
+          color: '#1A1D1F',
+        },
+      },
+    },
+    ActionIcon: {
+      defaultProps: {
+        variant: 'subtle',
+      },
+      styles: {
+        root: {
+          color: '#6F767E',
+          '&:hover': {
+            backgroundColor: 'rgba(82, 183, 136, 0.1)',
+          },
+        },
+      },
+    },
+    Tooltip: {
+      styles: {
+        tooltip: {
+          backgroundColor: '#1B4332',
+          fontSize: '12px',
+          fontWeight: 500,
+        },
+      },
+    },
   },
 })
 
 export const metadata: Metadata = {
-  title: 'Buddy App',
-  description: 'Personal finance management app'
+  title: 'Buddy',
+  description: 'Personal finance management'
 }
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false
+  userScalable: false,
+  viewportFit: 'cover'
 }
 
 export default function RootLayout({
@@ -169,7 +311,7 @@ export default function RootLayout({
       <head>
         <ColorSchemeScript defaultColorScheme="light" />
       </head>
-      <body className="antialiased">
+      <body>
         <MantineProvider theme={theme} defaultColorScheme="light">
           <Notifications />
           <Suspense fallback={'Loading'}>{children}</Suspense>

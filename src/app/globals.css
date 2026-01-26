@@ -1,133 +1,236 @@
-/* Modern Font Stacks - https://modernfontstacks.com */
-:root {
-  --font-system: system-ui, sans-serif;
-  --font-humanist: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+/* Clean Finance Dashboard Design */
+/* Inspired by modern banking apps with green accents */
 
-  /* Semantic colors for consistent usage */
-  --color-positive: var(--mantine-color-green-6);
-  --color-negative: var(--mantine-color-red-6);
-  --color-muted: var(--mantine-color-gray-6);
-  --color-border: var(--mantine-color-gray-3);
-  --color-bg-subtle: var(--mantine-color-gray-0);
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Green Finance Color Palette */
+  --color-primary: #1B4332;
+  --color-primary-light: #2D6A4F;
+  --color-primary-lighter: #40916C;
+  --color-accent: #52B788;
+  --color-accent-light: #74C69D;
+  --color-accent-bg: rgba(82, 183, 136, 0.1);
+
+  /* Neutrals */
+  --color-white: #FFFFFF;
+  --color-bg: #F8FAFB;
+  --color-card: #FFFFFF;
+  --color-border: #E5E9EB;
+  --color-border-light: #F0F3F4;
+
+  /* Text */
+  --color-text: #1A1D1F;
+  --color-text-secondary: #6F767E;
+  --color-text-muted: #9A9FA5;
+
+  /* Semantic Colors */
+  --color-positive: #2D6A4F;
+  --color-positive-bg: rgba(45, 106, 79, 0.1);
+  --color-negative: #D64550;
+  --color-negative-bg: rgba(214, 69, 80, 0.08);
+  --color-warning: #E9A23B;
+  --color-warning-bg: rgba(233, 162, 59, 0.1);
+
+  /* Typography */
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  background-color: var(--color-bg);
 }
 
 body {
-  font-family: var(--font-system);
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
 }
 
-/* Humanist font for headlines and page titles */
-h1, h2, h3, h4, h5, h6,
-.font-humanist {
-  font-family: var(--font-humanist);
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-text);
 }
 
-/* Monospace font for numeric values and inputs */
+/* Monospace for numbers */
 input[type="number"],
 .font-mono,
 .numeric-value {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
 textarea {
   field-sizing: content;
 }
 
-/* Subtle hover effect for clickable cards */
+/* Card hover effect */
 .hover-card {
-  transition: background-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 .hover-card:hover {
-  background-color: var(--mantine-color-gray-0);
+  border-color: var(--color-accent);
 }
 
-/* Handsontable Custom Styling - Match Mantine Theme */
-.expense-spreadsheet {
-  font-family: var(--font-system);
+/* Scrollable zones */
+.scrollable-zone {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.scrollable-zone::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-zone::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollable-zone::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 3px;
+}
+
+.scrollable-zone::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-muted);
+}
+
+/* Handsontable Styling */
+.expense-spreadsheet,
+.category-spreadsheet {
+  font-family: var(--font-body);
   font-size: 13px;
   width: 100%;
   min-width: 100%;
-  line-height: 1.3;
+  line-height: 1.4;
 }
 
-/* Table borders and cells */
-.expense-spreadsheet .ht_master .wtHolder {
-  background: white;
+.expense-spreadsheet .ht_master .wtHolder,
+.category-spreadsheet .ht_master .wtHolder {
+  background: var(--color-white);
 }
 
-.expense-spreadsheet td {
-  border-color: #dee2e6 !important;
-  padding: 0 2px !important;
+.expense-spreadsheet td,
+.category-spreadsheet td {
+  border-color: var(--color-border-light) !important;
+  padding: 0 4px !important;
+  color: var(--color-text);
 }
 
-.expense-spreadsheet th {
-  background: #f8f9fa !important;
-  border-color: #dee2e6 !important;
-  color: #495057;
+.expense-spreadsheet th,
+.category-spreadsheet th {
+  background: var(--color-bg) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
   font-weight: 600;
-  padding: 0 2px !important;
-  font-size: 12px;
+  padding: 0 4px !important;
+  height: 24px !important;
+  line-height: 24px !important;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   vertical-align: middle;
   text-align: inherit;
 }
 
-/* Selected cell */
-.expense-spreadsheet .ht__highlight {
-  background: #e7f5ff !important;
+/* Column headers - fit content */
+.expense-spreadsheet .ht_clone_top th,
+.category-spreadsheet .ht_clone_top th {
+  height: 24px !important;
+  line-height: 24px !important;
 }
 
-.expense-spreadsheet .area {
-  background: #d0ebff !important;
+/* Row numbers header cell */
+.expense-spreadsheet .ht_clone_top_inline_start_corner th,
+.category-spreadsheet .ht_clone_top_inline_start_corner th {
+  height: 24px !important;
 }
 
-/* Current cell border */
-.expense-spreadsheet .current.area {
-  border: 2px solid #228be6 !important;
+/* Selected cell - green highlight */
+.expense-spreadsheet .ht__highlight,
+.category-spreadsheet .ht__highlight {
+  background: var(--color-accent-bg) !important;
 }
 
-/* Numeric cells - use monospace */
-.expense-spreadsheet td.htRight {
+.expense-spreadsheet .area,
+.category-spreadsheet .area {
+  background: rgba(82, 183, 136, 0.15) !important;
+}
+
+.expense-spreadsheet .current.area,
+.category-spreadsheet .current.area {
+  border: 2px solid var(--color-accent) !important;
+}
+
+/* Numeric cells */
+.expense-spreadsheet td.htRight,
+.category-spreadsheet td.htRight {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
-/* Row headers (if enabled) */
-.expense-spreadsheet .ht__row_header {
-  background: #f8f9fa !important;
-  color: #868e96;
+/* Row headers */
+.expense-spreadsheet .ht__row_header,
+.category-spreadsheet .ht__row_header {
+  background: var(--color-bg) !important;
+  color: var(--color-text-muted);
+  font-size: 11px;
 }
 
 /* Dropdown arrow */
-.expense-spreadsheet .htAutocompleteArrow {
-  color: #868e96;
+.expense-spreadsheet .htAutocompleteArrow,
+.category-spreadsheet .htAutocompleteArrow {
+  color: var(--color-text-muted);
 }
 
 /* Input field when editing */
-.expense-spreadsheet .handsontableInput {
-  font-family: var(--font-system);
+.expense-spreadsheet .handsontableInput,
+.category-spreadsheet .handsontableInput {
+  font-family: var(--font-body);
   font-size: 13px;
-  padding: 2px 4px;
-  border: 2px solid #228be6 !important;
+  padding: 4px 6px;
+  border: 2px solid var(--color-accent) !important;
   border-radius: 4px;
+  background: var(--color-white);
+  color: var(--color-text);
 }
 
-/* Date picker integration */
-.expense-spreadsheet input[type="text"] {
-  font-family: var(--font-system);
+/* Date picker */
+.expense-spreadsheet input[type="text"],
+.category-spreadsheet input[type="text"] {
+  font-family: var(--font-body);
 }
 
-/* Dropdown menu styling */
+/* Dropdown menu */
 .handsontable .htDropdownMenu {
-  font-family: var(--font-system);
+  font-family: var(--font-body);
   font-size: 13px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
 }
 
 /* Autocomplete dropdown */
 .handsontable.listbox {
-  font-family: var(--font-system);
+  font-family: var(--font-body);
   font-size: 13px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
 }
 
 .handsontable.listbox .ht_master table {
@@ -135,65 +238,147 @@ textarea {
 }
 
 .handsontable.listbox td.current {
-  background: #e7f5ff !important;
-  color: #228be6;
+  background: var(--color-accent-bg) !important;
+  color: var(--color-text);
 }
 
 /* Invalid cells */
-.expense-spreadsheet .htInvalid {
-  background: #fff5f5 !important;
-  border: 1px solid #fa5252 !important;
+.expense-spreadsheet .htInvalid,
+.category-spreadsheet .htInvalid {
+  background: var(--color-negative-bg) !important;
+  border: 1px solid var(--color-negative) !important;
 }
 
-/* Duplicate row highlight - potential duplicate expenses */
+/* Duplicate row highlight */
 .expense-spreadsheet .duplicate-row {
-  background-color: #fee2e2 !important;
+  background-color: var(--color-negative-bg) !important;
 }
 
 /* Read-only cells */
 .expense-spreadsheet .htDimmed,
 .category-spreadsheet .htDimmed {
-  color: #868e96;
+  color: var(--color-text-muted);
+  font-style: italic;
 }
 
-/* Category spreadsheet uses same styling as expense spreadsheet */
-.category-spreadsheet {
-  font-family: var(--font-system);
-  font-size: 13px;
-  width: 100%;
-  min-width: 100%;
-  line-height: 1.3;
+/* Mantine overrides */
+.mantine-Card-root {
+  background-color: var(--color-white);
+  border-color: var(--color-border) !important;
 }
 
-.category-spreadsheet td {
-  border-color: #dee2e6 !important;
-  padding: 0 4px !important;
+.mantine-Table-thead {
+  background-color: var(--color-bg);
 }
 
-.category-spreadsheet th {
-  background: #f8f9fa !important;
-  border-color: #dee2e6 !important;
-  color: #495057;
+.mantine-Table-th {
+  font-family: var(--font-body) !important;
+  text-transform: uppercase;
+  font-size: 11px !important;
+  letter-spacing: 0.03em;
+  font-weight: 600 !important;
+  color: var(--color-text-secondary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+.mantine-Table-tr:hover {
+  background-color: var(--color-accent-bg) !important;
+}
+
+/* Input styling */
+.mantine-Input-input {
+  background-color: var(--color-white);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.mantine-Input-input:focus {
+  border-color: var(--color-accent);
+}
+
+/* Button refinements */
+.mantine-Button-root[data-variant="filled"] {
+  background-color: var(--color-primary);
+}
+
+.mantine-Button-root[data-variant="filled"]:hover {
+  background-color: var(--color-primary-light);
+}
+
+.mantine-Button-root[data-variant="light"] {
+  background-color: var(--color-accent-bg);
+  color: var(--color-primary);
+}
+
+.mantine-Button-root[data-variant="default"] {
+  border-color: var(--color-border);
+  background-color: var(--color-white);
+}
+
+.mantine-Button-root[data-variant="default"]:hover {
+  background-color: var(--color-bg);
+}
+
+/* Badge styling */
+.mantine-Badge-root {
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 10px;
   font-weight: 600;
-  padding: 4px !important;
+}
+
+/* Modal */
+.mantine-Modal-overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.mantine-Modal-content {
+  background-color: var(--color-white);
+}
+
+/* Select dropdown */
+.mantine-Select-dropdown,
+.mantine-Combobox-dropdown {
+  background-color: var(--color-white);
+  border-color: var(--color-border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.mantine-Select-option[data-selected],
+.mantine-Combobox-option[data-selected] {
+  background-color: var(--color-accent-bg);
+  color: var(--color-text);
+}
+
+/* DatePicker */
+.mantine-DatePicker-day[data-selected] {
+  background-color: var(--color-primary);
+}
+
+.mantine-MonthPickerInput-input {
+  background-color: var(--color-white);
+}
+
+/* Accordion */
+.mantine-Accordion-control {
+  background-color: var(--color-bg);
+}
+
+.mantine-Accordion-control:hover {
+  background-color: var(--color-accent-bg);
+}
+
+/* Tooltip */
+.mantine-Tooltip-tooltip {
+  background-color: var(--color-primary);
+  font-family: var(--font-body);
   font-size: 12px;
-  vertical-align: middle;
-  text-align: inherit;
 }
 
-.category-spreadsheet .ht__highlight {
-  background: #e7f5ff !important;
-}
-
-.category-spreadsheet .handsontableInput {
-  font-family: var(--font-system);
-  font-size: 13px;
-  padding: 2px 4px;
-  border: 2px solid #228be6 !important;
-  border-radius: 4px;
-}
-
-.category-spreadsheet td.htRight {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+/* Notification */
+.mantine-Notification-root {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
 }

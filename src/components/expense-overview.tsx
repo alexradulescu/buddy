@@ -3,21 +3,10 @@
 import { useCallback, useMemo } from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { NavLink } from 'react-router'
-import { Anchor, Badge, Table, ScrollArea } from '@mantine/core'
+import { Anchor, Badge, Table, ScrollArea, Stack, Text } from '@mantine/core'
 
-// Utility functions moved outside component to prevent recreation
 const formatCurrency = (amount: number | undefined): string => {
   return amount !== undefined ? `$${amount.toFixed(2)}` : 'N/A'
-}
-
-const getRowBackgroundColor = (currentAmount: number, budget: number | undefined): React.CSSProperties => {
-  if (!budget || !currentAmount) return {}
-  const difference = budget - currentAmount
-  const percentageDifference = (difference / budget) * 100
-
-  if (percentageDifference > 20) return { backgroundColor: 'var(--mantine-color-green-1)' }
-  if (percentageDifference >= 0) return { backgroundColor: 'var(--mantine-color-orange-1)' }
-  return { backgroundColor: 'var(--mantine-color-red-1)' }
 }
 
 interface ExpenseOverviewProps {
@@ -94,90 +83,129 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
             annualDifference: annualBudget !== undefined ? annualBudget - currentAnnualExpense : undefined,
             yearToDateDifference:
               yearToDateBudget !== undefined ? yearToDateBudget - currentYearToDateExpense : undefined,
-            rowColor: getRowBackgroundColor(currentMonthlyExpense, category.maxBudget)
           }
         }),
     [expenseCategories, expenses, calculateCategoryAmount, calculateAnnualBudget, calculateYearToDateBudget]
   )
 
   return (
-    <ScrollArea>
-      <Table striped highlightOnHover miw={800}>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Category</Table.Th>
-                <Table.Th ta="right">Current</Table.Th>
-                <Table.Th ta="right">Monthly Budget</Table.Th>
-                <Table.Th ta="right">Year-to-Date</Table.Th>
-                <Table.Th ta="right">YTD Budget</Table.Th>
-                <Table.Th ta="right">Annual Budget</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
+    <ScrollArea className="scrollable-zone">
+      <Table striped highlightOnHover miw={800} fz="sm">
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th pl="md">Category</Table.Th>
+            <Table.Th ta="right">Current</Table.Th>
+            <Table.Th ta="right">Monthly Budget</Table.Th>
+            <Table.Th ta="right">Year-to-Date</Table.Th>
+            <Table.Th ta="right">YTD Budget</Table.Th>
+            <Table.Th ta="right" pr="md">Annual Budget</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
 
-            <Table.Tbody>
-              {expenseCategoriesData.map(
-                ({
-                  category,
-                  currentMonthlyExpense,
-                  currentYearToDateExpense,
-                  yearToDateBudget,
-                  annualBudget,
-                  monthlyDifference,
-                  yearToDateDifference,
-                  annualDifference,
-                  rowColor
-                }) => (
-                  <Table.Tr key={category.id}>
-                    <Table.Td fw={500}>
-                      <Anchor
-                        component={NavLink}
-                        to={{
-                          pathname: '/expenses',
-                          search: `?month=${selectedMonth}&year=${selectedYear}&categoryExpense=${category.id}`
+        <Table.Tbody>
+          {expenseCategoriesData.map(
+            ({
+              category,
+              currentMonthlyExpense,
+              currentYearToDateExpense,
+              yearToDateBudget,
+              annualBudget,
+              monthlyDifference,
+              yearToDateDifference,
+              annualDifference,
+            }) => (
+              <Table.Tr key={category.id}>
+                <Table.Td fw={500} pl="md">
+                  <Anchor
+                    component={NavLink}
+                    to={{
+                      pathname: '/expenses',
+                      search: `?month=${selectedMonth}&year=${selectedYear}&categoryExpense=${category.id}`
+                    }}
+                    underline="hover"
+                    fz="sm"
+                    fw={500}
+                    c="forest.7"
+                  >
+                    {category.name}
+                  </Anchor>
+                </Table.Td>
+                <Table.Td
+                  ta="right"
+                  className="numeric-value"
+                  style={{
+                    color: currentMonthlyExpense > (category.maxBudget || 0) ? '#D64550' : undefined
+                  }}
+                >
+                  {formatCurrency(currentMonthlyExpense)}
+                </Table.Td>
+                <Table.Td ta="right" className="numeric-value">
+                  <Stack gap={0} align="flex-end">
+                    <Text fz="sm">{formatCurrency(category.maxBudget)}</Text>
+                    {monthlyDifference !== undefined && (
+                      <Badge
+                        size="xs"
+                        variant="light"
+                        styles={{
+                          root: {
+                            backgroundColor: monthlyDifference >= 0 ? 'rgba(45, 106, 79, 0.1)' : 'rgba(214, 69, 80, 0.1)',
+                            color: monthlyDifference >= 0 ? '#2D6A4F' : '#D64550',
+                          }
                         }}
-                        c="blue.6"
-                        underline="hover"
                       >
-                        {category.name}
-                      </Anchor>
-                    </Table.Td>
-                    <Table.Td ta="right" className="numeric-value" c={currentMonthlyExpense > (category.maxBudget || 0) ? 'red.6' : undefined}>
-                      {formatCurrency(currentMonthlyExpense)}
-                    </Table.Td>
-                    <Table.Td ta="right" className="numeric-value">
-                      {monthlyDifference !== undefined && (
-                        <Badge size="xs" color={monthlyDifference >= 0 ? 'gray' : 'red'} variant="light" mr="xs">
-                          {monthlyDifference >= 0 ? '+' : '-'}
-                          {formatCurrency(Math.abs(monthlyDifference))}
-                        </Badge>
-                      )}
-                      {formatCurrency(category.maxBudget)}
-                    </Table.Td>
+                        {monthlyDifference >= 0 ? '+' : '-'}
+                        {formatCurrency(Math.abs(monthlyDifference))}
+                      </Badge>
+                    )}
+                  </Stack>
+                </Table.Td>
 
-                    <Table.Td ta="right" className="numeric-value">{formatCurrency(currentYearToDateExpense)}</Table.Td>
-                    <Table.Td ta="right" className="numeric-value">
-                      {yearToDateDifference !== undefined && (
-                        <Badge size="xs" color={yearToDateDifference >= 0 ? 'gray' : 'red'} variant="light" mr="xs">
-                          {yearToDateDifference >= 0 ? '+' : '-'}
-                          {formatCurrency(Math.abs(yearToDateDifference))}
-                        </Badge>
-                      )}
-                      {formatCurrency(yearToDateBudget)}
-                    </Table.Td>
-                    <Table.Td ta="right" className="numeric-value">
-                      {annualDifference !== undefined && (
-                        <Badge size="xs" color={annualDifference >= 0 ? 'gray' : 'red'} variant="light" mr="xs">
-                          {annualDifference >= 0 ? '+' : '-'}
-                          {formatCurrency(Math.abs(annualDifference))}
-                        </Badge>
-                      )}
-                      {formatCurrency(annualBudget)}
-                    </Table.Td>
-                  </Table.Tr>
-                )
-              )}
-            </Table.Tbody>
-          </Table>
+                <Table.Td ta="right" className="numeric-value">{formatCurrency(currentYearToDateExpense)}</Table.Td>
+                <Table.Td ta="right" className="numeric-value">
+                  <Stack gap={0} align="flex-end">
+                    <Text fz="sm">{formatCurrency(yearToDateBudget)}</Text>
+                    {yearToDateDifference !== undefined && (
+                      <Badge
+                        size="xs"
+                        variant="light"
+                        styles={{
+                          root: {
+                            backgroundColor: yearToDateDifference >= 0 ? 'rgba(45, 106, 79, 0.1)' : 'rgba(214, 69, 80, 0.1)',
+                            color: yearToDateDifference >= 0 ? '#2D6A4F' : '#D64550',
+                          }
+                        }}
+                      >
+                        {yearToDateDifference >= 0 ? '+' : '-'}
+                        {formatCurrency(Math.abs(yearToDateDifference))}
+                      </Badge>
+                    )}
+                  </Stack>
+                </Table.Td>
+                <Table.Td ta="right" className="numeric-value" pr="md">
+                  <Stack gap={0} align="flex-end">
+                    <Text fz="sm">{formatCurrency(annualBudget)}</Text>
+                    {annualDifference !== undefined && (
+                      <Badge
+                        size="xs"
+                        variant="light"
+                        styles={{
+                          root: {
+                            backgroundColor: annualDifference >= 0 ? 'rgba(45, 106, 79, 0.1)' : 'rgba(214, 69, 80, 0.1)',
+                            color: annualDifference >= 0 ? '#2D6A4F' : '#D64550',
+                          }
+                        }}
+                      >
+                        {annualDifference >= 0 ? '+' : '-'}
+                        {formatCurrency(Math.abs(annualDifference))}
+                      </Badge>
+                    )}
+                  </Stack>
+                </Table.Td>
+              </Table.Tr>
+            )
+          )}
+        </Table.Tbody>
+      </Table>
     </ScrollArea>
   )
 }

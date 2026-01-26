@@ -1,8 +1,8 @@
 'use client'
 
-import { BarChart2, CreditCard, Home, LucideIcon, Package2, PiggyBank, Settings, TrendingUp } from 'lucide-react'
+import { BarChart2, CreditCard, Home, LucideIcon, PiggyBank, Settings, TrendingUp } from 'lucide-react'
 import { NavLink, useLocation } from 'react-router'
-import { Tooltip, Stack, UnstyledButton, rem, Text } from '@mantine/core'
+import { Tooltip, Stack, UnstyledButton, rem, Text, Box } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 interface NavItem {
@@ -26,27 +26,7 @@ export function DesktopNav() {
   const pathname = location.pathname
 
   return (
-    <Stack gap="md" p="sm" align="center">
-      <UnstyledButton
-        component={NavLink}
-        to={{
-          pathname: '/',
-          search: `?month=${selectedMonth}&year=${selectedYear}`
-        }}
-        w={rem(36)}
-        h={rem(36)}
-        style={(theme) => ({
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: theme.radius.xl,
-          backgroundColor: theme.colors.blue[6],
-          color: theme.white
-        })}
-      >
-        <Package2 size={16} />
-      </UnstyledButton>
-
+    <Stack gap="xs" p="xs" align="center">
       {navItems.map((item) => {
         const isActive = pathname === item.href
         return (
@@ -59,17 +39,17 @@ export function DesktopNav() {
               }}
               w={rem(36)}
               h={rem(36)}
-              style={(theme) => ({
+              style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: theme.radius.md,
-                color: isActive ? theme.colors.blue[6] : theme.colors.gray[6],
-                backgroundColor: isActive ? theme.colors.gray[1] : 'transparent',
-                transition: 'all 150ms ease'
-              })}
+                borderRadius: '8px',
+                color: isActive ? '#1B4332' : '#6F767E',
+                backgroundColor: isActive ? 'rgba(82, 183, 136, 0.15)' : 'transparent',
+                transition: 'all 0.15s ease',
+              }}
             >
-              <item.icon size={20} />
+              <item.icon size={18} strokeWidth={isActive ? 2 : 1.5} />
             </UnstyledButton>
           </Tooltip>
         )
@@ -95,19 +75,40 @@ export function MobileNav() {
               pathname: item.href,
               search: `?month=${selectedMonth}&year=${selectedYear}`
             }}
-            style={(theme) => ({
+            style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               flex: 1,
               padding: `${rem(8)} ${rem(8)} ${rem(4)}`,
-              color: isActive ? theme.colors.blue[6] : theme.colors.gray[6],
-              transition: 'all 150ms ease'
-            })}
+              color: isActive ? '#1B4332' : '#6F767E',
+              transition: 'all 0.15s ease',
+              position: 'relative',
+            }}
           >
-            <item.icon size={20} style={{ marginBottom: rem(4) }} />
-            <Text size="xs">{item.label}</Text>
+            {isActive && (
+              <Box
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '24px',
+                  height: '3px',
+                  backgroundColor: '#52B788',
+                  borderRadius: '2px',
+                }}
+              />
+            )}
+            <item.icon size={20} strokeWidth={isActive ? 2 : 1.5} style={{ marginBottom: rem(2) }} />
+            <Text
+              size="xs"
+              fw={isActive ? 600 : 400}
+              style={{ fontSize: '10px' }}
+            >
+              {item.label}
+            </Text>
           </UnstyledButton>
         )
       })}

@@ -1,7 +1,7 @@
 'use client'
 
 import { Calendar } from 'lucide-react'
-import { Card, Title, Stack, Group, Text } from '@mantine/core'
+import { Card, Title, Stack, Group, Text, Box } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 interface HomeOverviewProps {
@@ -32,24 +32,40 @@ export function HomeOverview({ totalMonthlyIncomes, totalMonthlyExpenses, netInc
   const monthName = new Date(selectedYear, selectedMonth).toLocaleString('en-US', { month: 'long' })
 
   const metrics = [
-    { label: 'Total Income', value: formatCurrency(totalMonthlyIncomes) },
-    { label: 'Total Expenses', value: formatCurrency(totalMonthlyExpenses) },
-    { label: 'Net Income', value: formatCurrency(netIncome) },
+    { label: 'Total Income', value: formatCurrency(totalMonthlyIncomes), isPositive: true },
+    { label: 'Total Expenses', value: formatCurrency(totalMonthlyExpenses), isNegative: true },
+    { label: 'Net Income', value: formatCurrency(netIncome), isHighlight: netIncome >= 0 },
     { label: 'Investments', value: formatCurrency(totalInvestmentValue) },
     { label: 'Saving Rate', value: savingRate }
   ]
 
   return (
     <Card>
-      <Group gap="xs" mb="xs">
-        <Calendar size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
-        <Title order={5}>{monthName} {selectedYear}</Title>
+      <Group gap="xs" mb="sm">
+        <Box style={{ color: '#52B788' }}>
+          <Calendar size={14} strokeWidth={1.5} />
+        </Box>
+        <Title order={5} fw={600}>
+          {monthName} {selectedYear}
+        </Title>
       </Group>
-      <Stack gap={4}>
+
+      <Stack gap={6}>
         {metrics.map((metric) => (
           <Group key={metric.label} justify="space-between" gap="xs">
-            <Text size="sm" c="dimmed">{metric.label}</Text>
-            <Text size="sm" fw={600} className="numeric-value">{metric.value}</Text>
+            <Text size="sm" c="dimmed">
+              {metric.label}
+            </Text>
+            <Text
+              size="sm"
+              fw={600}
+              className="numeric-value"
+              style={{
+                color: metric.isPositive ? '#2D6A4F' : metric.isNegative ? '#D64550' : undefined,
+              }}
+            >
+              {metric.value}
+            </Text>
           </Group>
         ))}
       </Stack>

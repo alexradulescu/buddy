@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { ExpenseList } from '@/components/expense-list'
-import { Card, Stack, Tabs, Group, NumberInput, Button, SimpleGrid } from '@mantine/core'
+import { Card, Stack, Group, NumberInput, Button, SimpleGrid, SegmentedControl } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'
 import { ExpenseSpreadsheet } from '@/components/expense-spreadsheet'
@@ -14,6 +14,7 @@ export default function ExpensesPage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [rowsToAdd, setRowsToAdd] = useState(1)
+  const [activeTab, setActiveTab] = useState('ai-import')
   const { addExpense } = useExpenseStore()
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
 
@@ -108,21 +109,38 @@ export default function ExpensesPage() {
     <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
       {/* Left Panel - Entry Methods */}
       <Card>
-        <Tabs defaultValue="ai-import">
-          <Tabs.List>
-            <Tabs.Tab value="ai-import" leftSection={<SparklesIcon size={14} />}>
-              AI Import
-            </Tabs.Tab>
-            <Tabs.Tab value="manual-entry" leftSection={<TableIcon size={14} />}>
-              Manual
-            </Tabs.Tab>
-          </Tabs.List>
+        <Stack gap="sm">
+          <SegmentedControl
+            value={activeTab}
+            onChange={setActiveTab}
+            data={[
+              {
+                value: 'ai-import',
+                label: (
+                  <Group gap={6} wrap="nowrap">
+                    <SparklesIcon size={14} />
+                    <span>AI Import</span>
+                  </Group>
+                )
+              },
+              {
+                value: 'manual-entry',
+                label: (
+                  <Group gap={6} wrap="nowrap">
+                    <TableIcon size={14} />
+                    <span>Manual</span>
+                  </Group>
+                )
+              }
+            ]}
+            fullWidth
+          />
 
-          <Tabs.Panel value="ai-import" pt="sm">
+          {activeTab === 'ai-import' && (
             <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
-          </Tabs.Panel>
+          )}
 
-          <Tabs.Panel value="manual-entry" pt="sm">
+          {activeTab === 'manual-entry' && (
             <Stack gap="sm">
               <ExpenseSpreadsheet
                 expenses={expenses}
@@ -141,8 +159,8 @@ export default function ExpensesPage() {
               </Group>
               <Button onClick={handleSaveExpenses} fullWidth>Save Expenses</Button>
             </Stack>
-          </Tabs.Panel>
-        </Tabs>
+          )}
+        </Stack>
       </Card>
 
       {/* Right Panel - Expense List */}

@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Card, Tooltip, Group, Text } from '@mantine/core'
+import { Card, Tooltip, Group, Text, Box } from '@mantine/core'
 
 interface OverviewCardProps {
   title: string
@@ -11,14 +11,28 @@ interface OverviewCardProps {
 
 export const OverviewCard: React.FC<OverviewCardProps> = ({ title, value, icon }) => {
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
+    <Card padding="md" radius="md" withBorder>
       <Group justify="space-between" align="center" mb="xs">
         <Tooltip label={title}>
-          <Text size="sm" fw={500}>{title}</Text>
+          <Text
+            size="xs"
+            fw={600}
+            style={{
+              textTransform: 'uppercase',
+              letterSpacing: '0.03em',
+              color: '#6F767E',
+            }}
+          >
+            {title}
+          </Text>
         </Tooltip>
-        {icon}
+        <Box style={{ color: '#52B788' }}>
+          {icon}
+        </Box>
       </Group>
-      <Text size="xl" fw={700} className="numeric-value">{value}</Text>
+      <Text size="xl" fw={600} className="numeric-value">
+        {value}
+      </Text>
     </Card>
   )
 }
