@@ -3,13 +3,15 @@ import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { HydrationBoundary } from '@/components/hydration-boundary'
 import { DesktopNav, MobileNav } from '@/components/navigation'
 import { AppHeader } from '@/components/app-header'
+import { HeaderActionProvider } from '@/contexts/header-action-context'
 import { AppShell, Group, Box } from '@mantine/core'
 
 export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <NuqsAdapter>
       <HydrationBoundary>
-        <AppShell
+        <HeaderActionProvider>
+          <AppShell
           header={{ height: 60 }}
           navbar={{
             width: 56,
@@ -73,7 +75,8 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
               {children}
             </Box>
           </AppShell.Main>
-        </AppShell>
+          </AppShell>
+        </HeaderActionProvider>
       </HydrationBoundary>
     </NuqsAdapter>
   )

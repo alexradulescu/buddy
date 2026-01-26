@@ -67,10 +67,10 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
       <Table striped highlightOnHover miw={600}>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Category</Table.Th>
+            <Table.Th pl="md">Category</Table.Th>
             <Table.Th ta="right">Current</Table.Th>
             <Table.Th ta="right">Year-to-Date</Table.Th>
-            <Table.Th ta="right">Annual</Table.Th>
+            <Table.Th ta="right" pr="md">Annual</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -79,7 +79,7 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
 
             return (
               <Table.Tr key={category.id}>
-                <Table.Td fw={500}>
+                <Table.Td fw={500} pl="md">
                   <Anchor
                     component={NavLink}
                     to={{
@@ -109,6 +109,7 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
                 <Table.Td
                   ta="right"
                   className="numeric-value"
+                  pr="md"
                   style={{ color: data.annualIncome > 0 ? '#2D6A4F' : undefined }}
                 >
                   {formatCurrency(data.annualIncome)}

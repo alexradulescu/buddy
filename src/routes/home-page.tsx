@@ -10,7 +10,8 @@ import { InvestmentOverview } from '@/components/investment/investment-overview'
 import { YTDOverview } from '@/components/ytd-overview'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { useDashboardExport } from '@/hooks/use-dashboard-export'
-import { Stack, Card, SimpleGrid, Group, Button } from '@mantine/core'
+import { useSetHeaderAction } from '@/contexts/header-action-context'
+import { Stack, Card, SimpleGrid, Button, ActionIcon, Box } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 import { Download } from 'lucide-react'
 
@@ -22,6 +23,29 @@ export default function HomePage() {
   const { data: { expenses = [] } = {} } = useExpenseStore()
   const { data: { incomes = [] } = {} } = useIncomeStore()
   const { investments, getLatestValue } = useInvestmentStore()
+
+  // Set header action - show label on desktop, icon only on mobile
+  useSetHeaderAction(
+    <>
+      <Button
+        leftSection={<Download size={16} />}
+        variant="light"
+        onClick={exportToCSV}
+        visibleFrom="sm"
+      >
+        Export CSV
+      </Button>
+      <ActionIcon
+        variant="light"
+        onClick={exportToCSV}
+        hiddenFrom="sm"
+        size="lg"
+        aria-label="Export CSV"
+      >
+        <Download size={18} />
+      </ActionIcon>
+    </>
+  )
 
   const totalMonthlyExpenses = expenses
     .filter((expense) => {
@@ -49,17 +73,6 @@ export default function HomePage() {
 
   return (
     <Stack gap="md">
-      {/* Export Button */}
-      <Group justify="flex-end">
-        <Button
-          leftSection={<Download size={16} />}
-          variant="light"
-          onClick={exportToCSV}
-        >
-          Export CSV
-        </Button>
-      </Group>
-
       {/* YTD and Monthly Overview side by side on desktop, stacked on mobile */}
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
         <YTDOverview />
@@ -75,8 +88,10 @@ export default function HomePage() {
       <Card padding={0}>
         <Accordion defaultValue="expenses">
           <Accordion.Item value="expenses">
-            <Accordion.Control>Expense Categories</Accordion.Control>
-            <Accordion.Panel>
+            <Accordion.Control styles={{ control: { paddingTop: 8, paddingBottom: 8 } }}>
+              Expense Categories
+            </Accordion.Control>
+            <Accordion.Panel styles={{ content: { padding: 0 } }}>
               <ExpenseOverview
                 expenses={expenses}
                 expenseCategories={expenseCategories}
@@ -92,8 +107,10 @@ export default function HomePage() {
       <Card padding={0}>
         <Accordion defaultValue="incomes">
           <Accordion.Item value="incomes">
-            <Accordion.Control>Income Categories</Accordion.Control>
-            <Accordion.Panel>
+            <Accordion.Control styles={{ control: { paddingTop: 8, paddingBottom: 8 } }}>
+              Income Categories
+            </Accordion.Control>
+            <Accordion.Panel styles={{ content: { padding: 0 } }}>
               <IncomeOverview
                 incomes={incomes}
                 incomeCategories={incomeCategories}
@@ -109,8 +126,10 @@ export default function HomePage() {
       <Card padding={0}>
         <Accordion defaultValue="investments">
           <Accordion.Item value="investments">
-            <Accordion.Control>Investments</Accordion.Control>
-            <Accordion.Panel>
+            <Accordion.Control styles={{ control: { paddingTop: 8, paddingBottom: 8 } }}>
+              Investments
+            </Accordion.Control>
+            <Accordion.Panel styles={{ content: { padding: 0 } }}>
               <InvestmentOverview />
             </Accordion.Panel>
           </Accordion.Item>

@@ -93,12 +93,12 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
       <Table striped highlightOnHover miw={800}>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Category</Table.Th>
+            <Table.Th pl="md">Category</Table.Th>
             <Table.Th ta="right">Current</Table.Th>
             <Table.Th ta="right">Monthly Budget</Table.Th>
             <Table.Th ta="right">Year-to-Date</Table.Th>
             <Table.Th ta="right">YTD Budget</Table.Th>
-            <Table.Th ta="right">Annual Budget</Table.Th>
+            <Table.Th ta="right" pr="md">Annual Budget</Table.Th>
           </Table.Tr>
         </Table.Thead>
 
@@ -115,7 +115,7 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
               annualDifference,
             }) => (
               <Table.Tr key={category.id}>
-                <Table.Td fw={500}>
+                <Table.Td fw={500} pl="md">
                   <Anchor
                     component={NavLink}
                     to={{
@@ -177,7 +177,7 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                   )}
                   {formatCurrency(yearToDateBudget)}
                 </Table.Td>
-                <Table.Td ta="right" className="numeric-value">
+                <Table.Td ta="right" className="numeric-value" pr="md">
                   {annualDifference !== undefined && (
                     <Badge
                       size="xs"
