@@ -87,7 +87,9 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
                       search: `?month=${selectedMonth}&year=${selectedYear}&categoryIncome=${category.id}`
                     }}
                     underline="hover"
-                    style={{ color: '#1B4332', fontWeight: 500 }}
+                    fz="sm"
+                    fw={500}
+                    c="forest.7"
                   >
                     {category.title}
                   </Anchor>
