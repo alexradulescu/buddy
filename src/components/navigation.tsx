@@ -1,6 +1,6 @@
 'use client'
 
-import { BarChart2, CreditCard, Home, LucideIcon, Package2, PiggyBank, Settings, TrendingUp } from 'lucide-react'
+import { BarChart2, CreditCard, Home, LucideIcon, PiggyBank, Settings, TrendingUp } from 'lucide-react'
 import { NavLink, useLocation } from 'react-router'
 import { Tooltip, Stack, UnstyledButton, rem, Text, Box } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
@@ -27,29 +27,6 @@ export function DesktopNav() {
 
   return (
     <Stack gap="xs" p="xs" align="center">
-      {/* Logo */}
-      <UnstyledButton
-        component={NavLink}
-        to={{
-          pathname: '/',
-          search: `?month=${selectedMonth}&year=${selectedYear}`
-        }}
-        w={rem(36)}
-        h={rem(36)}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: '8px',
-          backgroundColor: '#1B4332',
-          color: '#FFFFFF',
-        }}
-      >
-        <Package2 size={18} strokeWidth={1.5} />
-      </UnstyledButton>
-
-      <Box w={24} h={1} my={4} style={{ backgroundColor: '#E5E9EB' }} />
-
       {navItems.map((item) => {
         const isActive = pathname === item.href
         return (

@@ -68,22 +68,22 @@ export function InvestmentOverview() {
       <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm" px="md" pt="sm">
         <Stack gap={2}>
           <Text size="xs" c="dimmed">Total Value</Text>
-          <Text size="lg" fw={600} className="numeric-value">{formatCurrency(totalInvestmentValue)}</Text>
+          <Text fw={600} className="numeric-value" style={{ fontSize: '16px' }}>{formatCurrency(totalInvestmentValue)}</Text>
         </Stack>
         <Stack gap={2}>
           <Text size="xs" c="dimmed">Total Invested</Text>
-          <Text size="lg" fw={600} className="numeric-value">{formatCurrency(totalContributions)}</Text>
+          <Text fw={600} className="numeric-value" style={{ fontSize: '16px' }}>{formatCurrency(totalContributions)}</Text>
         </Stack>
         <Stack gap={2}>
           <Text size="xs" c="dimmed">Total P&L</Text>
-          <Text size="lg" fw={600} c={totalProfitLoss >= 0 ? 'green.6' : 'red.6'} className="numeric-value">
+          <Text fw={600} c={totalProfitLoss >= 0 ? 'green.6' : 'red.6'} className="numeric-value" style={{ fontSize: '16px' }}>
             {formatCurrency(totalProfitLoss)} ({profitLossPercentage.toFixed(2)}%)
           </Text>
         </Stack>
       </SimpleGrid>
 
       <ScrollArea>
-        <Table style={{ minWidth: 500 }}>
+        <Table style={{ minWidth: 500, fontSize: '14px' }}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th pl="md">Name</Table.Th>

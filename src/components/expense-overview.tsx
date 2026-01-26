@@ -90,7 +90,7 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
 
   return (
     <ScrollArea className="scrollable-zone">
-      <Table striped highlightOnHover miw={800} fz="sm">
+      <Table striped highlightOnHover miw={800} style={{ fontSize: '14px' }}>
         <Table.Thead>
           <Table.Tr>
             <Table.Th pl="md">Category</Table.Th>
@@ -138,63 +138,66 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
                   {formatCurrency(currentMonthlyExpense)}
                 </Table.Td>
                 <Table.Td ta="right" className="numeric-value">
-                  {monthlyDifference !== undefined && (
-                    <Badge
-                      size="xs"
-                      variant="light"
-                      mr="xs"
-                      styles={{
-                        root: {
-                          backgroundColor: monthlyDifference >= 0 ? 'rgba(45, 106, 79, 0.1)' : 'rgba(214, 69, 80, 0.1)',
-                          color: monthlyDifference >= 0 ? '#2D6A4F' : '#D64550',
-                        }
-                      }}
-                    >
-                      {monthlyDifference >= 0 ? '+' : '-'}
-                      {formatCurrency(Math.abs(monthlyDifference))}
-                    </Badge>
-                  )}
-                  {formatCurrency(category.maxBudget)}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <span>{formatCurrency(category.maxBudget)}</span>
+                    {monthlyDifference !== undefined && (
+                      <Badge
+                        size="xs"
+                        variant="light"
+                        styles={{
+                          root: {
+                            backgroundColor: monthlyDifference >= 0 ? 'rgba(45, 106, 79, 0.1)' : 'rgba(214, 69, 80, 0.1)',
+                            color: monthlyDifference >= 0 ? '#2D6A4F' : '#D64550',
+                          }
+                        }}
+                      >
+                        {monthlyDifference >= 0 ? '+' : '-'}
+                        {formatCurrency(Math.abs(monthlyDifference))}
+                      </Badge>
+                    )}
+                  </div>
                 </Table.Td>
 
                 <Table.Td ta="right" className="numeric-value">{formatCurrency(currentYearToDateExpense)}</Table.Td>
                 <Table.Td ta="right" className="numeric-value">
-                  {yearToDateDifference !== undefined && (
-                    <Badge
-                      size="xs"
-                      variant="light"
-                      mr="xs"
-                      styles={{
-                        root: {
-                          backgroundColor: yearToDateDifference >= 0 ? 'rgba(45, 106, 79, 0.1)' : 'rgba(214, 69, 80, 0.1)',
-                          color: yearToDateDifference >= 0 ? '#2D6A4F' : '#D64550',
-                        }
-                      }}
-                    >
-                      {yearToDateDifference >= 0 ? '+' : '-'}
-                      {formatCurrency(Math.abs(yearToDateDifference))}
-                    </Badge>
-                  )}
-                  {formatCurrency(yearToDateBudget)}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <span>{formatCurrency(yearToDateBudget)}</span>
+                    {yearToDateDifference !== undefined && (
+                      <Badge
+                        size="xs"
+                        variant="light"
+                        styles={{
+                          root: {
+                            backgroundColor: yearToDateDifference >= 0 ? 'rgba(45, 106, 79, 0.1)' : 'rgba(214, 69, 80, 0.1)',
+                            color: yearToDateDifference >= 0 ? '#2D6A4F' : '#D64550',
+                          }
+                        }}
+                      >
+                        {yearToDateDifference >= 0 ? '+' : '-'}
+                        {formatCurrency(Math.abs(yearToDateDifference))}
+                      </Badge>
+                    )}
+                  </div>
                 </Table.Td>
                 <Table.Td ta="right" className="numeric-value" pr="md">
-                  {annualDifference !== undefined && (
-                    <Badge
-                      size="xs"
-                      variant="light"
-                      mr="xs"
-                      styles={{
-                        root: {
-                          backgroundColor: annualDifference >= 0 ? 'rgba(45, 106, 79, 0.1)' : 'rgba(214, 69, 80, 0.1)',
-                          color: annualDifference >= 0 ? '#2D6A4F' : '#D64550',
-                        }
-                      }}
-                    >
-                      {annualDifference >= 0 ? '+' : '-'}
-                      {formatCurrency(Math.abs(annualDifference))}
-                    </Badge>
-                  )}
-                  {formatCurrency(annualBudget)}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <span>{formatCurrency(annualBudget)}</span>
+                    {annualDifference !== undefined && (
+                      <Badge
+                        size="xs"
+                        variant="light"
+                        styles={{
+                          root: {
+                            backgroundColor: annualDifference >= 0 ? 'rgba(45, 106, 79, 0.1)' : 'rgba(214, 69, 80, 0.1)',
+                            color: annualDifference >= 0 ? '#2D6A4F' : '#D64550',
+                          }
+                        }}
+                      >
+                        {annualDifference >= 0 ? '+' : '-'}
+                        {formatCurrency(Math.abs(annualDifference))}
+                      </Badge>
+                    )}
+                  </div>
                 </Table.Td>
               </Table.Tr>
             )
