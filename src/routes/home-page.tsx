@@ -88,7 +88,7 @@ export default function HomePage() {
       <Card padding={0}>
         <Accordion defaultValue="expenses">
           <Accordion.Item value="expenses">
-            <Accordion.Control styles={{ control: { paddingTop: 8, paddingBottom: 8 } }}>
+            <Accordion.Control styles={{ control: { paddingTop: 0, paddingBottom: 0 } }}>
               Expense Categories
             </Accordion.Control>
             <Accordion.Panel styles={{ content: { padding: 0 } }}>
@@ -107,7 +107,7 @@ export default function HomePage() {
       <Card padding={0}>
         <Accordion defaultValue="incomes">
           <Accordion.Item value="incomes">
-            <Accordion.Control styles={{ control: { paddingTop: 8, paddingBottom: 8 } }}>
+            <Accordion.Control styles={{ control: { paddingTop: 0, paddingBottom: 0 } }}>
               Income Categories
             </Accordion.Control>
             <Accordion.Panel styles={{ content: { padding: 0 } }}>
@@ -126,7 +126,7 @@ export default function HomePage() {
       <Card padding={0}>
         <Accordion defaultValue="investments">
           <Accordion.Item value="investments">
-            <Accordion.Control styles={{ control: { paddingTop: 8, paddingBottom: 8 } }}>
+            <Accordion.Control styles={{ control: { paddingTop: 0, paddingBottom: 0 } }}>
               Investments
             </Accordion.Control>
             <Accordion.Panel styles={{ content: { padding: 0 } }}>
