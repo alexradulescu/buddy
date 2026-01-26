@@ -90,7 +90,7 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
 
   return (
     <ScrollArea className="scrollable-zone">
-      <Table striped highlightOnHover miw={800}>
+      <Table striped highlightOnHover miw={800} fz="sm">
         <Table.Thead>
           <Table.Tr>
             <Table.Th pl="md">Category</Table.Th>

@@ -19,7 +19,7 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
             collapsed: { mobile: true }
           }}
           footer={{
-            height: 64
+            height: 'calc(64px + env(safe-area-inset-bottom, 0px))'
           }}
           padding="md"
           withBorder={false}
@@ -56,8 +56,9 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
               backgroundColor: '#FFFFFF',
               borderTop: '1px solid #E5E9EB',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)'
             }}
           >
             <Group gap={0} h="100%" align="center" style={{ width: '100%' }}>
