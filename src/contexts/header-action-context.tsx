@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react'
+import { createContext, useContext, useState, ReactNode, useRef, useEffect } from 'react'
 
 interface HeaderActionContextType {
   action: ReactNode | null
@@ -28,11 +28,19 @@ export function useHeaderAction() {
 }
 
 // Hook for pages to set their header action
+// The action is set on mount and cleared on unmount
 export function useSetHeaderAction(action: ReactNode | null) {
   const { setAction } = useHeaderAction()
+  const actionRef = useRef(action)
+  actionRef.current = action
 
-  React.useEffect(() => {
-    setAction(action)
+  useEffect(() => {
+    // Set the action from the ref (always has latest value)
+    setAction(actionRef.current)
+
+    // Clear the action when component unmounts
     return () => setAction(null)
-  }, [action, setAction])
+    // Only run on mount/unmount - setAction is stable from useState
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 }
