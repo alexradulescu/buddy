@@ -5,6 +5,13 @@ import { openai } from '@ai-sdk/openai'
 import { streamObject } from 'ai'
 import { z } from 'zod'
 
+// Vercel serverless function config — streaming keeps the connection alive
+// Free/Hobby: 10s, Pro: 60s (streaming extends this as long as bytes flow)
+export const config = {
+  maxDuration: 60,
+  supportsResponseStreaming: true,
+}
+
 interface PromptProps {
   transactions: string
   categories: string
@@ -173,4 +180,7 @@ app.post('/completion', async (c) => {
   }
 })
 
-export default handle(app)
+const handler = handle(app)
+export const GET = handler
+export const POST = handler
+export default handler

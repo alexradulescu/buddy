@@ -4,8 +4,8 @@
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "functions": {
-    "api/**": {
-      "maxDuration": 300
+    "api/completion.ts": {
+      "maxDuration": 60
     }
   }
 }
