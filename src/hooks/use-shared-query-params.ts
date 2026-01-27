@@ -1,5 +1,3 @@
-'use client'
-
 import { parseAsInteger, useQueryState } from 'nuqs'
 
 export function useSharedQueryParams() {

@@ -1,14 +1,13 @@
-'use client'
-
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { ArrowLeft } from 'lucide-react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { Route } from '@/routes/investments.$id.edit'
 import InvestmentForm from '@/components/investment/forms/investment-form'
 import { PageHeader } from '@/components/page-header'
 import { Button, Stack, Title, Text, Center } from '@mantine/core'
 
 export default function EditInvestmentPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id } = Route.useParams()
   const navigate = useNavigate()
   const { investments } = useInvestmentStore()
 
@@ -31,14 +30,14 @@ export default function EditInvestmentPage() {
   return (
     <Stack gap="xl">
       <div>
-        <Button variant="subtle" size="sm" component={Link} to={`/investments/${id}`} leftSection={<ArrowLeft size={16} />}>
+        <Button variant="subtle" size="sm" component={Link} to="/investments/$id" params={{ id } as any} leftSection={<ArrowLeft size={16} />}>
           Back to Investment
         </Button>
       </div>
 
       <PageHeader title="Edit Investment" description="Update your investment details" />
 
-      <InvestmentForm investment={investment} onSuccess={() => navigate(`/investments/${id}`)} />
+      <InvestmentForm investment={investment} onSuccess={() => navigate({ to: '/investments/$id', params: { id } })} />
     </Stack>
   )
 }

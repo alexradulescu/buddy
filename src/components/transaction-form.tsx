@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState } from 'react'
 import { ExpenseCategory, IncomeCategory } from '@/stores/instantdb'
 import { format } from 'date-fns'

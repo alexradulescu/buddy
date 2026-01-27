@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState } from 'react'
 import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
 import { Edit2, Trash2 } from 'lucide-react'

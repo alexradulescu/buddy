@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState } from 'react'
 import { AccountBalance, useAccountBalances } from '@/stores/instantdb'
 import { useForm } from 'react-hook-form'

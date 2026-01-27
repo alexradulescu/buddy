@@ -1,14 +1,6 @@
-import '@mantine/core/styles.css'
-import '@mantine/dates/styles.css'
-import '@mantine/notifications/styles.css'
-import './globals.css'
-import { Suspense } from 'react'
-import type { Metadata, Viewport } from 'next'
-import { ColorSchemeScript, MantineProvider, mantineHtmlProps, createTheme } from '@mantine/core'
-import { Notifications } from '@mantine/notifications'
+import { createTheme } from '@mantine/core'
 
-// Clean Finance Dashboard Theme
-const theme = createTheme({
+export const theme = createTheme({
   // Typography - Clean, readable Inter
   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   fontFamilyMonospace: "'JetBrains Mono', ui-monospace, monospace",
@@ -287,36 +279,3 @@ const theme = createTheme({
     },
   },
 })
-
-export const metadata: Metadata = {
-  title: 'Buddy',
-  description: 'Personal finance management'
-}
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  viewportFit: 'cover'
-}
-
-export default function RootLayout({
-  children
-}: Readonly<{
-  children: React.ReactNode
-}>) {
-  return (
-    <html lang="en" {...mantineHtmlProps}>
-      <head>
-        <ColorSchemeScript defaultColorScheme="light" />
-      </head>
-      <body>
-        <MantineProvider theme={theme} defaultColorScheme="light">
-          <Notifications />
-          <Suspense fallback={'Loading'}>{children}</Suspense>
-        </MantineProvider>
-      </body>
-    </html>
-  )
-}

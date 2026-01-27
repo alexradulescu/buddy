@@ -1,8 +1,6 @@
-'use client'
-
 import { BarChart2, CreditCard, Home, LucideIcon, PiggyBank, Settings, TrendingUp } from 'lucide-react'
-import { NavLink, useLocation } from 'react-router'
-import { Tooltip, Stack, UnstyledButton, rem, Text, Box } from '@mantine/core'
+import { Link, useRouterState } from '@tanstack/react-router'
+import { Tooltip, Stack, rem, Text, Box } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 interface NavItem {
@@ -22,8 +20,7 @@ const navItems: NavItem[] = [
 
 export function DesktopNav() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
-  const location = useLocation()
-  const pathname = location.pathname
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
 
   return (
     <Stack gap="xs" p="xs" align="center">
@@ -31,26 +28,24 @@ export function DesktopNav() {
         const isActive = pathname === item.href
         return (
           <Tooltip key={item.href} label={item.label} position="right">
-            <UnstyledButton
-              component={NavLink}
-              to={{
-                pathname: item.href,
-                search: `?month=${selectedMonth}&year=${selectedYear}`
-              }}
-              w={rem(36)}
-              h={rem(36)}
+            <Link
+              to={item.href}
+              search={{ month: selectedMonth, year: selectedYear } as any}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                width: rem(36),
+                height: rem(36),
                 borderRadius: '8px',
                 color: isActive ? '#1B4332' : '#6F767E',
                 backgroundColor: isActive ? 'rgba(82, 183, 136, 0.15)' : 'transparent',
                 transition: 'all 0.15s ease',
+                textDecoration: 'none',
               }}
             >
               <item.icon size={18} strokeWidth={isActive ? 2 : 1.5} />
-            </UnstyledButton>
+            </Link>
           </Tooltip>
         )
       })}
@@ -60,21 +55,17 @@ export function DesktopNav() {
 
 export function MobileNav() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
-  const location = useLocation()
-  const pathname = location.pathname
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
 
   return (
     <>
       {navItems.map((item) => {
         const isActive = pathname === item.href
         return (
-          <UnstyledButton
+          <Link
             key={item.href}
-            component={NavLink}
-            to={{
-              pathname: item.href,
-              search: `?month=${selectedMonth}&year=${selectedYear}`
-            }}
+            to={item.href}
+            search={{ month: selectedMonth, year: selectedYear } as any}
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -85,6 +76,7 @@ export function MobileNav() {
               color: isActive ? '#1B4332' : '#6F767E',
               transition: 'all 0.15s ease',
               position: 'relative',
+              textDecoration: 'none',
             }}
           >
             {isActive && (
@@ -109,7 +101,7 @@ export function MobileNav() {
             >
               {item.label}
             </Text>
-          </UnstyledButton>
+          </Link>
         )
       })}
     </>

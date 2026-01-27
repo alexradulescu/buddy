@@ -1,5 +1,3 @@
-'use client'
-
 import { Button, Modal } from '@mantine/core'
 
 interface DeleteConfirmationProps {

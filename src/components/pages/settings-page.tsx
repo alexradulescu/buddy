@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import { useCategoryStore } from '@/stores/instantdb'
 import { CategorySpreadsheet } from '@/components/category-spreadsheet'
