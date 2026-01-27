@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { format } from 'date-fns'
 import { Edit, Search, Trash } from 'lucide-react'
-import { useQueryState } from 'nuqs'
+import { useSearch, useNavigate } from '@tanstack/react-router'
 import { Button, Group, Stack, Text, TextInput, Select, Table, ScrollArea } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { DeleteConfirmation } from './delete-confirmation'
@@ -18,7 +18,12 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategoryId, setSelectedCategoryId] = useQueryState('categoryExpense')
+  const search = useSearch({ strict: false }) as { categoryExpense?: string }
+  const nav = useNavigate()
+  const selectedCategoryId = search.categoryExpense ?? null
+  const setSelectedCategoryId = (value: string | null) => {
+    void (nav as any)({ search: (prev: Record<string, unknown>) => ({ ...prev, categoryExpense: value || undefined }) })
+  }
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null)
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
 

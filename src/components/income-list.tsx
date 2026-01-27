@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { Income, useCategoryStore, useIncomeStore } from '@/stores/instantdb'
 import { format } from 'date-fns'
 import { Edit, Search, Trash } from 'lucide-react'
-import { useQueryState } from 'nuqs'
+import { useSearch, useNavigate } from '@tanstack/react-router'
 import { Button, Group, Stack, Text, TextInput, Select, Table, ScrollArea } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { DeleteConfirmation } from './delete-confirmation'
@@ -17,7 +17,12 @@ export const IncomeList: React.FC<IncomeListProps> = ({ selectedMonth, selectedY
   const { data: { incomes = [] } = {}, removeIncome, updateIncome } = useIncomeStore()
   const { data: { incomeCategories = [] } = {} } = useCategoryStore()
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategoryId, setSelectedCategoryId] = useQueryState('categoryIncome')
+  const search = useSearch({ strict: false }) as { categoryIncome?: string }
+  const nav = useNavigate()
+  const selectedCategoryId = search.categoryIncome ?? null
+  const setSelectedCategoryId = (value: string | null) => {
+    void (nav as any)({ search: (prev: Record<string, unknown>) => ({ ...prev, categoryIncome: value || undefined }) })
+  }
   const [incomeToDelete, setIncomeToDelete] = useState<Income | null>(null)
   const [editingIncome, setEditingIncome] = useState<Income | null>(null)
 
