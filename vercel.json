@@ -5,7 +5,7 @@
   ],
   "functions": {
     "api/completion.ts": {
-      "maxDuration": 60
+      "maxDuration": 300
     }
   }
 }

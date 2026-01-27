@@ -1,16 +1,10 @@
-import { Hono } from 'hono'
-import { handle } from 'hono/vercel'
 import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 import { streamObject } from 'ai'
 import { z } from 'zod'
 
-// Vercel serverless function config — streaming keeps the connection alive
-// Free/Hobby: 10s, Pro: 60s (streaming extends this as long as bytes flow)
-export const config = {
-  maxDuration: 60,
-  supportsResponseStreaming: true,
-}
+// Vercel serverless config — matches the old Next.js route config
+export const maxDuration = 300
 
 interface PromptProps {
   transactions: string
@@ -90,18 +84,19 @@ const expenseSchema = z.object({
   description: z.string().describe('Cleaned up description preserving key information')
 })
 
-const app = new Hono().basePath('/api')
-
 /**
  * POST handler for expense categorization
  *
+ * Plain Vercel serverless function (no Hono wrapper).
+ * Identical signature to the old Next.js route handler.
+ *
  * Multi-provider fallback strategy:
- * 1. Try Gemini 2.5 Flash (fast, cheap)
+ * 1. Try Gemini 3 Flash (fast, cheap)
  * 2. Fall back to GPT-4o-mini if Gemini fails
  *
  * Uses streaming to prevent timeouts on Vercel Free tier
  */
-app.post('/completion', async (c) => {
+export async function POST(req: Request) {
   try {
     const {
       prompt,
@@ -111,7 +106,7 @@ app.post('/completion', async (c) => {
       prompt: string
       expenseCategories: Array<{ id: string; name: string }>
       historicalExpenses: Array<{ description: string; categoryId: string; amount: number }>
-    } = await c.req.json()
+    } = await req.json()
 
     // Format categories as "id: name" for clarity
     const categoriesString = expenseCategories.map((cat) => `${cat.id}: ${cat.name}`).join('\n')
@@ -170,17 +165,12 @@ app.post('/completion', async (c) => {
     }
   } catch (error) {
     console.error('[AI] Request processing error:', error)
-    return c.json(
+    return Response.json(
       {
         error: 'Failed to process expense categorization request',
         message: error instanceof Error ? error.message : 'Unknown error'
       },
-      500
+      { status: 500 }
     )
   }
-})
-
-const handler = handle(app)
-export const GET = handler
-export const POST = handler
-export default handler
+}
