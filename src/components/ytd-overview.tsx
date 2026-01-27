@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import { Calendar } from 'lucide-react'
 import { Card, Title, Stack, Group, Text } from '@mantine/core'

@@ -1,8 +1,6 @@
-'use client'
-
 import { useCallback, useMemo } from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
-import { NavLink } from 'react-router'
+import { Link } from '@tanstack/react-router'
 import { Anchor, Badge, Table, ScrollArea, Stack, Text } from '@mantine/core'
 
 const formatCurrency = (amount: number | undefined): string => {
@@ -117,11 +115,9 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
               <Table.Tr key={category.id}>
                 <Table.Td fw={500} pl="md">
                   <Anchor
-                    component={NavLink}
-                    to={{
-                      pathname: '/expenses',
-                      search: `?month=${selectedMonth}&year=${selectedYear}&categoryExpense=${category.id}`
-                    }}
+                    component={Link}
+                    to="/expenses"
+                    search={{ month: selectedMonth, year: selectedYear, categoryExpense: category.id } as any}
                     underline="hover"
                     fz="sm"
                     fw={500}

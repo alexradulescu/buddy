@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useMemo, useState } from 'react'
 import { Income, useCategoryStore, useIncomeStore } from '@/stores/instantdb'
 import { format } from 'date-fns'

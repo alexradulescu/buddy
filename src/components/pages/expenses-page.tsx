@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState } from 'react'
 import { ExpenseList } from '@/components/expense-list'
 import { Card, Stack, Group, NumberInput, Button, SimpleGrid, SegmentedControl } from '@mantine/core'

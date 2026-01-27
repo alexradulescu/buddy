@@ -1,3 +1,5 @@
+import { Hono } from 'hono'
+import { handle } from 'hono/vercel'
 import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 import { streamObject } from 'ai'
@@ -81,7 +83,7 @@ const expenseSchema = z.object({
   description: z.string().describe('Cleaned up description preserving key information')
 })
 
-export const maxDuration = 300
+const app = new Hono().basePath('/api')
 
 /**
  * POST handler for expense categorization
@@ -92,7 +94,7 @@ export const maxDuration = 300
  *
  * Uses streaming to prevent timeouts on Vercel Free tier
  */
-export async function POST(req: Request) {
+app.post('/completion', async (c) => {
   try {
     const {
       prompt,
@@ -102,7 +104,7 @@ export async function POST(req: Request) {
       prompt: string
       expenseCategories: Array<{ id: string; name: string }>
       historicalExpenses: Array<{ description: string; categoryId: string; amount: number }>
-    } = await req.json()
+    } = await c.req.json()
 
     // Format categories as "id: name" for clarity
     const categoriesString = expenseCategories.map((cat) => `${cat.id}: ${cat.name}`).join('\n')
@@ -161,12 +163,14 @@ export async function POST(req: Request) {
     }
   } catch (error) {
     console.error('[AI] Request processing error:', error)
-    return Response.json(
+    return c.json(
       {
         error: 'Failed to process expense categorization request',
         message: error instanceof Error ? error.message : 'Unknown error'
       },
-      { status: 500 }
+      500
     )
   }
-}
+})
+
+export default handle(app)

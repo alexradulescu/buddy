@@ -1,7 +1,5 @@
-'use client'
-
 import { ArrowLeft } from 'lucide-react'
-import { Link } from 'react-router'
+import { Link } from '@tanstack/react-router'
 import InvestmentForm from '@/components/investment/forms/investment-form'
 import { PageHeader } from '@/components/page-header'
 import { Button, Stack, Group } from '@mantine/core'

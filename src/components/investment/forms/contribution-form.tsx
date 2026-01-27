@@ -1,5 +1,3 @@
-'use client'
-
 import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { InvestmentContribution } from '@/types/investment'

@@ -1,5 +1,3 @@
-'use client'
-
 import React, { FC } from 'react'
 import { format } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'

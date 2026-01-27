@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState } from 'react'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'

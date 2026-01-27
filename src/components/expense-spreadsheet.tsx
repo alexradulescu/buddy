@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useCallback, useMemo } from 'react'
 import { HotTable } from '@handsontable/react'
 import { registerAllModules } from 'handsontable/registry'
