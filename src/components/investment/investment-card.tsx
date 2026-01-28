@@ -1,9 +1,7 @@
-'use client'
-
 import { useMemo } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { Investment } from '@/types/investment'
-import { Link } from 'react-router'
+import { Link } from '@tanstack/react-router'
 import { Card, Badge, Stack, Group, Text, SimpleGrid } from '@mantine/core'
 
 interface InvestmentCardProps {
@@ -34,7 +32,7 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
   }
 
   return (
-    <Link to={`/investments/${investment.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+    <Link to="/investments/$id" params={{ id: investment.id }} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card
         style={{ height: '100%', cursor: 'pointer' }}
         className="hover-card"

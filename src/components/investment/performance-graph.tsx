@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import { Card, Stack, Group, Title, Text } from '@mantine/core'
 import { TrendingUp } from 'lucide-react'

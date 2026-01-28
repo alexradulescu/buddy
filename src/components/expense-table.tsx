@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import { Button, NumberInput, ScrollArea, Select, Stack, Table, Text, Textarea } from '@mantine/core'

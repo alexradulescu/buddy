@@ -1,8 +1,6 @@
-'use client'
-
 import { useMemo } from 'react'
 import { Income, IncomeCategory } from '@/stores/instantdb'
-import { NavLink } from 'react-router'
+import { Link } from '@tanstack/react-router'
 import { Table, Anchor, ScrollArea } from '@mantine/core'
 
 interface IncomeOverviewProps {
@@ -81,11 +79,9 @@ export function IncomeOverview({ incomes, incomeCategories, selectedYear, select
               <Table.Tr key={category.id}>
                 <Table.Td fw={500} pl="md">
                   <Anchor
-                    component={NavLink}
-                    to={{
-                      pathname: '/incomes',
-                      search: `?month=${selectedMonth}&year=${selectedYear}&categoryIncome=${category.id}`
-                    }}
+                    component={Link}
+                    to="/incomes"
+                    search={{ month: selectedMonth, year: selectedYear, categoryIncome: category.id } as any}
                     underline="hover"
                     fz="sm"
                     fw={500}

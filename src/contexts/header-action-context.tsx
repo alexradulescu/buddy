@@ -1,5 +1,3 @@
-'use client'
-
 import { createContext, useContext, useState, ReactNode, useRef, useEffect } from 'react'
 
 interface HeaderActionContextType {

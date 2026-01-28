@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import { Card, Tooltip, Group, Text, Box } from '@mantine/core'
 

@@ -72,7 +72,7 @@ export type AccountBalance = InstaQLEntity<typeof schema, 'accountBalances'>
 export type IncomeCategory = InstaQLEntity<typeof schema, 'incomeCategories'>
 
 export const db = init({
-  appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID || '',
+  appId: import.meta.env.VITE_INSTANTDB_APP_ID || '',
   schema
 })
 

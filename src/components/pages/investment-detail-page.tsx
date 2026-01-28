@@ -1,9 +1,8 @@
-'use client'
-
 import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
-import { ArrowLeft, Edit, Trash2, TrendingUp, DollarSign } from 'lucide-react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { ArrowLeft, Edit, Trash2, DollarSign } from 'lucide-react'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { Route } from '@/routes/investments.$id'
 import ContributionTable from '@/components/investment/contribution-table'
 import PerformanceGraph from '@/components/investment/performance-graph'
 import ValueTable from '@/components/investment/value-table'
@@ -18,7 +17,7 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
 })
 
 export default function InvestmentDetailPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id } = Route.useParams()
   const navigate = useNavigate()
   const {
     investments,
@@ -67,7 +66,7 @@ export default function InvestmentDetailPage() {
         message: 'The investment has been successfully deleted.',
         color: 'green'
       })
-      navigate('/investments')
+      navigate({ to: '/investments' })
     } catch (error) {
       notifications.show({
         title: 'Error',
@@ -136,7 +135,7 @@ export default function InvestmentDetailPage() {
           Back to Investments
         </Button>
         <Group gap="xs">
-          <Button variant="default" component={Link} to={`/investments/${id}/edit`} leftSection={<Edit size={14} />}>
+          <Button variant="default" component={Link} to="/investments/$id/edit" params={{ id } as any} leftSection={<Edit size={14} />}>
             Edit
           </Button>
           <Button color="red" onClick={() => setDeleteModalOpen(true)} leftSection={<Trash2 size={14} />}>

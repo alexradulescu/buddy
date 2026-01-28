@@ -1,10 +1,8 @@
-'use client'
-
 import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { Investment } from '@/types/investment'
 import { useForm, Controller } from 'react-hook-form'
-import { useNavigate } from 'react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { Button, Card, TextInput, Textarea, Switch, Stack, Group, Text, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 
@@ -51,7 +49,7 @@ export default function InvestmentForm({ investment, onSuccess }: InvestmentForm
       if (onSuccess) {
         onSuccess()
       } else {
-        navigate('/investments')
+        navigate({ to: '/investments' })
       }
     } catch (error) {
       console.error('Investment save error:', error)
@@ -119,7 +117,7 @@ export default function InvestmentForm({ investment, onSuccess }: InvestmentForm
           />
 
           <Group justify="space-between" mt="xs">
-            <Button variant="subtle" color="gray" onClick={() => navigate('/investments')}>
+            <Button variant="subtle" color="gray" onClick={() => navigate({ to: '/investments' })}>
               Cancel
             </Button>
             <Button type="submit" loading={isSubmitting}>

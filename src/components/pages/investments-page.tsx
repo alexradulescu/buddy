@@ -1,8 +1,6 @@
-'use client'
-
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { Plus } from 'lucide-react'
-import { Link } from 'react-router'
+import { Link } from '@tanstack/react-router'
 import InvestmentCard from '@/components/investment/investment-card'
 import { useSetHeaderAction } from '@/contexts/header-action-context'
 import { Button, Stack, Title, Text, Card, SimpleGrid, Center, ActionIcon } from '@mantine/core'

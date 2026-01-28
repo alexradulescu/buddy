@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useEffect, useState } from 'react'
 import { ExpenseCategory, IncomeCategory } from '@/stores/instantdb'
 import { Plus, Save, Trash2 } from 'lucide-react'
