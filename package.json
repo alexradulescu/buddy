@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite --port 3000",
-    "build": "mkdir -p .vercel/output/functions/__fallback.func && mkdir -p .output/server && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src/",
     "pack": "repopack ./src --ignore './src/components/ui/*'"
@@ -51,7 +51,7 @@
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.49.0",
     "@typescript-eslint/parser": "^8.49.0",
-    "@vitejs/plugin-react": "^4.4.0",
+    "@vitejs/plugin-react": "^5.0.4",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
@@ -60,7 +60,7 @@
     "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
-    "vite": "^6.3.0",
+    "vite": "^7.3.1",
     "vite-tsconfig-paths": "^5.1.0"
   }
 }
