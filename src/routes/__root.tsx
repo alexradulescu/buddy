@@ -1,44 +1,12 @@
-import { createRootRoute, Outlet, HeadContent, Scripts } from '@tanstack/react-router'
-import { MantineProvider } from '@mantine/core'
-import { Notifications } from '@mantine/notifications'
+import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { HeaderActionProvider } from '@/contexts/header-action-context'
 import { DesktopNav, MobileNav } from '@/components/navigation'
 import { AppHeader } from '@/components/app-header'
 import { AppShell, Group, Box } from '@mantine/core'
-import { theme } from '@/theme'
-
-import '@mantine/core/styles.css'
-import '@mantine/dates/styles.css'
-import '@mantine/notifications/styles.css'
-import '@/globals.css'
 
 export const Route = createRootRoute({
-  component: RootDocument,
+  component: RootLayout,
 })
-
-function RootDocument() {
-  return (
-    <html lang="en">
-      <head>
-        <meta charSet="UTF-8" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-        />
-        <title>Buddy</title>
-        <meta name="description" content="Personal finance management" />
-        <HeadContent />
-      </head>
-      <body>
-        <MantineProvider theme={theme} defaultColorScheme="light">
-          <Notifications />
-          <RootLayout />
-        </MantineProvider>
-        <Scripts />
-      </body>
-    </html>
-  )
-}
 
 function RootLayout() {
   return (
@@ -61,7 +29,6 @@ function RootLayout() {
           },
         }}
       >
-        {/* Header */}
         <AppShell.Header
           style={{
             backgroundColor: '#FFFFFF',
@@ -71,7 +38,6 @@ function RootLayout() {
           <AppHeader />
         </AppShell.Header>
 
-        {/* Desktop sidebar */}
         <AppShell.Navbar
           style={{
             backgroundColor: '#FFFFFF',
@@ -81,7 +47,6 @@ function RootLayout() {
           <DesktopNav />
         </AppShell.Navbar>
 
-        {/* Mobile bottom navigation */}
         <AppShell.Footer
           hiddenFrom="sm"
           style={{
@@ -98,7 +63,6 @@ function RootLayout() {
           </Group>
         </AppShell.Footer>
 
-        {/* Main content */}
         <AppShell.Main
           style={{
             backgroundColor: '#F8FAFB',

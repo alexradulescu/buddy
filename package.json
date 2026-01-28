@@ -7,9 +7,9 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "vite dev",
+    "dev": "vite --port 3000",
     "build": "vite build",
-    "start": "node .output/server/index.mjs",
+    "preview": "vite preview",
     "lint": "eslint src/",
     "pack": "repopack ./src --ignore './src/components/ui/*'"
   },
@@ -26,7 +26,7 @@
     "@mantine/notifications": "^8.3.10",
     "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-router": "^1.120.0",
-    "@tanstack/react-start": "^1.120.0",
+    "@tanstack/router-plugin": "^1.120.0",
     "@uiw/react-markdown-preview": "^5.1.5",
     "ai": "^5.0.116",
     "clsx": "^2.1.1",
@@ -34,6 +34,7 @@
     "dayjs": "^1.11.19",
     "handsontable": "^16.2.0",
     "lucide-react": "^0.562.0",
+    "nitro": "latest",
     "openai": "^6.15.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -54,7 +55,6 @@
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
-    "nitro": "3.0.0",
     "postcss": "^8.5.6",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
