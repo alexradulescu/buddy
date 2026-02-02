@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import { useCategoryStore, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'

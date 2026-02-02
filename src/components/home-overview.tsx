@@ -1,5 +1,3 @@
-'use client'
-
 import { Calendar } from 'lucide-react'
 import { Card, Title, Stack, Group, Text, Box } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'

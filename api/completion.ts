@@ -1,7 +1,10 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 import { streamObject } from 'ai'
 import { z } from 'zod'
+
+export const maxDuration = 300
 
 interface PromptProps {
   transactions: string
@@ -9,10 +12,6 @@ interface PromptProps {
   historicalExpenses: string
 }
 
-/**
- * Detailed prompt for AI expense categorization
- * Includes step-by-step instructions and examples for better accuracy
- */
 const buildPrompt = ({ transactions, categories, historicalExpenses }: PromptProps) =>
   `You are an intelligent assistant tasked with categorizing a list of bank transactions for an expense tracker.
 
@@ -71,9 +70,6 @@ Return an array of categorized expenses. For each transaction, provide:
 - description: string (cleaned up, readable)
 `
 
-/**
- * Expense schema for validation
- */
 const expenseSchema = z.object({
   amount: z.number().nonnegative().describe('Amount of the expense as a decimal number'),
   categoryId: z.string().min(1).describe('CategoryId from the active categories list'),
@@ -81,35 +77,25 @@ const expenseSchema = z.object({
   description: z.string().describe('Cleaned up description preserving key information')
 })
 
-export const maxDuration = 300
-
 /**
- * POST handler for expense categorization
- *
- * Multi-provider fallback strategy:
- * 1. Try Gemini 2.5 Flash (fast, cheap)
- * 2. Fall back to GPT-4o-mini if Gemini fails
- *
- * Uses streaming to prevent timeouts on Vercel Free tier
+ * Vercel serverless function using Node.js (req, res) pattern.
+ * Streams the AI response by piping the ReadableStream to res.
  */
-export async function POST(req: Request) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' })
+    return
+  }
+
   try {
-    const {
-      prompt,
-      expenseCategories,
-      historicalExpenses
-    }: {
-      prompt: string
-      expenseCategories: Array<{ id: string; name: string }>
-      historicalExpenses: Array<{ description: string; categoryId: string; amount: number }>
-    } = await req.json()
+    const { prompt, expenseCategories, historicalExpenses } = req.body
 
-    // Format categories as "id: name" for clarity
-    const categoriesString = expenseCategories.map((cat) => `${cat.id}: ${cat.name}`).join('\n')
+    const categoriesString = expenseCategories
+      .map((cat: { id: string; name: string }) => `${cat.id}: ${cat.name}`)
+      .join('\n')
 
-    // Format historical expenses as JSON for reliable parsing
     const historicalString = JSON.stringify(
-      historicalExpenses.map((e) => ({
+      historicalExpenses.map((e: { description: string; categoryId: string; amount: number }) => ({
         description: e.description,
         categoryId: e.categoryId,
         amount: e.amount
@@ -124,7 +110,8 @@ export async function POST(req: Request) {
       historicalExpenses: historicalString
     })
 
-    // Try Gemini first (cheaper, fast)
+    let streamResponse: Response
+
     try {
       console.log('[AI] Using Gemini 3 Flash')
       const result = streamObject({
@@ -134,12 +121,10 @@ export async function POST(req: Request) {
         prompt: promptContent,
         maxRetries: 2
       })
-
-      return result.toTextStreamResponse()
+      streamResponse = result.toTextStreamResponse()
     } catch (geminiError) {
       console.warn('[AI] Gemini failed, falling back to GPT-4o-mini:', geminiError)
 
-      // Fallback to GPT-4o-mini (reliable)
       try {
         console.log('[AI] Using GPT-4o-mini (fallback)')
         const result = streamObject({
@@ -149,24 +134,38 @@ export async function POST(req: Request) {
           prompt: promptContent,
           maxRetries: 2
         })
-
-        return result.toTextStreamResponse()
+        streamResponse = result.toTextStreamResponse()
       } catch (openaiError) {
-        console.error('[AI] Both providers failed:', {
-          gemini: geminiError,
-          openai: openaiError
-        })
-        throw new Error('AI categorization failed with all providers')
+        console.error('[AI] Both providers failed:', { gemini: geminiError, openai: openaiError })
+        res.status(500).json({ error: 'AI categorization failed with all providers' })
+        return
       }
     }
+
+    // Forward headers from the AI SDK streaming response
+    streamResponse.headers.forEach((value, key) => {
+      res.setHeader(key, value)
+    })
+
+    // Pipe the ReadableStream to the Node.js response
+    const reader = streamResponse.body?.getReader()
+    if (!reader) {
+      res.status(500).json({ error: 'No response stream available' })
+      return
+    }
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      res.write(value)
+    }
+
+    res.end()
   } catch (error) {
     console.error('[AI] Request processing error:', error)
-    return Response.json(
-      {
-        error: 'Failed to process expense categorization request',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    )
+    res.status(500).json({
+      error: 'Failed to process expense categorization request',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    })
   }
 }

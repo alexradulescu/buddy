@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import { IncomeForm } from '@/components/income-form'
 import { IncomeList } from '@/components/income-list'

@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo, useState } from 'react'
 import { InvestmentContribution } from '@/types/investment'
 import { Edit, Trash2, PiggyBank } from 'lucide-react'

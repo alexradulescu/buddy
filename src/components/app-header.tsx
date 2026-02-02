@@ -1,7 +1,5 @@
-'use client'
-
 import React from 'react'
-import { useLocation } from 'react-router'
+import { useRouterState } from '@tanstack/react-router'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { ActionIcon, Group, Title, Box } from '@mantine/core'
 import { MonthPickerInput } from '@mantine/dates'
@@ -18,7 +16,7 @@ const pageTitle: Record<string, string> = {
 }
 
 export function AppHeader() {
-  const location = useLocation()
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
   const { selectedYear, setSelectedYear, selectedMonth, setSelectedMonth } = useSharedQueryParams()
   const { action } = useHeaderAction()
 
@@ -39,7 +37,7 @@ export function AppHeader() {
   }
 
   const selectedDate = new Date(selectedYear, selectedMonth)
-  const title = pageTitle[location.pathname] || 'Buddy'
+  const title = pageTitle[pathname] || 'Buddy'
 
   return (
     <Group justify="space-between" h="100%" px="md">

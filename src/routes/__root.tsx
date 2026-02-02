@@ -1,25 +1,27 @@
-import { FC, PropsWithChildren } from 'react'
-import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
-import { HydrationBoundary } from '@/components/hydration-boundary'
+import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
+import { HeaderActionProvider } from '@/contexts/header-action-context'
 import { DesktopNav, MobileNav } from '@/components/navigation'
 import { AppHeader } from '@/components/app-header'
-import { HeaderActionProvider } from '@/contexts/header-action-context'
 import { AppShell, Group, Box } from '@mantine/core'
 
-export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
+export const Route = createRootRoute({
+  component: RootLayout,
+})
+
+function RootLayout() {
   return (
     <NuqsAdapter>
-      <HydrationBoundary>
-        <HeaderActionProvider>
-          <AppShell
+      <HeaderActionProvider>
+        <AppShell
           header={{ height: 60 }}
           navbar={{
             width: 56,
             breakpoint: 'sm',
-            collapsed: { mobile: true }
+            collapsed: { mobile: true },
           }}
           footer={{
-            height: 'calc(64px + env(safe-area-inset-bottom, 0px))'
+            height: 'calc(64px + env(safe-area-inset-bottom, 0px))',
           }}
           padding="md"
           withBorder={false}
@@ -58,7 +60,7 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
               display: 'flex',
               alignItems: 'flex-start',
               justifyContent: 'center',
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
           >
             <Group gap={0} h="100%" align="center" style={{ width: '100%' }}>
@@ -73,14 +75,11 @@ export const RootLayout: FC<PropsWithChildren> = ({ children }) => {
             }}
           >
             <Box className="scrollable-zone" style={{ height: '100%' }}>
-              {children}
+              <Outlet />
             </Box>
           </AppShell.Main>
-          </AppShell>
-        </HeaderActionProvider>
-      </HydrationBoundary>
+        </AppShell>
+      </HeaderActionProvider>
     </NuqsAdapter>
   )
 }
-
-export default RootLayout

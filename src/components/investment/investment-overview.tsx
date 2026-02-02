@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import { Table, Stack, SimpleGrid, Text, ScrollArea } from '@mantine/core'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'

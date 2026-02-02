@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useMemo, useState } from 'react'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { Button, Stack, Textarea, Title } from '@mantine/core'

@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState } from 'react'
 import { useAccountBalances, useExpenseStore, useIncomeStore } from '@/stores/instantdb'
 import { AccountForm } from '@/components/account-form'
