@@ -1,5 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { buildStatementPrompt, streamAIResponse } from './_lib/expense-ai'
+import { google } from '@ai-sdk/google'
+import { openai } from '@ai-sdk/openai'
+import { streamObject } from 'ai'
+import { z } from 'zod'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
@@ -9,6 +12,86 @@ export const maxDuration = 300
  * Vercel serverless function for bank statement upload
  * Accepts PDF/CSV files, extracts text, and processes with AI
  */
+
+// Schema for AI output
+const expenseSchema = z.object({
+  amount: z.number().nonnegative().describe('Amount of the expense as a decimal number'),
+  categoryId: z.string().min(1).describe('CategoryId from the active categories list'),
+  date: z.string().min(8).describe('Date in yyyy-MM-dd format'),
+  description: z.string().describe('Cleaned up description preserving key information')
+})
+
+function buildStatementPrompt({
+  extractedText,
+  expenseCategories,
+  historicalExpenses
+}: {
+  extractedText: string
+  expenseCategories: Array<{ id: string; name: string }>
+  historicalExpenses: Array<{ date: string; amount: number; description: string; categoryId: string }>
+}): string {
+  const categoryList = expenseCategories.map((c) => `- ${c.id}: ${c.name}`).join('\n')
+
+  const historyContext =
+    historicalExpenses.length > 0
+      ? `\n\nHere are recent expenses for context on categorization patterns:\n${JSON.stringify(historicalExpenses.slice(0, 50), null, 2)}`
+      : ''
+
+  return `You are processing a bank statement to extract EXPENSE transactions only.
+
+IMPORTANT RULES:
+1. Only extract EXPENSES (debits, purchases, payments, withdrawals)
+2. IGNORE all income/credits (salary, refunds, transfers IN)
+3. IGNORE internal transfers between accounts
+4. IGNORE refunds (transactions with "REFUND" in description)
+5. Include ATM/cash withdrawals
+6. All amounts should be POSITIVE numbers
+7. Dates must be in yyyy-MM-dd format
+8. Match each expense to the most appropriate category from the list below
+
+Available categories:
+${categoryList}
+${historyContext}
+
+Bank statement content:
+---
+${extractedText}
+---
+
+Extract all expense transactions as a JSON array. For each expense include: date, amount (positive), description, categoryId.`
+}
+
+async function streamAIResponse(prompt: string): Promise<Response> {
+  try {
+    console.log('[AI] Using Gemini 3 Flash')
+    const result = streamObject({
+      model: google('gemini-3-flash-preview'),
+      output: 'array',
+      schema: expenseSchema,
+      prompt,
+      maxRetries: 2
+    })
+    return result.toTextStreamResponse()
+  } catch (geminiError) {
+    console.warn('[AI] Gemini failed, falling back to GPT-4o-mini:', geminiError)
+
+    try {
+      console.log('[AI] Using GPT-4o-mini (fallback)')
+      const result = streamObject({
+        model: openai('gpt-4o-mini'),
+        output: 'array',
+        schema: expenseSchema,
+        prompt,
+        maxRetries: 2
+      })
+      return result.toTextStreamResponse()
+    } catch (openaiError) {
+      console.error('[AI] Both providers failed:', { gemini: geminiError, openai: openaiError })
+      throw new Error('AI categorization failed with all providers')
+    }
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })

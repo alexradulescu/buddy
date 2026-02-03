@@ -4,7 +4,8 @@
       "Bash(npm install:*)",
       "Bash(npm run dev:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm search:*)"
+      "Bash(npm search:*)",
+      "Bash(find:*)"
     ]
   }
 }
