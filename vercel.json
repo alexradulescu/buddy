@@ -6,6 +6,9 @@
   "functions": {
     "api/completion.ts": {
       "maxDuration": 300
+    },
+    "api/upload-statement.ts": {
+      "maxDuration": 300
     }
   }
 }
