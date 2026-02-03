@@ -3,12 +3,13 @@ import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 import { streamObject } from 'ai'
 import { z } from 'zod'
+import type { ExpenseCategory, HistoricalExpense } from './types'
 
 export const maxDuration = 300
 
 /**
  * Vercel serverless function for expense categorization
- * Uses shared AI utilities for consistent processing
+ * Self-contained AI utilities for reliable deployment on Vercel
  */
 
 // Schema for AI output
@@ -53,7 +54,7 @@ ${transactions}
 - Skip/ignore any transaction containing: "Salary", "Bullish" (these are income, not expenses)
 - Format amounts as decimal numbers (e.g., 45.50) without currency symbols
 - If 2 amounts exist, use the one in SGD or S$ (the smaller amount is usually the transaction, larger is balance)
-- Format dates as 'yyyy-MM-dd'. If no year is present, use 2025
+- Format dates as 'yyyy-MM-dd'. If no year is present, use ${new Date().getFullYear()}
 - If 2 dates exist, use the later/more recent date
 - Clean up descriptions minimally for readability while preserving key merchant/transaction info
 
@@ -113,13 +114,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const { prompt, expenseCategories, historicalExpenses } = req.body
 
+    // Validate required inputs
+    if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
+      return res.status(400).json({ error: 'Invalid or missing prompt' })
+    }
+    if (!Array.isArray(expenseCategories)) {
+      return res.status(400).json({ error: 'Invalid expenseCategories: must be an array' })
+    }
+    if (!Array.isArray(historicalExpenses)) {
+      return res.status(400).json({ error: 'Invalid historicalExpenses: must be an array' })
+    }
+
     const categoriesString = expenseCategories
-      .map((cat: { id: string; name: string }) => `${cat.id}: ${cat.name}`)
+      .map((cat: ExpenseCategory) => `${cat.id}: ${cat.name}`)
       .join('\n')
 
     const historicalString = JSON.stringify(
       historicalExpenses.map(
-        (e: { description: string; categoryId: string; amount: number }) => ({
+        (e: HistoricalExpense) => ({
           description: e.description,
           categoryId: e.categoryId,
           amount: e.amount

@@ -3,6 +3,7 @@ import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 import { streamObject } from 'ai'
 import { z } from 'zod'
+import type { ExpenseCategory, HistoricalExpense } from './types'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
@@ -10,7 +11,7 @@ export const maxDuration = 300
 
 /**
  * Vercel serverless function for bank statement upload
- * Accepts PDF/CSV files, extracts text, and processes with AI
+ * Self-contained AI utilities for reliable deployment on Vercel
  */
 
 // Schema for AI output
@@ -27,8 +28,8 @@ function buildStatementPrompt({
   historicalExpenses
 }: {
   extractedText: string
-  expenseCategories: Array<{ id: string; name: string }>
-  historicalExpenses: Array<{ date: string; amount: number; description: string; categoryId: string }>
+  expenseCategories: ExpenseCategory[]
+  historicalExpenses: HistoricalExpense[]
 }): string {
   const categoryList = expenseCategories.map((c) => `- ${c.id}: ${c.name}`).join('\n')
 
