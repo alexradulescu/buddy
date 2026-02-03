@@ -3,16 +3,17 @@ import { ExpenseList } from '@/components/expense-list'
 import { Card, Stack, Group, NumberInput, Button, SimpleGrid, SegmentedControl } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { ExpenseAiConverter } from '@/components/expense-ai-converter'
+import { ExpenseFileUpload } from '@/components/expense-file-upload'
 import { ExpenseSpreadsheet } from '@/components/expense-spreadsheet'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { notifications } from '@mantine/notifications'
-import { SparklesIcon, TableIcon } from 'lucide-react'
+import { SparklesIcon, TableIcon, UploadIcon } from 'lucide-react'
 
 export default function ExpensesPage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [rowsToAdd, setRowsToAdd] = useState(1)
-  const [activeTab, setActiveTab] = useState('ai-import')
+  const [activeTab, setActiveTab] = useState('upload')
   const { addExpense } = useExpenseStore()
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
 
@@ -113,6 +114,15 @@ export default function ExpensesPage() {
             onChange={setActiveTab}
             data={[
               {
+                value: 'upload',
+                label: (
+                  <Group gap={6} wrap="nowrap">
+                    <UploadIcon size={14} />
+                    <span>Upload</span>
+                  </Group>
+                )
+              },
+              {
                 value: 'ai-import',
                 label: (
                   <Group gap={6} wrap="nowrap">
@@ -133,6 +143,10 @@ export default function ExpensesPage() {
             ]}
             fullWidth
           />
+
+          {activeTab === 'upload' && (
+            <ExpenseFileUpload onExpensesGenerated={handleAiConvertedExpenses} />
+          )}
 
           {activeTab === 'ai-import' && (
             <ExpenseAiConverter onExpensesGenerated={handleAiConvertedExpenses} />
