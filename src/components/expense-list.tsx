@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { format } from 'date-fns'
-import { Edit, Search, Trash } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, Edit, Search, Trash } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Button, Group, Stack, Text, TextInput, Select, Table, ScrollArea } from '@mantine/core'
+import { Button, Group, Stack, Text, TextInput, Select, Table, ScrollArea, UnstyledButton } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { DeleteConfirmation } from './delete-confirmation'
 import { TransactionForm } from './transaction-form'
@@ -13,6 +13,9 @@ interface ExpenseListProps {
   selectedMonth: number
 }
 
+type SortColumn = 'date' | 'description' | 'category' | 'amount'
+type SortDirection = 'asc' | 'desc'
+
 export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selectedYear }) => {
   const { data: { expenses = [] } = {}, removeExpense, updateExpense } = useExpenseStore()
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
@@ -21,25 +24,52 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
   const [selectedCategoryId, setSelectedCategoryId] = useQueryState('categoryExpense')
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null)
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
+  const [sortColumn, setSortColumn] = useState<SortColumn>('date')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
 
-  const filteredExpenses = expenses
-    .map((expense) => ({
-      ...expense,
-      category: expenseCategories.find((expenseCategory) => expenseCategory.id === expense.categoryId)?.name
-    }))
-    .filter((expense) => {
-      const expenseDate = new Date(expense.date)
-      const matchesDate = expenseDate.getFullYear() === selectedYear && expenseDate.getMonth() === selectedMonth
-      const matchesSearch =
-        searchTerm === '' ||
-        expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        expense.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        expense.amount.toString().includes(searchTerm)
-      const matchesCategory =
-        !selectedCategoryId || selectedCategoryId === 'all' || expense.categoryId === selectedCategoryId
-      return matchesDate && matchesSearch && matchesCategory
-    })
-    .sort((a, b) => a.date.localeCompare(b.date))
+  const handleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortColumn(column)
+      setSortDirection('asc')
+    }
+  }
+
+  const filteredExpenses = useMemo(() => {
+    return expenses
+      .map((expense) => ({
+        ...expense,
+        category: expenseCategories.find((expenseCategory) => expenseCategory.id === expense.categoryId)?.name
+      }))
+      .filter((expense) => {
+        const expenseDate = new Date(expense.date)
+        const matchesDate = expenseDate.getFullYear() === selectedYear && expenseDate.getMonth() === selectedMonth
+        const matchesSearch =
+          searchTerm === '' ||
+          expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          expense.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          expense.amount.toString().includes(searchTerm)
+        const matchesCategory =
+          !selectedCategoryId || selectedCategoryId === 'all' || expense.categoryId === selectedCategoryId
+        return matchesDate && matchesSearch && matchesCategory
+      })
+      .sort((a, b) => {
+        const dir = sortDirection === 'asc' ? 1 : -1
+        switch (sortColumn) {
+          case 'date':
+            return a.date.localeCompare(b.date) * dir
+          case 'description':
+            return a.description.localeCompare(b.description) * dir
+          case 'category':
+            return (a.category ?? '').localeCompare(b.category ?? '') * dir
+          case 'amount':
+            return (a.amount - b.amount) * dir
+          default:
+            return 0
+        }
+      })
+  }, [expenses, expenseCategories, selectedYear, selectedMonth, searchTerm, selectedCategoryId, sortColumn, sortDirection])
 
   const handleDeleteClick = (expense: Expense) => {
     setExpenseToDelete(expense)
@@ -105,14 +135,22 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
           <Text size="xs" c="dimmed">
             {filteredExpenses.length} {filteredExpenses.length === 1 ? 'item' : 'items'}
           </Text>
-          <ScrollArea>
-            <Table miw={450}>
+          <ScrollArea mah={500}>
+            <Table miw={450} stickyHeader>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th w={80}>Date</Table.Th>
-                  <Table.Th>Description</Table.Th>
-                  <Table.Th>Category</Table.Th>
-                  <Table.Th ta="right" w={70}>Amount</Table.Th>
+                  <Table.Th w={80}>
+                    <SortableHeader column="date" label="Date" sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort} />
+                  </Table.Th>
+                  <Table.Th>
+                    <SortableHeader column="description" label="Description" sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort} />
+                  </Table.Th>
+                  <Table.Th>
+                    <SortableHeader column="category" label="Category" sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort} />
+                  </Table.Th>
+                  <Table.Th ta="right" w={70}>
+                    <SortableHeader column="amount" label="Amount" sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort} justify="flex-end" />
+                  </Table.Th>
                   <Table.Th w={60}>Actions</Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -169,5 +207,26 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ selectedMonth, selecte
         initialData={editingExpense || undefined}
       />
     </Stack>
+  )
+}
+
+const SortableHeader: React.FC<{
+  column: SortColumn
+  label: string
+  sortColumn: SortColumn
+  sortDirection: SortDirection
+  onSort: (column: SortColumn) => void
+  justify?: 'flex-start' | 'flex-end'
+}> = ({ column, label, sortColumn, sortDirection, onSort, justify = 'flex-start' }) => {
+  const isActive = sortColumn === column
+  const Icon = isActive ? (sortDirection === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown
+
+  return (
+    <UnstyledButton onClick={() => onSort(column)} style={{ width: '100%' }}>
+      <Group gap={4} wrap="nowrap" justify={justify}>
+        <Text fw={700} size="sm">{label}</Text>
+        <Icon size={14} opacity={isActive ? 1 : 0.4} />
+      </Group>
+    </UnstyledButton>
   )
 }
