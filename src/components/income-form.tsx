@@ -3,6 +3,7 @@ import { useCategoryStore, useIncomeStore } from '@/stores/instantdb'
 import { Button, NumberInput, Group, Stack } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { IncomeSpreadsheet } from '@/components/income-spreadsheet'
+import { useUnsavedChangesWarning } from '@/hooks/use-unsaved-changes-warning'
 
 interface IncomeFormProps {
   selectedYear: number
@@ -25,6 +26,8 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ selectedYear, selectedMo
   const [rowsToAdd, setRowsToAdd] = useState(1)
   const { addIncome } = useIncomeStore()
   const { data: { incomeCategories = [] } = {} } = useCategoryStore()
+  const isDirty = tableIncomes.some((i) => i.amount !== '' || i.description !== '')
+  useUnsavedChangesWarning(isDirty)
 
   function getDefaultDate(year: number, month: number): Date {
     const currentDate = new Date()
