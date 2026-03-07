@@ -8,11 +8,13 @@ import { ExpenseSpreadsheet } from '@/components/expense-spreadsheet'
 import { Expense, useCategoryStore, useExpenseStore } from '@/stores/instantdb'
 import { notifications } from '@mantine/notifications'
 import { SparklesIcon, TableIcon, UploadIcon } from 'lucide-react'
+import { useUnsavedChangesWarning } from '@/hooks/use-unsaved-changes-warning'
 
 export default function ExpensesPage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [rowsToAdd, setRowsToAdd] = useState(1)
+  useUnsavedChangesWarning(expenses.length > 0)
   const [activeTab, setActiveTab] = useState('upload')
   const { addExpense } = useExpenseStore()
   const { data: { expenseCategories = [] } = {} } = useCategoryStore()
