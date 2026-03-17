@@ -12,8 +12,6 @@ module.exports = {
   plugins: ['@ianvs/prettier-plugin-sort-imports'],
   importOrder: [
     '^react$',
-    '^next$',
-    '^remix$',
     '<THIRD_PARTY_MODULES>',
     '^(@api|@assets|@ui|src|app|@/hooks|@/components)(/.*)$',
     '^(?!.*[.]css$)[./].*$',
