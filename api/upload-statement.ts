@@ -128,10 +128,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     try {
       if (isPdf) {
-        const pdfParse = (await import('pdf-parse')).default
+        const { PDFParse } = await import('pdf-parse')
         const arrayBuffer = await file.arrayBuffer()
         const buffer = Buffer.from(arrayBuffer)
-        const pdfData = await pdfParse(buffer)
+        const parser = new PDFParse({ data: buffer })
+        const pdfData = await parser.getText()
         extractedText = pdfData.text
 
         console.log('[upload-statement] PDF extracted, length:', extractedText.length)

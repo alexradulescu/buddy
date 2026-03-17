@@ -6,7 +6,8 @@ import { Plus, Save } from 'lucide-react'
 import { ExpenseCategory, IncomeCategory } from '@/stores/instantdb'
 import { notifications } from '@mantine/notifications'
 import Handsontable from 'handsontable'
-import 'handsontable/dist/handsontable.full.min.css'
+import 'handsontable/styles/handsontable.css'
+import 'handsontable/styles/ht-theme-main.css'
 
 // Register Handsontable modules
 registerAllModules()
@@ -449,6 +450,7 @@ export const CategorySpreadsheet: React.FC<CategorySpreadsheetProps> = ({
               colHeaders={true}
               rowHeaders={false}
               licenseKey="non-commercial-and-evaluation"
+              themeName="ht-theme-main"
               height="auto"
               width="100%"
               stretchH="all"

@@ -3,7 +3,8 @@ import { HotTable } from '@handsontable/react'
 import { registerAllModules } from 'handsontable/registry'
 import { Stack, Text } from '@mantine/core'
 import Handsontable from 'handsontable'
-import 'handsontable/dist/handsontable.full.min.css'
+import 'handsontable/styles/handsontable.css'
+import 'handsontable/styles/ht-theme-main.css'
 
 // Register Handsontable modules
 registerAllModules()
@@ -224,6 +225,7 @@ export const IncomeSpreadsheet: React.FC<IncomeSpreadsheetProps> = ({
           colHeaders={true}
           rowHeaders={false}
           licenseKey="non-commercial-and-evaluation"
+          themeName="ht-theme-main"
           height={400}
           width="100%"
           stretchH="all"

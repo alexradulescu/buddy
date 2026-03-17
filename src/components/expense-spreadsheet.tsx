@@ -5,7 +5,8 @@ import { Stack, Text, Button } from '@mantine/core'
 import { TrashIcon } from 'lucide-react'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import Handsontable from 'handsontable'
-import 'handsontable/dist/handsontable.full.min.css'
+import 'handsontable/styles/handsontable.css'
+import 'handsontable/styles/ht-theme-main.css'
 
 // Register Handsontable modules
 registerAllModules()
@@ -269,6 +270,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
           colHeaders={true}
           rowHeaders={false}
           licenseKey="non-commercial-and-evaluation"
+          themeName="ht-theme-main"
           height={400}
           width="100%"
           stretchH="all"
