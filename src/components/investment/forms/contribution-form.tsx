@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { InvestmentContribution } from '@/types/investment'
 import { useForm, Controller } from 'react-hook-form'
-import { Button, NumberInput, Textarea, TextInput } from '@mantine/core'
+import { Button, NumberInput, Textarea } from '@mantine/core'
 import { DatePickerInput } from '@mantine/dates'
 import { notifications } from '@mantine/notifications'
 

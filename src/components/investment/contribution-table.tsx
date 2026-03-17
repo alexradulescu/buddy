@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { InvestmentContribution } from '@/types/investment'
 import { Edit, Trash2, PiggyBank } from 'lucide-react'
-import { Button, Card, Table, Group, Title, Text, Center, Stack } from '@mantine/core'
+import { Button, Card, Table, Group, Title, Text, Center } from '@mantine/core'
 import ContributionForm from './forms/contribution-form'
 
 interface ContributionTableProps {

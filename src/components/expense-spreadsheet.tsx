@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 import { HotTable } from '@handsontable/react'
 import { registerAllModules } from 'handsontable/registry'
-import { Stack, Text, Button } from '@mantine/core'
-import { TrashIcon } from 'lucide-react'
+import { Stack, Text } from '@mantine/core'
 import { Expense, ExpenseCategory } from '@/stores/instantdb'
 import Handsontable from 'handsontable'
 import 'handsontable/styles/handsontable.css'
@@ -74,7 +73,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
       instance: Handsontable,
       td: HTMLTableCellElement,
       row: number,
-      col: number,
+      _col: number,
       prop: string | number,
       value: any,
       cellProperties: Handsontable.CellProperties
@@ -104,10 +103,10 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
       instance: Handsontable,
       td: HTMLTableCellElement,
       row: number,
-      col: number,
-      prop: string | number,
-      value: any,
-      cellProperties: Handsontable.CellProperties
+      _col: number,
+      _prop: string | number,
+      _value: any,
+      _cellProperties: Handsontable.CellProperties
     ) => {
       // Clear existing content
       td.innerHTML = ''
@@ -196,7 +195,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
 
   // Cell properties callback for duplicate row highlighting
   const getCellProperties = useCallback(
-    (row: number, col: number): Handsontable.CellMeta => {
+    (row: number, _col: number): Handsontable.CellMeta => {
       const expense = expenses[row]
       if (expense && duplicateIds?.has(expense.id)) {
         return {

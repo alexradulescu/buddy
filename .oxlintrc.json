@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "react/prop-types": "off",
+    "react/jsx-filename-extension": "off",
+    "react/react-in-jsx-scope": "off"
+  },
+  "env": {
+    "builtin": true,
+    "browser": true,
+    "es2022": true
+  },
+  "ignorePatterns": ["dist", "node_modules", "src/routeTree.gen.ts"]
+}

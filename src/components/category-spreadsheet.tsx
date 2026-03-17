@@ -120,10 +120,10 @@ export const CategorySpreadsheet: React.FC<CategorySpreadsheetProps> = ({
       instance: Handsontable,
       td: HTMLTableCellElement,
       row: number,
-      col: number,
-      prop: string | number,
-      value: any,
-      cellProperties: Handsontable.CellProperties
+      _col: number,
+      _prop: string | number,
+      _value: any,
+      _cellProperties: Handsontable.CellProperties
     ) => {
       td.innerHTML = ''
       td.style.padding = '0'
@@ -175,7 +175,7 @@ export const CategorySpreadsheet: React.FC<CategorySpreadsheetProps> = ({
       col: number,
       prop: string | number,
       value: any,
-      cellProperties: Handsontable.CellProperties
+      _cellProperties: Handsontable.CellProperties
     ) => {
       td.innerHTML = ''
       td.style.textAlign = 'center'
@@ -305,10 +305,10 @@ export const CategorySpreadsheet: React.FC<CategorySpreadsheetProps> = ({
 
       try {
         if (category.isNew) {
-          const { id, isNew, ...newCategory } = category
+          const { id: _id, isNew: _isNew, ...newCategory } = category
           await onAdd(newCategory)
         } else if (category.id) {
-          const { id, isNew, ...updateData } = category
+          const { id: _id, isNew: _isNew, ...updateData } = category
           await onUpdate(category.id, updateData)
         }
       } catch (error) {
