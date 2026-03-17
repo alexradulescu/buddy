@@ -76,7 +76,7 @@ export const ExpenseSpreadsheet: React.FC<ExpenseSpreadsheetProps> = ({
       _col: number,
       prop: string | number,
       value: any,
-      cellProperties: Handsontable.CellProperties
+      _cellProperties: Handsontable.CellProperties
     ) => {
       const numValue = Number(value)
       const formattedValue = !isNaN(numValue) ? numValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : value

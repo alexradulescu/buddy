@@ -80,10 +80,10 @@ export const IncomeSpreadsheet: React.FC<IncomeSpreadsheetProps> = ({
       instance: Handsontable,
       td: HTMLTableCellElement,
       row: number,
-      col: number,
-      prop: string | number,
-      value: any,
-      cellProperties: Handsontable.CellProperties
+      _col: number,
+      _prop: string | number,
+      _value: any,
+      _cellProperties: Handsontable.CellProperties
     ) => {
       // Clear existing content
       td.innerHTML = ''
