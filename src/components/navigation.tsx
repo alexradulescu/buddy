@@ -68,7 +68,7 @@ export function MobileNav() {
         borderRadius: '20px',
         border: '1px solid rgba(255, 255, 255, 0.75)',
         boxShadow: '0 4px 24px rgba(0, 0, 0, 0.07)',
-        padding: `${rem(6)} ${rem(4)}`,
+        padding: `${rem(2)} ${rem(2)}`,
       }}
     >
       {navItems.map((item) => {
