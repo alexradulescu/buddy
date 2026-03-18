@@ -4,17 +4,20 @@ import { HeaderActionProvider } from '@/contexts/header-action-context'
 import { DesktopNav, MobileNav } from '@/components/navigation'
 import { AppHeader } from '@/components/app-header'
 import { AppShell, Box } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 
 export const Route = createRootRoute({
   component: RootLayout,
 })
 
 function RootLayout() {
+  const isMobile = useMediaQuery('(max-width: 48em)')
+
   return (
     <NuqsAdapter>
       <HeaderActionProvider>
         <AppShell
-          header={{ height: 60 }}
+          header={{ height: isMobile ? 'calc(60px + env(safe-area-inset-top, 0px))' : 60 }}
           navbar={{
             width: 56,
             breakpoint: 'sm',
@@ -34,8 +37,11 @@ function RootLayout() {
           {/* Header */}
           <AppShell.Header
             style={{
-              backgroundColor: '#FFFFFF',
-              borderBottom: '1px solid #E5E9EB',
+              backgroundColor: isMobile ? 'rgba(255, 255, 255, 0.72)' : '#FFFFFF',
+              backdropFilter: isMobile ? 'blur(20px)' : 'none',
+              WebkitBackdropFilter: isMobile ? 'blur(20px)' : 'none',
+              borderBottom: isMobile ? '1px solid rgba(229, 233, 235, 0.6)' : '1px solid #E5E9EB',
+              paddingTop: isMobile ? 'env(safe-area-inset-top, 0px)' : 0,
             }}
           >
             <AppHeader />
