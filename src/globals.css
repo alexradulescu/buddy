@@ -261,34 +261,40 @@ textarea {
   font-style: italic;
 }
 
-/* Mobile: frosted glass top header + scroll-behind layout */
+/* Desktop: solid header */
 .mantine-AppShell-header {
   background-color: #FFFFFF;
   border-bottom: 1px solid #E5E9EB;
 }
 
+/* Mobile: iOS 26-style frosted glass bars + scroll-behind layout */
 @media (max-width: 48em) {
-  /* Glass effect — must live in CSS so inline styles don't block it */
+  /* Top bar — 70% transparent, 10px blur */
   .mantine-AppShell-header {
-    background-color: rgba(255, 255, 255, 0.72) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border-bottom: 1px solid rgba(229, 233, 235, 0.6) !important;
+    background-color: rgba(255, 255, 255, 0.70) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-bottom: 1px solid rgba(229, 233, 235, 0.5) !important;
     padding-top: env(safe-area-inset-top, 0px);
   }
 
-  /*
-   * The key fix: remove Mantine's auto padding-top on Main so the scroll
-   * container starts at y=0 (behind the fixed glass header), not below it.
-   * Content then scrolls UP under the glass, just like iOS nav bars.
-   */
+  /* Remove Mantine's auto padding so scroll starts at y=0 (behind both glass bars) */
   .mantine-AppShell-main {
     padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
 
-  /* Push the initial content below the glass header */
+  /* Bottom bar container — transparent, let MobileNav own the glass */
+  .mantine-AppShell-footer {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  /* Scroll zone: push content below top bar and above bottom bar */
   .scrollable-zone {
     padding-top: calc(60px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
   }
 }
 

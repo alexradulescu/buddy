@@ -52,10 +52,7 @@ function RootLayout() {
             style={{
               backgroundColor: 'transparent',
               border: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '8px 12px',
-              paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))',
+              padding: 0,
             }}
           >
             <MobileNav />

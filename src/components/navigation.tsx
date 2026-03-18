@@ -62,13 +62,14 @@ export function MobileNav() {
       style={{
         display: 'flex',
         width: '100%',
-        backgroundColor: 'rgba(255, 255, 255, 0.5)',
-        backdropFilter: 'blur(5px)',
-        WebkitBackdropFilter: 'blur(5px)',
-        borderRadius: '20px',
-        border: '1px solid rgba(255, 255, 255, 0.75)',
-        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.07)',
-        padding: `${rem(2)} ${rem(2)}`,
+        height: '100%',
+        backgroundColor: 'rgba(255, 255, 255, 0.75)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        borderTop: '1px solid rgba(229, 233, 235, 0.5)',
+        paddingTop: rem(8),
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        alignItems: 'flex-start',
       }}
     >
       {navItems.map((item) => {
@@ -84,13 +85,13 @@ export function MobileNav() {
               alignItems: 'center',
               justifyContent: 'center',
               flex: 1,
-              padding: `${rem(6)} ${rem(4)}`,
+              padding: `${rem(4)} ${rem(4)}`,
               color: isActive ? '#1B4332' : '#6F767E',
               transition: 'all 0.15s ease',
               textDecoration: 'none',
-              borderRadius: '18px',
+              borderRadius: '10px',
               backgroundColor: isActive ? 'rgba(82, 183, 136, 0.15)' : 'transparent',
-              gap: rem(2),
+              gap: rem(3),
             }}
           >
             <item.icon size={22} strokeWidth={isActive ? 2 : 1.5} />
