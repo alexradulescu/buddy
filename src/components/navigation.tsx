@@ -88,7 +88,7 @@ export function MobileNav() {
               color: isActive ? '#1B4332' : '#6F767E',
               transition: 'all 0.15s ease',
               textDecoration: 'none',
-              borderRadius: '14px',
+              borderRadius: '18px',
               backgroundColor: isActive ? 'rgba(82, 183, 136, 0.15)' : 'transparent',
               gap: rem(2),
             }}
