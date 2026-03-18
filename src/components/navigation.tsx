@@ -58,7 +58,19 @@ export function MobileNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
 
   return (
-    <>
+    <Box
+      style={{
+        display: 'flex',
+        width: '100%',
+        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+        backdropFilter: 'blur(5px)',
+        WebkitBackdropFilter: 'blur(5px)',
+        borderRadius: '20px',
+        border: '1px solid rgba(255, 255, 255, 0.75)',
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.07)',
+        padding: `${rem(2)} ${rem(2)}`,
+      }}
+    >
       {navItems.map((item) => {
         const isActive = pathname === item.href
         return (
@@ -72,38 +84,26 @@ export function MobileNav() {
               alignItems: 'center',
               justifyContent: 'center',
               flex: 1,
-              padding: `${rem(8)} ${rem(8)} ${rem(4)}`,
+              padding: `${rem(6)} ${rem(4)}`,
               color: isActive ? '#1B4332' : '#6F767E',
               transition: 'all 0.15s ease',
-              position: 'relative',
               textDecoration: 'none',
+              borderRadius: '18px',
+              backgroundColor: isActive ? 'rgba(82, 183, 136, 0.15)' : 'transparent',
+              gap: rem(2),
             }}
           >
-            {isActive && (
-              <Box
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: '24px',
-                  height: '3px',
-                  backgroundColor: '#52B788',
-                  borderRadius: '2px',
-                }}
-              />
-            )}
-            <item.icon size={20} strokeWidth={isActive ? 2 : 1.5} style={{ marginBottom: rem(2) }} />
+            <item.icon size={22} strokeWidth={isActive ? 2 : 1.5} />
             <Text
               size="xs"
               fw={isActive ? 600 : 400}
-              style={{ fontSize: '10px' }}
+              style={{ fontSize: '10px', lineHeight: 1.2 }}
             >
               {item.label}
             </Text>
           </Link>
         )
       })}
-    </>
+    </Box>
   )
 }
