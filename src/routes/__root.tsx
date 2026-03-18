@@ -3,7 +3,7 @@ import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import { HeaderActionProvider } from '@/contexts/header-action-context'
 import { DesktopNav, MobileNav } from '@/components/navigation'
 import { AppHeader } from '@/components/app-header'
-import { AppShell, Group, Box } from '@mantine/core'
+import { AppShell, Box } from '@mantine/core'
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -55,17 +55,15 @@ function RootLayout() {
           <AppShell.Footer
             hiddenFrom="sm"
             style={{
-              backgroundColor: '#FFFFFF',
-              borderTop: '1px solid #E5E9EB',
+              backgroundColor: 'transparent',
+              border: 'none',
               display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+              alignItems: 'center',
+              padding: '8px 12px',
+              paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))',
             }}
           >
-            <Group gap={0} h="100%" align="center" style={{ width: '100%' }}>
-              <MobileNav />
-            </Group>
+            <MobileNav />
           </AppShell.Footer>
 
           {/* Main content */}
