@@ -5,7 +5,6 @@ import { ActionIcon, Group, Title, Box } from '@mantine/core'
 import { MonthPickerInput } from '@mantine/dates'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { useHeaderAction } from '@/contexts/header-action-context'
-import { useMediaQuery } from '@mantine/hooks'
 
 const pageTitle: Record<string, string> = {
   '/': 'Budget Overview',
@@ -20,7 +19,6 @@ export function AppHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const { selectedYear, setSelectedYear, selectedMonth, setSelectedMonth } = useSharedQueryParams()
   const { action } = useHeaderAction()
-  const isMobile = useMediaQuery('(max-width: 48em)')
 
   const handleMonthChange = (increment: number) => {
     let newMonth = selectedMonth + increment
@@ -63,9 +61,9 @@ export function AppHeader() {
               root: {
                 borderTopLeftRadius: '8px',
                 borderBottomLeftRadius: '8px',
-                border: isMobile ? '1px solid rgba(229, 233, 235, 0.6)' : '1px solid #E5E9EB',
+                border: '1px solid #E5E9EB',
                 borderRight: 'none',
-                backgroundColor: isMobile ? 'rgba(255, 255, 255, 0.4)' : '#FFFFFF',
+                backgroundColor: 'transparent',
                 color: '#6F767E',
                 '&:hover': {
                   backgroundColor: 'rgba(82, 183, 136, 0.1)',
@@ -79,8 +77,8 @@ export function AppHeader() {
 
           <Box
             style={{
-              borderTop: isMobile ? '1px solid rgba(229, 233, 235, 0.6)' : '1px solid #E5E9EB',
-              borderBottom: isMobile ? '1px solid rgba(229, 233, 235, 0.6)' : '1px solid #E5E9EB',
+              borderTop: '1px solid #E5E9EB',
+              borderBottom: '1px solid #E5E9EB',
             }}
           >
             <MonthPickerInput
@@ -102,7 +100,7 @@ export function AppHeader() {
                   fontSize: '13px',
                   fontWeight: 500,
                   color: '#1A1D1F',
-                  backgroundColor: isMobile ? 'rgba(255, 255, 255, 0.4)' : '#FFFFFF',
+                  backgroundColor: 'transparent',
                   height: '34px',
                   minHeight: '34px',
                   padding: '0 4px',
@@ -121,9 +119,9 @@ export function AppHeader() {
               root: {
                 borderTopRightRadius: '8px',
                 borderBottomRightRadius: '8px',
-                border: isMobile ? '1px solid rgba(229, 233, 235, 0.6)' : '1px solid #E5E9EB',
+                border: '1px solid #E5E9EB',
                 borderLeft: 'none',
-                backgroundColor: isMobile ? 'rgba(255, 255, 255, 0.4)' : '#FFFFFF',
+                backgroundColor: 'transparent',
                 color: '#6F767E',
                 '&:hover': {
                   backgroundColor: 'rgba(82, 183, 136, 0.1)',
