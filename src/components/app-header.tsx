@@ -50,7 +50,7 @@ export function AppHeader() {
         {action}
 
         {/* Month picker */}
-        <Group gap={0} wrap="nowrap">
+        <Group gap={0} wrap="nowrap" className="month-picker-group">
           <ActionIcon
             variant="subtle"
             onClick={() => handleMonthChange(-1)}

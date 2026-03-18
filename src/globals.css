@@ -261,40 +261,78 @@ textarea {
   font-style: italic;
 }
 
-/* Desktop: solid header */
+/* Desktop header: solid white */
 .mantine-AppShell-header {
   background-color: #FFFFFF;
   border-bottom: 1px solid #E5E9EB;
 }
 
-/* Mobile: iOS 26-style frosted glass bars + scroll-behind layout */
+/*
+ * Mobile bottom nav bar.
+ * Rendered outside AppShell (see __root.tsx) so it's a true fixed overlay,
+ * not part of Mantine's document-flow layout.
+ * Hidden on desktop via this rule; shown on mobile via the media query below.
+ */
+.mobile-nav-bar {
+  display: none;
+}
+
+/* ── Mobile: iOS 26 glass overlay layout ──────────────────────────────── */
 @media (max-width: 48em) {
-  /* Top bar — 70% transparent, 10px blur */
+
+  /* Top bar: iOS vibrancy — saturate + blur gives the real frosted look */
   .mantine-AppShell-header {
-    background-color: rgba(255, 255, 255, 0.70) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border-bottom: 1px solid rgba(229, 233, 235, 0.5) !important;
+    background-color: rgba(248, 250, 251, 0.82) !important;
+    backdrop-filter: saturate(180%) blur(20px) !important;
+    -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.12) !important;
     padding-top: env(safe-area-inset-top, 0px);
   }
 
-  /* Remove Mantine's auto padding so scroll starts at y=0 (behind both glass bars) */
+  /*
+   * Strip ALL Mantine-injected padding from AppShell.Main.
+   * Content now starts at y=0 and scrolls freely behind the glass bars.
+   * The root-scroll-content class below handles the actual spacing.
+   */
   .mantine-AppShell-main {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  /* Bottom bar container — transparent, let MobileNav own the glass */
-  .mantine-AppShell-footer {
-    background: transparent !important;
-    border: none !important;
     padding: 0 !important;
   }
 
-  /* Scroll zone: push content below top bar and above bottom bar */
-  .scrollable-zone {
+  /*
+   * Root scroll content: offset from both glass bars.
+   * Also re-applies horizontal padding that AppShell.Main normally provides.
+   * Inner ScrollAreas (expense/income) have their own scroll — not affected.
+   */
+  .root-scroll-content {
     padding-top: calc(60px + env(safe-area-inset-top, 0px));
-    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    padding-left: var(--mantine-spacing-md, 1rem);
+    padding-right: var(--mantine-spacing-md, 1rem);
+  }
+
+  /* Bottom nav: fixed glass overlay above content */
+  .mobile-nav-bar {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+  }
+
+  /* Month picker pill on mobile */
+  .month-picker-group {
+    background-color: rgba(116, 116, 128, 0.12) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+  }
+
+  .month-picker-group .mantine-ActionIcon-root {
+    border: none !important;
+  }
+
+  .month-picker-group > .mantine-Box-root {
+    border: none !important;
   }
 }
 

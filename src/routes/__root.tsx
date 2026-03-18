@@ -3,7 +3,7 @@ import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import { HeaderActionProvider } from '@/contexts/header-action-context'
 import { DesktopNav, MobileNav } from '@/components/navigation'
 import { AppHeader } from '@/components/app-header'
-import { AppShell, Box } from '@mantine/core'
+import { AppShell } from '@mantine/core'
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -20,23 +20,16 @@ function RootLayout() {
             breakpoint: 'sm',
             collapsed: { mobile: true },
           }}
-          footer={{
-            height: 'calc(64px + env(safe-area-inset-bottom, 0px))',
-          }}
           padding="md"
           withBorder={false}
           styles={{
-            root: {
-              backgroundColor: '#F8FAFB',
-            },
+            root: { backgroundColor: '#F8FAFB' },
           }}
         >
-          {/* Header — styled via CSS (see globals.css mobile overrides) */}
           <AppShell.Header>
             <AppHeader />
           </AppShell.Header>
 
-          {/* Desktop sidebar */}
           <AppShell.Navbar
             style={{
               backgroundColor: '#FFFFFF',
@@ -46,29 +39,21 @@ function RootLayout() {
             <DesktopNav />
           </AppShell.Navbar>
 
-          {/* Mobile bottom navigation */}
-          <AppShell.Footer
-            hiddenFrom="sm"
-            style={{
-              backgroundColor: 'transparent',
-              border: 'none',
-              padding: 0,
-            }}
-          >
-            <MobileNav />
-          </AppShell.Footer>
-
-          {/* Main content */}
-          <AppShell.Main
-            style={{
-              backgroundColor: '#F8FAFB',
-            }}
-          >
-            <Box className="scrollable-zone" style={{ height: '100%' }}>
+          <AppShell.Main style={{ backgroundColor: '#F8FAFB' }}>
+            <div className="scrollable-zone root-scroll-content">
               <Outlet />
-            </Box>
+            </div>
           </AppShell.Main>
         </AppShell>
+
+        {/*
+         * Mobile bottom nav lives OUTSIDE AppShell so it is a true fixed
+         * overlay — not part of the document flow that AppShell manages.
+         * Hidden on desktop via CSS (.mobile-nav-bar display:none at sm+).
+         */}
+        <div className="mobile-nav-bar">
+          <MobileNav />
+        </div>
       </HeaderActionProvider>
     </NuqsAdapter>
   )

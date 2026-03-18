@@ -1,6 +1,7 @@
+import React from 'react'
 import { BarChart2, CreditCard, Home, LucideIcon, PiggyBank, Settings, TrendingUp } from 'lucide-react'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { Tooltip, Stack, rem, Text, Box } from '@mantine/core'
+import { Tooltip, Stack, rem } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 
 interface NavItem {
@@ -58,19 +59,17 @@ export function MobileNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
 
   return (
-    <Box
+    <div
       style={{
         display: 'flex',
         width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(255, 255, 255, 0.75)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        borderTop: '1px solid rgba(229, 233, 235, 0.5)',
-        paddingTop: rem(8),
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        alignItems: 'flex-start',
-      }}
+        backgroundColor: 'rgba(248, 250, 251, 0.82)',
+        backdropFilter: 'saturate(180%) blur(20px)',
+        WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+        borderTop: '0.5px solid rgba(0, 0, 0, 0.12)',
+        paddingTop: '8px',
+        paddingBottom: 'env(safe-area-inset-bottom, 8px)',
+      } as React.CSSProperties}
     >
       {navItems.map((item) => {
         const isActive = pathname === item.href
@@ -85,26 +84,28 @@ export function MobileNav() {
               alignItems: 'center',
               justifyContent: 'center',
               flex: 1,
-              padding: `${rem(4)} ${rem(4)}`,
-              color: isActive ? '#1B4332' : '#6F767E',
-              transition: 'all 0.15s ease',
+              gap: '2px',
+              paddingTop: '4px',
+              paddingBottom: '4px',
+              color: isActive ? '#1B4332' : '#8E8E93',
               textDecoration: 'none',
-              borderRadius: '10px',
-              backgroundColor: isActive ? 'rgba(82, 183, 136, 0.15)' : 'transparent',
-              gap: rem(3),
+              transition: 'color 0.15s ease',
             }}
           >
-            <item.icon size={22} strokeWidth={isActive ? 2 : 1.5} />
-            <Text
-              size="xs"
-              fw={isActive ? 600 : 400}
-              style={{ fontSize: '10px', lineHeight: 1.2 }}
+            <item.icon size={24} strokeWidth={isActive ? 2 : 1.5} />
+            <span
+              style={{
+                fontSize: '10px',
+                fontWeight: isActive ? 600 : 400,
+                lineHeight: 1.2,
+                letterSpacing: '-0.01em',
+              }}
             >
               {item.label}
-            </Text>
+            </span>
           </Link>
         )
       })}
-    </Box>
+    </div>
   )
 }
