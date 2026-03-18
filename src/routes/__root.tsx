@@ -17,7 +17,10 @@ function RootLayout() {
     <NuqsAdapter>
       <HeaderActionProvider>
         <AppShell
-          header={{ height: isMobile ? 'calc(60px + env(safe-area-inset-top, 0px))' : 60 }}
+          header={{
+            height: isMobile ? 'calc(60px + env(safe-area-inset-top, 0px))' : 60,
+            offset: !isMobile,
+          }}
           navbar={{
             width: 56,
             breakpoint: 'sm',
@@ -76,6 +79,9 @@ function RootLayout() {
           <AppShell.Main
             style={{
               backgroundColor: '#F8FAFB',
+              ...(isMobile && {
+                paddingTop: 'calc(60px + env(safe-area-inset-top, 0px) + var(--mantine-spacing-md))',
+              }),
             }}
           >
             <Box className="scrollable-zone" style={{ height: '100%' }}>
