@@ -67,7 +67,7 @@ export default function InvestmentDetailPage() {
         color: 'green'
       })
       navigate({ to: '/investments' })
-    } catch (error) {
+    } catch {
       notifications.show({
         title: 'Error',
         message: 'Failed to delete the investment. Please try again.',
@@ -86,7 +86,7 @@ export default function InvestmentDetailPage() {
           message: 'The contribution has been successfully deleted.',
           color: 'green'
         })
-      } catch (error) {
+      } catch {
         notifications.show({
           title: 'Error',
           message: 'Failed to delete the contribution. Please try again.',
@@ -105,7 +105,7 @@ export default function InvestmentDetailPage() {
           message: 'The value entry has been successfully deleted.',
           color: 'green'
         })
-      } catch (error) {
+      } catch {
         notifications.show({
           title: 'Error',
           message: 'Failed to delete the value entry. Please try again.',

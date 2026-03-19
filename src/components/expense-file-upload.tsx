@@ -11,7 +11,7 @@ import {
   Stack,
   Title
 } from '@mantine/core'
-import { Upload, FileText } from 'lucide-react'
+import { Upload } from 'lucide-react'
 import { notifications } from '@mantine/notifications'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { ExpenseSpreadsheet } from '@/components/expense-spreadsheet'

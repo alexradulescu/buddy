@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Edit, Trash2, BarChart3 } from 'lucide-react'
-import { Button, Card, Table, Group, Title, Text, Center, Stack } from '@mantine/core'
+import { Button, Card, Table, Group, Title, Text, Center } from '@mantine/core'
 import { InvestmentValue } from '@/types/investment'
 import ValueForm from './forms/value-form'
 

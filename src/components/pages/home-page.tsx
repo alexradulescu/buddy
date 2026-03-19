@@ -9,7 +9,7 @@ import { YTDOverview } from '@/components/ytd-overview'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { useDashboardExport } from '@/hooks/use-dashboard-export'
 import { useSetHeaderAction } from '@/contexts/header-action-context'
-import { Stack, Card, SimpleGrid, Button, ActionIcon, Box } from '@mantine/core'
+import { Stack, Card, SimpleGrid, Button, ActionIcon } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 import { Download } from 'lucide-react'
 

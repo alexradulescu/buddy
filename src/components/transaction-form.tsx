@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { ExpenseCategory, IncomeCategory } from '@/stores/instantdb'
-import { format } from 'date-fns'
 import { Button, Modal, TextInput, NumberInput, Select } from '@mantine/core'
 import { DatePickerInput } from '@mantine/dates'
 

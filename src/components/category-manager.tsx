@@ -88,11 +88,11 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
     return true
   }
 
-  const isExpenseCategory = (category: EditableCategory): category is EditableExpenseCategory => {
+  const isExpenseCategory = (_category: EditableCategory): _category is EditableExpenseCategory => {
     return type === 'expense'
   }
 
-  const isIncomeCategory = (category: EditableCategory): category is EditableIncomeCategory => {
+  const isIncomeCategory = (_category: EditableCategory): _category is EditableIncomeCategory => {
     return type === 'income'
   }
 
@@ -169,10 +169,10 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
 
     try {
       if (category.isNew) {
-        const { id, isNew, ...newCategory } = category
+        const { id: _id, isNew: _isNew, ...newCategory } = category
         await onAdd(newCategory)
       } else if (category.id) {
-        const { id, isNew, ...updateData } = category
+        const { id: _id, isNew: _isNew, ...updateData } = category
         await onUpdate(category.id, updateData)
       }
     } catch (error) {

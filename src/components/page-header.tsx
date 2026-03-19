@@ -1,5 +1,4 @@
 import React, { FC } from 'react'
-import { format } from 'date-fns'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { ActionIcon, Group, Stack, Title, Text } from '@mantine/core'
 import { MonthPickerInput } from '@mantine/dates'

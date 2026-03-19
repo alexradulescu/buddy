@@ -91,10 +91,10 @@ export const ExpenseAiConverter: React.FC<ExpenseAiConverterProps> = ({ onExpens
 
       // Parse the streaming text response
       const text = await response.text()
-      const expenses = JSON.parse(text)
+      const parsedExpenses = JSON.parse(text)
 
-      if (expenses && Array.isArray(expenses) && expenses.length > 0) {
-        const processedExpenses = expenses.map((expense) => ({
+      if (parsedExpenses && Array.isArray(parsedExpenses) && parsedExpenses.length > 0) {
+        const processedExpenses = parsedExpenses.map((expense) => ({
           ...expense,
           id: crypto.randomUUID()
         }))
