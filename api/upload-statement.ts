@@ -9,11 +9,6 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
 export const maxDuration = 300
 
-/**
- * Vercel serverless function for bank statement upload
- * Self-contained AI utilities for reliable deployment on Vercel
- */
-
 // Schema for AI output
 const expenseSchema = z.object({
   amount: z.number().nonnegative().describe('Amount of the expense as a decimal number'),
@@ -22,15 +17,7 @@ const expenseSchema = z.object({
   description: z.string().describe('Cleaned up description preserving key information')
 })
 
-function buildStatementPrompt({
-  extractedText,
-  expenseCategories,
-  historicalExpenses
-}: {
-  extractedText: string
-  expenseCategories: ExpenseCategory[]
-  historicalExpenses: HistoricalExpense[]
-}): string {
+function buildInstructions(expenseCategories: ExpenseCategory[], historicalExpenses: HistoricalExpense[]): string {
   const categoryList = expenseCategories.map((c) => `- ${c.id}: ${c.name}`).join('\n')
 
   const historyContext =
@@ -54,15 +41,53 @@ Available categories:
 ${categoryList}
 ${historyContext}
 
-Bank statement content:
----
-${extractedText}
----
-
 Extract all expense transactions as a JSON array. For each expense include: date, amount (positive), description, categoryId.`
 }
 
-async function streamAIResponse(prompt: string): Promise<Response> {
+function buildStatementPrompt({
+  extractedText,
+  expenseCategories,
+  historicalExpenses
+}: {
+  extractedText: string
+  expenseCategories: ExpenseCategory[]
+  historicalExpenses: HistoricalExpense[]
+}): string {
+  return `${buildInstructions(expenseCategories, historicalExpenses)}
+
+Bank statement content:
+---
+${extractedText}
+---`
+}
+
+// PDF path: send file directly to Gemini — no pdfjs/canvas dependency needed
+async function streamAIResponseWithPDF(
+  pdfData: Uint8Array,
+  expenseCategories: ExpenseCategory[],
+  historicalExpenses: HistoricalExpense[]
+): Promise<Response> {
+  console.log('[AI] Using Gemini with native PDF support')
+  const result = streamObject({
+    model: google('gemini-2.5-flash-preview-05-20'),
+    output: 'array',
+    schema: expenseSchema,
+    messages: [
+      {
+        role: 'user',
+        content: [
+          { type: 'file', data: pdfData, mimeType: 'application/pdf' },
+          { type: 'text', text: buildInstructions(expenseCategories, historicalExpenses) }
+        ]
+      }
+    ],
+    maxRetries: 2
+  })
+  return result.toTextStreamResponse()
+}
+
+// CSV / text path: extract text first then pass as prompt with Gemini + OpenAI fallback
+async function streamAIResponseWithText(prompt: string): Promise<Response> {
   try {
     console.log('[AI] Using Gemini 3 Flash')
     const result = streamObject({
@@ -104,17 +129,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const expenseCategoriesJson = formData.get('expenseCategories') as string | null
     const historicalExpensesJson = formData.get('historicalExpenses') as string | null
 
-    // Validate file exists
     if (!file) {
       return res.status(400).json({ error: 'No file provided' })
     }
 
-    // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       return res.status(400).json({ error: 'File is too large. Maximum size is 5MB.' })
     }
 
-    // Validate file type
     const fileType = file.type
     const fileName = file.name.toLowerCase()
     const isPdf = fileType === 'application/pdf' || fileName.endsWith('.pdf')
@@ -124,54 +146,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Unsupported file type. Please upload a PDF or CSV file.' })
     }
 
-    let extractedText: string
+    const expenseCategories: ExpenseCategory[] = JSON.parse(expenseCategoriesJson || '[]')
+    const historicalExpenses: HistoricalExpense[] = JSON.parse(historicalExpensesJson || '[]')
 
-    try {
-      if (isPdf) {
-        const { getDocumentProxy, extractText } = await import('unpdf')
-        const arrayBuffer = await file.arrayBuffer()
-        const pdfDoc = await getDocumentProxy(new Uint8Array(arrayBuffer))
-        const { text } = await extractText(pdfDoc, { mergePages: true })
-        extractedText = Array.isArray(text) ? text.join('\n') : text
+    let streamResponse: Response
 
-        console.log('[upload-statement] PDF extracted, length:', extractedText.length)
-
-        if (!extractedText || extractedText.trim().length < 50) {
-          return res.status(422).json({ error: 'Could not extract text from PDF. Please try CSV format.' })
-        }
-      } else {
+    if (isPdf) {
+      const arrayBuffer = await file.arrayBuffer()
+      console.log('[upload-statement] Processing PDF natively, size:', arrayBuffer.byteLength)
+      streamResponse = await streamAIResponseWithPDF(
+        new Uint8Array(arrayBuffer),
+        expenseCategories,
+        historicalExpenses
+      )
+    } else {
+      let extractedText: string
+      try {
         extractedText = await file.text()
         console.log('[upload-statement] CSV content length:', extractedText.length)
-
         if (!extractedText || extractedText.trim().length < 10) {
           return res.status(422).json({ error: 'CSV file appears to be empty.' })
         }
+      } catch (error) {
+        console.error('[upload-statement] CSV read error:', error)
+        return res.status(422).json({ error: 'Failed to read file. Please try a different file.' })
       }
-    } catch (error) {
-      console.error('[upload-statement] Extraction error:', error)
-      return res.status(422).json({ error: 'Failed to read file. Please try a different file.' })
+      const prompt = buildStatementPrompt({ extractedText, expenseCategories, historicalExpenses })
+      console.log('[upload-statement] Sending to AI, prompt length:', prompt.length)
+      streamResponse = await streamAIResponseWithText(prompt)
+      streamResponse.headers.set('X-Extracted-Text', encodeURIComponent(extractedText))
     }
 
-    // Parse categories and historical expenses
-    const expenseCategories = JSON.parse(expenseCategoriesJson || '[]')
-    const historicalExpenses = JSON.parse(historicalExpensesJson || '[]')
-
-    // Build prompt for AI
-    const prompt = buildStatementPrompt({ extractedText, expenseCategories, historicalExpenses })
-    console.log('[upload-statement] Sending to AI, prompt length:', prompt.length)
-
-    // Get streaming AI response
-    const streamResponse = await streamAIResponse(prompt)
-
-    // Add extracted text to response headers
-    streamResponse.headers.set('X-Extracted-Text', encodeURIComponent(extractedText))
-
-    // Forward headers from streaming response
     streamResponse.headers.forEach((value, key) => {
       res.setHeader(key, value)
     })
 
-    // Pipe the stream to response
     const reader = streamResponse.body?.getReader()
     if (!reader) {
       return res.status(500).json({ error: 'No response stream available' })
@@ -194,14 +203,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 }
 
 /**
- * Parse FormData from Vercel request
- * Vercel's body parsing doesn't handle multipart/form-data properly
- * so we need to parse it manually
+ * Parse FormData from Vercel request.
+ * Vercel's body parsing doesn't handle multipart/form-data, so we do it manually.
  */
 async function getFormData(req: VercelRequest): Promise<FormData> {
-  // Vercel might have already parsed the body
   if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
-    // Body was parsed as JSON, need to reconstruct FormData
     const formData = new FormData()
     for (const [key, value] of Object.entries(req.body)) {
       formData.append(key, value as any)
@@ -209,7 +215,6 @@ async function getFormData(req: VercelRequest): Promise<FormData> {
     return formData
   }
 
-  // Read raw body and parse FormData
   const busboy = await import('busboy')
   const contentType = req.headers['content-type'] || ''
 
