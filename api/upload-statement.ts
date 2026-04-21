@@ -76,7 +76,7 @@ async function streamAIResponseWithPDF(
       {
         role: 'user',
         content: [
-          { type: 'file', data: pdfData, mimeType: 'application/pdf' },
+          { type: 'file', data: pdfData, mediaType: 'application/pdf' },
           { type: 'text', text: buildInstructions(expenseCategories, historicalExpenses) }
         ]
       }
