@@ -1,27 +1,26 @@
+import { useState } from 'react'
 import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { Plus } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
 import InvestmentCard from '@/components/investment/investment-card'
+import InvestmentForm from '@/components/investment/forms/investment-form'
 import { useSetHeaderAction } from '@/contexts/header-action-context'
-import { Button, Stack, Title, Text, Card, SimpleGrid, Center, ActionIcon } from '@mantine/core'
+import { Button, Modal, Stack, Title, Text, Card, SimpleGrid, Center, ActionIcon } from '@mantine/core'
 
 export default function InvestmentsPage() {
   const { investments } = useInvestmentStore()
+  const [addModalOpen, setAddModalOpen] = useState(false)
 
-  // Set header action - show label on desktop, icon only on mobile
   useSetHeaderAction(
     <>
       <Button
-        component={Link}
-        to="/investments/new"
+        onClick={() => setAddModalOpen(true)}
         leftSection={<Plus size={16} />}
         visibleFrom="sm"
       >
         Add Investment
       </Button>
       <ActionIcon
-        component={Link}
-        to="/investments/new"
+        onClick={() => setAddModalOpen(true)}
         variant="filled"
         hiddenFrom="sm"
         size="lg"
@@ -40,7 +39,7 @@ export default function InvestmentsPage() {
             <Stack align="center" gap="sm">
               <Title order={4}>No investments yet</Title>
               <Text size="sm" c="dimmed">Get started by adding your first investment</Text>
-              <Button component={Link} to="/investments/new" leftSection={<Plus size={16} />}>
+              <Button onClick={() => setAddModalOpen(true)} leftSection={<Plus size={16} />}>
                 Add Investment
               </Button>
             </Stack>
@@ -53,6 +52,18 @@ export default function InvestmentsPage() {
           ))}
         </SimpleGrid>
       )}
+
+      <Modal
+        opened={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        title="Add Investment"
+        centered
+      >
+        <InvestmentForm
+          onSuccess={() => setAddModalOpen(false)}
+          onCancel={() => setAddModalOpen(false)}
+        />
+      </Modal>
     </Stack>
   )
 }

@@ -4,7 +4,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { Route } from '@/routes/investments.$id.edit'
 import InvestmentForm from '@/components/investment/forms/investment-form'
 import { PageHeader } from '@/components/page-header'
-import { Button, Stack, Title, Text, Center } from '@mantine/core'
+import { Button, Card, Stack, Title, Text, Center } from '@mantine/core'
 
 export default function EditInvestmentPage() {
   const { id } = Route.useParams()
@@ -37,7 +37,9 @@ export default function EditInvestmentPage() {
 
       <PageHeader title="Edit Investment" description="Update your investment details" />
 
-      <InvestmentForm investment={investment} onSuccess={() => navigate({ to: '/investments/$id', params: { id } })} />
+      <Card>
+        <InvestmentForm investment={investment} onSuccess={() => navigate({ to: '/investments/$id', params: { id } })} />
+      </Card>
     </Stack>
   )
 }

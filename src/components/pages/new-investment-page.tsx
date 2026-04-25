@@ -2,7 +2,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import InvestmentForm from '@/components/investment/forms/investment-form'
 import { PageHeader } from '@/components/page-header'
-import { Button, Stack, Group } from '@mantine/core'
+import { Button, Card, Stack, Group } from '@mantine/core'
 
 export default function NewInvestmentPage() {
   return (
@@ -15,7 +15,9 @@ export default function NewInvestmentPage() {
 
       <PageHeader title="Add Investment" description="Create a new investment to track" />
 
-      <InvestmentForm />
+      <Card>
+        <InvestmentForm />
+      </Card>
     </Stack>
   )
 }
