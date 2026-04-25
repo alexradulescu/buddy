@@ -6,6 +6,7 @@ import { Route } from '@/routes/investments.$id'
 import ContributionTable from '@/components/investment/contribution-table'
 import PerformanceGraph from '@/components/investment/performance-graph'
 import ValueTable from '@/components/investment/value-table'
+import InvestmentForm from '@/components/investment/forms/investment-form'
 import { Button, Card, Modal, Stack, Group, Title, Text, SimpleGrid, Center } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 
@@ -30,6 +31,7 @@ export default function InvestmentDetailPage() {
     deleteValue
   } = useInvestmentStore()
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
 
   // Find the investment by ID
   const investment = investments.find((inv) => inv.id === id)
@@ -135,7 +137,7 @@ export default function InvestmentDetailPage() {
           Back to Investments
         </Button>
         <Group gap="xs">
-          <Button variant="default" component={Link} to="/investments/$id/edit" params={{ id } as any} leftSection={<Edit size={14} />}>
+          <Button variant="default" onClick={() => setEditModalOpen(true)} leftSection={<Edit size={14} />}>
             Edit
           </Button>
           <Button color="red" onClick={() => setDeleteModalOpen(true)} leftSection={<Trash2 size={14} />}>
@@ -179,6 +181,20 @@ export default function InvestmentDetailPage() {
         <ContributionTable investmentId={id} contributions={contributions} onDelete={handleDeleteContribution} />
         <ValueTable investmentId={id} values={values} onDelete={handleDeleteValue} />
       </SimpleGrid>
+
+      {/* Edit Investment Modal */}
+      <Modal
+        opened={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        title="Edit Investment"
+        centered
+      >
+        <InvestmentForm
+          investment={investment}
+          onSuccess={() => setEditModalOpen(false)}
+          onCancel={() => setEditModalOpen(false)}
+        />
+      </Modal>
 
       {/* Delete Confirmation Modal */}
       <Modal
