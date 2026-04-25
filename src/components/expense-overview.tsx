@@ -43,7 +43,7 @@ export function ExpenseOverview({ expenses, expenseCategories, selectedYear, sel
 
   const calculateAnnualBudget = useCallback(
     (maxBudget: number | undefined, maxAnnualBudget: number | undefined): number | undefined => {
-      if (maxAnnualBudget !== undefined) return maxAnnualBudget
+      if (maxAnnualBudget) return maxAnnualBudget
       if (maxBudget !== undefined) return maxBudget * 12
       return undefined
     },
