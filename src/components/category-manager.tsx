@@ -170,9 +170,15 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ type, categori
     try {
       if (category.isNew) {
         const { id: _id, isNew: _isNew, ...newCategory } = category
+        if (isExpenseCategory(category) && (newCategory as Partial<ExpenseCategory>).maxAnnualBudget === 0) {
+          delete (newCategory as Partial<ExpenseCategory>).maxAnnualBudget
+        }
         await onAdd(newCategory)
       } else if (category.id) {
         const { id: _id, isNew: _isNew, ...updateData } = category
+        if (isExpenseCategory(category) && (updateData as Partial<ExpenseCategory>).maxAnnualBudget === 0) {
+          delete (updateData as Partial<ExpenseCategory>).maxAnnualBudget
+        }
         await onUpdate(category.id, updateData)
       }
     } catch (error) {
