@@ -9,39 +9,47 @@ import { YTDOverview } from '@/components/ytd-overview'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { useDashboardExport } from '@/hooks/use-dashboard-export'
 import { useSetHeaderAction } from '@/contexts/header-action-context'
-import { Stack, Card, SimpleGrid, Button, ActionIcon } from '@mantine/core'
+import { Stack, Card, SimpleGrid, Button, ActionIcon, Menu } from '@mantine/core'
 import { Accordion } from '@mantine/core'
-import { Download } from 'lucide-react'
+import { Download, ChevronDown } from 'lucide-react'
 
 export default function HomePage() {
   const { selectedYear, selectedMonth } = useSharedQueryParams()
-  const { exportToCSV } = useDashboardExport()
+  const { exportOverviewToCSV, exportFullToCSV } = useDashboardExport()
 
   const { data: { expenseCategories = [], incomeCategories = [] } = {} } = useCategoryStore()
   const { data: { expenses = [] } = {} } = useExpenseStore()
   const { data: { incomes = [] } = {} } = useIncomeStore()
   const { investments, getLatestValue } = useInvestmentStore()
 
-  // Set header action - show label on desktop, icon only on mobile
   useSetHeaderAction(
     <>
-      <Button
-        leftSection={<Download size={16} />}
-        variant="light"
-        onClick={exportToCSV}
-        visibleFrom="sm"
-      >
-        Export CSV
-      </Button>
-      <ActionIcon
-        variant="light"
-        onClick={exportToCSV}
-        hiddenFrom="sm"
-        size="lg"
-        aria-label="Export CSV"
-      >
-        <Download size={18} />
-      </ActionIcon>
+      <Menu shadow="md" width={180} visibleFrom="sm">
+        <Menu.Target>
+          <Button
+            leftSection={<Download size={16} />}
+            rightSection={<ChevronDown size={14} />}
+            variant="light"
+          >
+            Export CSV
+          </Button>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item onClick={exportOverviewToCSV}>Overview</Menu.Item>
+          <Menu.Item onClick={exportFullToCSV}>Full</Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+      <Menu shadow="md" width={180} hiddenFrom="sm">
+        <Menu.Target>
+          <ActionIcon variant="light" size="lg" aria-label="Export CSV">
+            <Download size={18} />
+          </ActionIcon>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item onClick={exportOverviewToCSV}>Overview</Menu.Item>
+          <Menu.Item onClick={exportFullToCSV}>Full</Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
     </>
   )
 
