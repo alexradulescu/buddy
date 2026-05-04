@@ -324,15 +324,69 @@ export function useDashboardExport() {
     return lines.join('\n')
   }, [ytdData, expenseCategoriesData, incomeCategoriesData, investmentData])
 
-  // Export function
-  const exportToCSV = useCallback(() => {
+  // Build full CSV content (overview + individual transactions for selected month)
+  const buildFullCSVContent = useCallback(() => {
+    const overviewContent = buildCSVContent()
+    const lines: string[] = [overviewContent, '']
+
+    const monthLabel = format(new Date(selectedYear, selectedMonth), 'MMMM yyyy')
+
+    lines.push(`SECTION: All Expenses (${monthLabel})`)
+    lines.push(createCSVRow(['Date', 'Category', 'Description', 'Amount']))
+    const monthExpenses = expenses
+      .filter((expense) => {
+        const d = new Date(expense.date)
+        return d.getFullYear() === selectedYear && d.getMonth() === selectedMonth
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    monthExpenses.forEach((expense) => {
+      const categoryName = expenseCategories.find((c) => c.id === expense.categoryId)?.name ?? ''
+      lines.push(createCSVRow([
+        expense.date,
+        escapeCSVField(categoryName),
+        escapeCSVField(expense.description),
+        formatNumberForCSV(expense.amount)
+      ]))
+    })
+    lines.push('')
+
+    lines.push(`SECTION: All Incomes (${monthLabel})`)
+    lines.push(createCSVRow(['Date', 'Category', 'Description', 'Amount']))
+    const monthIncomes = incomes
+      .filter((income) => {
+        const d = new Date(income.date)
+        return d.getFullYear() === selectedYear && d.getMonth() === selectedMonth
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    monthIncomes.forEach((income) => {
+      const categoryName = incomeCategories.find((c) => c.id === income.categoryId)?.title ?? ''
+      lines.push(createCSVRow([
+        income.date,
+        escapeCSVField(categoryName),
+        escapeCSVField(income.description),
+        formatNumberForCSV(income.amount)
+      ]))
+    })
+
+    return lines.join('\n')
+  }, [buildCSVContent, expenses, incomes, expenseCategories, incomeCategories, selectedYear, selectedMonth])
+
+  const exportOverviewToCSV = useCallback(() => {
     const csvContent = buildCSVContent()
     const dateForFilename = new Date(selectedYear, selectedMonth)
-    const filename = `Dashboard-${format(dateForFilename, 'MMM-yyyy')}.csv`
+    const filename = `Dashboard-Overview-${format(dateForFilename, 'MMM-yyyy')}.csv`
     downloadCSV(csvContent, filename)
   }, [buildCSVContent, selectedYear, selectedMonth])
 
+  const exportFullToCSV = useCallback(() => {
+    const csvContent = buildFullCSVContent()
+    const dateForFilename = new Date(selectedYear, selectedMonth)
+    const filename = `Dashboard-Full-${format(dateForFilename, 'MMM-yyyy')}.csv`
+    downloadCSV(csvContent, filename)
+  }, [buildFullCSVContent, selectedYear, selectedMonth])
+
   return {
-    exportToCSV
+    exportOverviewToCSV,
+    exportFullToCSV
   }
 }
