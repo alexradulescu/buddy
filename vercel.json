@@ -9,6 +9,9 @@
     },
     "api/upload-statement.ts": {
       "maxDuration": 300
+    },
+    "api/counselor.ts": {
+      "maxDuration": 300
     }
   }
 }
