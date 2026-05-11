@@ -17,6 +17,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as InvestmentsIndexRouteImport } from './routes/investments.index'
 import { Route as InvestmentsNewRouteImport } from './routes/investments.new'
 import { Route as InvestmentsIdRouteImport } from './routes/investments.$id'
+import { Route as ApiUploadStatementRouteImport } from './routes/api/upload-statement'
+import { Route as ApiCompletionRouteImport } from './routes/api/completion'
 import { Route as InvestmentsIdEditRouteImport } from './routes/investments.$id.edit'
 
 const SettingsRoute = SettingsRouteImport.update({
@@ -59,6 +61,16 @@ const InvestmentsIdRoute = InvestmentsIdRouteImport.update({
   path: '/investments/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiUploadStatementRoute = ApiUploadStatementRouteImport.update({
+  id: '/api/upload-statement',
+  path: '/api/upload-statement',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCompletionRoute = ApiCompletionRouteImport.update({
+  id: '/api/completion',
+  path: '/api/completion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvestmentsIdEditRoute = InvestmentsIdEditRouteImport.update({
   id: '/edit',
   path: '/edit',
@@ -71,6 +83,8 @@ export interface FileRoutesByFullPath {
   '/expenses': typeof ExpensesRoute
   '/incomes': typeof IncomesRoute
   '/settings': typeof SettingsRoute
+  '/api/completion': typeof ApiCompletionRoute
+  '/api/upload-statement': typeof ApiUploadStatementRoute
   '/investments/$id': typeof InvestmentsIdRouteWithChildren
   '/investments/new': typeof InvestmentsNewRoute
   '/investments/': typeof InvestmentsIndexRoute
@@ -82,6 +96,8 @@ export interface FileRoutesByTo {
   '/expenses': typeof ExpensesRoute
   '/incomes': typeof IncomesRoute
   '/settings': typeof SettingsRoute
+  '/api/completion': typeof ApiCompletionRoute
+  '/api/upload-statement': typeof ApiUploadStatementRoute
   '/investments/$id': typeof InvestmentsIdRouteWithChildren
   '/investments/new': typeof InvestmentsNewRoute
   '/investments': typeof InvestmentsIndexRoute
@@ -94,6 +110,8 @@ export interface FileRoutesById {
   '/expenses': typeof ExpensesRoute
   '/incomes': typeof IncomesRoute
   '/settings': typeof SettingsRoute
+  '/api/completion': typeof ApiCompletionRoute
+  '/api/upload-statement': typeof ApiUploadStatementRoute
   '/investments/$id': typeof InvestmentsIdRouteWithChildren
   '/investments/new': typeof InvestmentsNewRoute
   '/investments/': typeof InvestmentsIndexRoute
@@ -107,6 +125,8 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/incomes'
     | '/settings'
+    | '/api/completion'
+    | '/api/upload-statement'
     | '/investments/$id'
     | '/investments/new'
     | '/investments/'
@@ -118,6 +138,8 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/incomes'
     | '/settings'
+    | '/api/completion'
+    | '/api/upload-statement'
     | '/investments/$id'
     | '/investments/new'
     | '/investments'
@@ -129,6 +151,8 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/incomes'
     | '/settings'
+    | '/api/completion'
+    | '/api/upload-statement'
     | '/investments/$id'
     | '/investments/new'
     | '/investments/'
@@ -141,6 +165,8 @@ export interface RootRouteChildren {
   ExpensesRoute: typeof ExpensesRoute
   IncomesRoute: typeof IncomesRoute
   SettingsRoute: typeof SettingsRoute
+  ApiCompletionRoute: typeof ApiCompletionRoute
+  ApiUploadStatementRoute: typeof ApiUploadStatementRoute
   InvestmentsIdRoute: typeof InvestmentsIdRouteWithChildren
   InvestmentsNewRoute: typeof InvestmentsNewRoute
   InvestmentsIndexRoute: typeof InvestmentsIndexRoute
@@ -204,6 +230,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvestmentsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/upload-statement': {
+      id: '/api/upload-statement'
+      path: '/api/upload-statement'
+      fullPath: '/api/upload-statement'
+      preLoaderRoute: typeof ApiUploadStatementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/completion': {
+      id: '/api/completion'
+      path: '/api/completion'
+      fullPath: '/api/completion'
+      preLoaderRoute: typeof ApiCompletionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/investments/$id/edit': {
       id: '/investments/$id/edit'
       path: '/edit'
@@ -232,6 +272,8 @@ const rootRouteChildren: RootRouteChildren = {
   ExpensesRoute: ExpensesRoute,
   IncomesRoute: IncomesRoute,
   SettingsRoute: SettingsRoute,
+  ApiCompletionRoute: ApiCompletionRoute,
+  ApiUploadStatementRoute: ApiUploadStatementRoute,
   InvestmentsIdRoute: InvestmentsIdRouteWithChildren,
   InvestmentsNewRoute: InvestmentsNewRoute,
   InvestmentsIndexRoute: InvestmentsIndexRoute,
@@ -239,3 +281,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
