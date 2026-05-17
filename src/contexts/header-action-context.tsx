@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useRef, useEffect } from 'react'
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 
 interface HeaderActionContextType {
   action: ReactNode | null
@@ -25,20 +25,17 @@ export function useHeaderAction() {
   return context
 }
 
-// Hook for pages to set their header action
-// The action is set on mount and cleared on unmount
+// Hook for pages to set their header action.
+// Updates whenever the action changes so callbacks captured in JSX stay fresh,
+// and clears the action when the component unmounts.
 export function useSetHeaderAction(action: ReactNode | null) {
   const { setAction } = useHeaderAction()
-  const actionRef = useRef(action)
-  actionRef.current = action
 
   useEffect(() => {
-    // Set the action from the ref (always has latest value)
-    setAction(actionRef.current)
+    setAction(action)
+  }, [action, setAction])
 
-    // Clear the action when component unmounts
+  useEffect(() => {
     return () => setAction(null)
-    // Only run on mount/unmount - setAction is stable from useState
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [setAction])
 }
