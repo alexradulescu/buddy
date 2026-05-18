@@ -1,35 +1,43 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 
-interface HeaderActionContextType {
-  action: ReactNode | null
-  setAction: (action: ReactNode | null) => void
-}
+type SetHeaderAction = (action: ReactNode | null) => void
 
-const HeaderActionContext = createContext<HeaderActionContextType | undefined>(undefined)
+// Two contexts so that components calling useSetHeaderAction only subscribe to
+// the (stable) setter — otherwise setting the action would re-render the
+// caller, produce a new ReactNode, and loop.
+const HeaderActionContext = createContext<ReactNode | null>(null)
+const HeaderActionSetterContext = createContext<SetHeaderAction | undefined>(undefined)
 
 export function HeaderActionProvider({ children }: { children: ReactNode }) {
   const [action, setAction] = useState<ReactNode | null>(null)
 
   return (
-    <HeaderActionContext.Provider value={{ action, setAction }}>
-      {children}
-    </HeaderActionContext.Provider>
+    <HeaderActionSetterContext.Provider value={setAction}>
+      <HeaderActionContext.Provider value={action}>
+        {children}
+      </HeaderActionContext.Provider>
+    </HeaderActionSetterContext.Provider>
   )
 }
 
 export function useHeaderAction() {
-  const context = useContext(HeaderActionContext)
-  if (!context) {
-    throw new Error('useHeaderAction must be used within a HeaderActionProvider')
+  const action = useContext(HeaderActionContext)
+  return { action }
+}
+
+function useHeaderActionSetter() {
+  const setAction = useContext(HeaderActionSetterContext)
+  if (!setAction) {
+    throw new Error('useSetHeaderAction must be used within a HeaderActionProvider')
   }
-  return context
+  return setAction
 }
 
 // Hook for pages to set their header action.
 // Updates whenever the action changes so callbacks captured in JSX stay fresh,
 // and clears the action when the component unmounts.
 export function useSetHeaderAction(action: ReactNode | null) {
-  const { setAction } = useHeaderAction()
+  const setAction = useHeaderActionSetter()
 
   useEffect(() => {
     setAction(action)
