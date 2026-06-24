@@ -1,18 +1,10 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { createFileRoute } from '@tanstack/react-router'
 import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 import { streamObject } from 'ai'
 import { z } from 'zod'
-import type { ExpenseCategory, HistoricalExpense } from './types'
+import type { ExpenseCategory, HistoricalExpense } from '@/types/ai'
 
-export const maxDuration = 300
-
-/**
- * Vercel serverless function for expense categorization
- * Self-contained AI utilities for reliable deployment on Vercel
- */
-
-// Schema for AI output
 const expenseSchema = z.object({
   amount: z.number().nonnegative().describe('Amount of the expense as a decimal number'),
   categoryId: z.string().min(1).describe('CategoryId from the active categories list'),
@@ -106,72 +98,61 @@ async function streamAIResponse(prompt: string): Promise<Response> {
   }
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+export const Route = createFileRoute('/api/completion')({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
+        try {
+          const { prompt, expenseCategories, historicalExpenses } = await request.json()
+
+          if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
+            return Response.json({ error: 'Invalid or missing prompt' }, { status: 400 })
+          }
+          if (!Array.isArray(expenseCategories)) {
+            return Response.json(
+              { error: 'Invalid expenseCategories: must be an array' },
+              { status: 400 }
+            )
+          }
+          if (!Array.isArray(historicalExpenses)) {
+            return Response.json(
+              { error: 'Invalid historicalExpenses: must be an array' },
+              { status: 400 }
+            )
+          }
+
+          const categoriesString = expenseCategories
+            .map((cat: ExpenseCategory) => `${cat.id}: ${cat.name}`)
+            .join('\n')
+
+          const historicalString = JSON.stringify(
+            historicalExpenses.map((e: HistoricalExpense) => ({
+              description: e.description,
+              categoryId: e.categoryId,
+              amount: e.amount
+            })),
+            null,
+            2
+          )
+
+          const promptContent = buildExpensePrompt({
+            transactions: prompt,
+            categories: categoriesString,
+            historicalExpenses: historicalString
+          })
+
+          return await streamAIResponse(promptContent)
+        } catch (error) {
+          console.error('[AI] Request processing error:', error)
+          return Response.json(
+            {
+              error: 'Failed to process expense categorization request',
+              message: error instanceof Error ? error.message : 'Unknown error'
+            },
+            { status: 500 }
+          )
+        }
+      }
+    }
   }
-
-  try {
-    const { prompt, expenseCategories, historicalExpenses } = req.body
-
-    // Validate required inputs
-    if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
-      return res.status(400).json({ error: 'Invalid or missing prompt' })
-    }
-    if (!Array.isArray(expenseCategories)) {
-      return res.status(400).json({ error: 'Invalid expenseCategories: must be an array' })
-    }
-    if (!Array.isArray(historicalExpenses)) {
-      return res.status(400).json({ error: 'Invalid historicalExpenses: must be an array' })
-    }
-
-    const categoriesString = expenseCategories
-      .map((cat: ExpenseCategory) => `${cat.id}: ${cat.name}`)
-      .join('\n')
-
-    const historicalString = JSON.stringify(
-      historicalExpenses.map(
-        (e: HistoricalExpense) => ({
-          description: e.description,
-          categoryId: e.categoryId,
-          amount: e.amount
-        })
-      ),
-      null,
-      2
-    )
-
-    const promptContent = buildExpensePrompt({
-      transactions: prompt,
-      categories: categoriesString,
-      historicalExpenses: historicalString
-    })
-
-    const streamResponse = await streamAIResponse(promptContent)
-
-    // Forward headers from streaming response
-    streamResponse.headers.forEach((value, key) => {
-      res.setHeader(key, value)
-    })
-
-    // Pipe the stream to response
-    const reader = streamResponse.body?.getReader()
-    if (!reader) {
-      return res.status(500).json({ error: 'No response stream available' })
-    }
-
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      res.write(value)
-    }
-
-    res.end()
-  } catch (error) {
-    console.error('[AI] Request processing error:', error)
-    res.status(500).json({
-      error: 'Failed to process expense categorization request',
-      message: error instanceof Error ? error.message : 'Unknown error'
-    })
-  }
-}
+})
