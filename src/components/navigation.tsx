@@ -1,4 +1,4 @@
-import { BarChart2, CreditCard, Home, LucideIcon, PiggyBank, Settings, TrendingUp } from 'lucide-react'
+import { BarChart2, Brain, CreditCard, Home, LucideIcon, PiggyBank, Settings, TrendingUp } from 'lucide-react'
 import { Link, useRouterState } from '@tanstack/react-router'
 import { Tooltip, Stack, rem, Text, Box } from '@mantine/core'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
@@ -15,6 +15,7 @@ const navItems: NavItem[] = [
   { href: '/incomes', label: 'Incomes', icon: PiggyBank },
   { href: '/investments', label: 'Investments', icon: TrendingUp },
   { href: '/accounts', label: 'Accounts', icon: BarChart2 },
+  { href: '/counselor', label: 'Counselor', icon: Brain },
   { href: '/settings', label: 'Settings', icon: Settings }
 ]
 

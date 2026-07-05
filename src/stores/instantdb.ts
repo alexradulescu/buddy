@@ -41,6 +41,11 @@ export const schema = i.schema({
       targetAmount: i.number(),
       isArchived: i.boolean()
     }),
+    counselorProfiles: i.entity({
+      id: i.string(),
+      context: i.string(),
+      updatedAt: i.number()
+    }),
     investments: i.entity({
       id: i.string(),
       name: i.string(),
@@ -70,6 +75,7 @@ export type Expense = InstaQLEntity<typeof schema, 'expenses'>
 export type ExpenseCategory = InstaQLEntity<typeof schema, 'expenseCategories'>
 export type AccountBalance = InstaQLEntity<typeof schema, 'accountBalances'>
 export type IncomeCategory = InstaQLEntity<typeof schema, 'incomeCategories'>
+export type CounselorProfile = InstaQLEntity<typeof schema, 'counselorProfiles'>
 
 export const db = init({
   appId: import.meta.env.VITE_INSTANTDB_APP_ID || '',
