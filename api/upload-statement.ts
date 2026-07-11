@@ -1,7 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { google } from '@ai-sdk/google'
-import { openai } from '@ai-sdk/openai'
-import { streamObject } from 'ai'
+import { gateway, streamObject } from 'ai'
 import { z } from 'zod'
 import type { ExpenseCategory, HistoricalExpense } from './types'
 
@@ -62,35 +60,23 @@ ${extractedText}
 Extract all expense transactions as a JSON array. For each expense include: date, amount (positive), description, categoryId.`
 }
 
-async function streamAIResponse(prompt: string): Promise<Response> {
-  try {
-    console.log('[AI] Using Gemini 3 Flash')
-    const result = streamObject({
-      model: google('gemini-3-flash-preview'),
-      output: 'array',
-      schema: expenseSchema,
-      prompt,
-      maxRetries: 2
-    })
-    return result.toTextStreamResponse()
-  } catch (geminiError) {
-    console.warn('[AI] Gemini failed, falling back to GPT-4o-mini:', geminiError)
+function streamAIResponse(prompt: string): Response {
+  console.log('[AI] Using Qwen 3.5 Flash via AI Gateway (GPT OSS 20B fallback)')
 
-    try {
-      console.log('[AI] Using GPT-4o-mini (fallback)')
-      const result = streamObject({
-        model: openai('gpt-4o-mini'),
-        output: 'array',
-        schema: expenseSchema,
-        prompt,
-        maxRetries: 2
-      })
-      return result.toTextStreamResponse()
-    } catch (openaiError) {
-      console.error('[AI] Both providers failed:', { gemini: geminiError, openai: openaiError })
-      throw new Error('AI categorization failed with all providers')
-    }
-  }
+  const result = streamObject({
+    model: gateway('alibaba/qwen3.5-flash'),
+    output: 'array',
+    schema: expenseSchema,
+    prompt,
+    providerOptions: {
+      gateway: {
+        models: ['openai/gpt-oss-20b']
+      }
+    },
+    maxRetries: 2
+  })
+
+  return result.toTextStreamResponse()
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -162,7 +148,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('[upload-statement] Sending to AI, prompt length:', prompt.length)
 
     // Get streaming AI response
-    const streamResponse = await streamAIResponse(prompt)
+    const streamResponse = streamAIResponse(prompt)
 
     // Add extracted text to response headers
     streamResponse.headers.set('X-Extracted-Text', encodeURIComponent(extractedText))

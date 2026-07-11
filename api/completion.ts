@@ -1,7 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { google } from '@ai-sdk/google'
-import { openai } from '@ai-sdk/openai'
-import { streamObject } from 'ai'
+import { gateway, streamObject } from 'ai'
 import { z } from 'zod'
 import type { ExpenseCategory, HistoricalExpense } from './types'
 
@@ -75,35 +73,23 @@ Return an array of categorized expenses. For each transaction, provide:
 `
 }
 
-async function streamAIResponse(prompt: string): Promise<Response> {
-  try {
-    console.log('[AI] Using Gemini 3 Flash')
-    const result = streamObject({
-      model: google('gemini-3-flash-preview'),
-      output: 'array',
-      schema: expenseSchema,
-      prompt,
-      maxRetries: 2
-    })
-    return result.toTextStreamResponse()
-  } catch (geminiError) {
-    console.warn('[AI] Gemini failed, falling back to GPT-4o-mini:', geminiError)
+function streamAIResponse(prompt: string): Response {
+  console.log('[AI] Using Qwen 3.5 Flash via AI Gateway (GPT OSS 20B fallback)')
 
-    try {
-      console.log('[AI] Using GPT-4o-mini (fallback)')
-      const result = streamObject({
-        model: openai('gpt-4o-mini'),
-        output: 'array',
-        schema: expenseSchema,
-        prompt,
-        maxRetries: 2
-      })
-      return result.toTextStreamResponse()
-    } catch (openaiError) {
-      console.error('[AI] Both providers failed:', { gemini: geminiError, openai: openaiError })
-      throw new Error('AI categorization failed with all providers')
-    }
-  }
+  const result = streamObject({
+    model: gateway('alibaba/qwen3.5-flash'),
+    output: 'array',
+    schema: expenseSchema,
+    prompt,
+    providerOptions: {
+      gateway: {
+        models: ['openai/gpt-oss-20b']
+      }
+    },
+    maxRetries: 2
+  })
+
+  return result.toTextStreamResponse()
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -125,18 +111,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Invalid historicalExpenses: must be an array' })
     }
 
-    const categoriesString = expenseCategories
-      .map((cat: ExpenseCategory) => `${cat.id}: ${cat.name}`)
-      .join('\n')
+    const categoriesString = expenseCategories.map((cat: ExpenseCategory) => `${cat.id}: ${cat.name}`).join('\n')
 
     const historicalString = JSON.stringify(
-      historicalExpenses.map(
-        (e: HistoricalExpense) => ({
-          description: e.description,
-          categoryId: e.categoryId,
-          amount: e.amount
-        })
-      ),
+      historicalExpenses.map((e: HistoricalExpense) => ({
+        description: e.description,
+        categoryId: e.categoryId,
+        amount: e.amount
+      })),
       null,
       2
     )
@@ -147,7 +129,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       historicalExpenses: historicalString
     })
 
-    const streamResponse = await streamAIResponse(promptContent)
+    const streamResponse = streamAIResponse(promptContent)
 
     // Forward headers from streaming response
     streamResponse.headers.forEach((value, key) => {
