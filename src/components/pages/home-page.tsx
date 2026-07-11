@@ -9,7 +9,7 @@ import { YTDOverview } from '@/components/ytd-overview'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { useDashboardExport } from '@/hooks/use-dashboard-export'
 import { useSetHeaderAction } from '@/contexts/header-action-context'
-import { Stack, Card, SimpleGrid, Button, ActionIcon, Menu } from '@mantine/core'
+import { Stack, Card, SimpleGrid, Button, ActionIcon, Box, Menu } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 import { Download, ChevronDown } from 'lucide-react'
 
@@ -24,32 +24,32 @@ export default function HomePage() {
 
   useSetHeaderAction(
     <>
-      <Menu shadow="md" width={180} visibleFrom="sm">
-        <Menu.Target>
-          <Button
-            leftSection={<Download size={16} />}
-            rightSection={<ChevronDown size={14} />}
-            variant="light"
-          >
-            Export CSV
-          </Button>
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Item onClick={exportOverviewToCSV}>Overview</Menu.Item>
-          <Menu.Item onClick={exportFullToCSV}>Full</Menu.Item>
-        </Menu.Dropdown>
-      </Menu>
-      <Menu shadow="md" width={180} hiddenFrom="sm">
-        <Menu.Target>
-          <ActionIcon variant="light" size="lg" aria-label="Export CSV">
-            <Download size={18} />
-          </ActionIcon>
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Item onClick={exportOverviewToCSV}>Overview</Menu.Item>
-          <Menu.Item onClick={exportFullToCSV}>Full</Menu.Item>
-        </Menu.Dropdown>
-      </Menu>
+      <Box visibleFrom="sm">
+        <Menu shadow="md" width={180}>
+          <Menu.Target>
+            <Button leftSection={<Download size={16} />} rightSection={<ChevronDown size={14} />} variant="light">
+              Export CSV
+            </Button>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item onClick={exportOverviewToCSV}>Overview</Menu.Item>
+            <Menu.Item onClick={exportFullToCSV}>Full</Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </Box>
+      <Box hiddenFrom="sm">
+        <Menu shadow="md" width={180}>
+          <Menu.Target>
+            <ActionIcon variant="light" size="lg" aria-label="Export CSV">
+              <Download size={18} />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item onClick={exportOverviewToCSV}>Overview</Menu.Item>
+            <Menu.Item onClick={exportFullToCSV}>Full</Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </Box>
     </>
   )
 
@@ -71,7 +71,7 @@ export default function HomePage() {
 
   // Calculate total investment value from active investments
   const totalInvestmentValue = investments
-    .filter(investment => investment.isActive)
+    .filter((investment) => investment.isActive)
     .reduce((total, investment) => {
       const latestValue = getLatestValue(investment.id)
       return total + (latestValue || 0)
@@ -132,9 +132,7 @@ export default function HomePage() {
       <Card padding={0}>
         <Accordion defaultValue="investments">
           <Accordion.Item value="investments">
-            <Accordion.Control styles={{ control: { paddingTop: 0, paddingBottom: 0 } }}>
-              Investments
-            </Accordion.Control>
+            <Accordion.Control styles={{ control: { paddingTop: 0, paddingBottom: 0 } }}>Investments</Accordion.Control>
             <Accordion.Panel styles={{ content: { padding: 0 } }}>
               <InvestmentOverview />
             </Accordion.Panel>
