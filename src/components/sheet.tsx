@@ -141,7 +141,7 @@ export function Sheet<T extends Row>({ rows, columns, onChange, onDelete, highli
       colHeaders
       licenseKey="non-commercial-and-evaluation"
       themeName="ht-theme-main"
-      className="expense-spreadsheet"
+      className="sheet"
       height={height}
       width="100%"
       stretchH="all"

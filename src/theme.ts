@@ -10,8 +10,12 @@ export const palette = {
   accentBg: 'rgba(82, 183, 136, 0.15)'
 }
 
+// Input backgrounds and borders come from globals.css
+const inputStyles = {
+  label: { fontWeight: 500, fontSize: '12px', color: '#6F767E', marginBottom: '4px' }
+}
+
 export const theme = createTheme({
-  // Typography - Clean, readable Inter
   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   fontFamilyMonospace: "'JetBrains Mono', ui-monospace, monospace",
   headings: {
@@ -19,7 +23,6 @@ export const theme = createTheme({
     fontWeight: '600'
   },
 
-  // Green Finance Color Palette
   colors: {
     forest: [
       '#E9F5EF', // 0
@@ -68,11 +71,7 @@ export const theme = createTheme({
   // Component defaults
   components: {
     Card: {
-      defaultProps: {
-        padding: 'sm',
-        radius: 'md',
-        withBorder: true
-      },
+      defaultProps: { padding: 'sm', withBorder: true },
       styles: {
         root: {
           borderColor: '#E5E9EB',
@@ -106,98 +105,13 @@ export const theme = createTheme({
         }
       }
     },
-    Button: {
-      defaultProps: {
-        radius: 'md',
-        size: 'sm'
-      },
-      styles: {
-        root: {
-          fontWeight: 500
-        }
-      }
-    },
-    TextInput: {
-      defaultProps: {
-        radius: 'md',
-        size: 'sm'
-      },
-      styles: {
-        input: {
-          backgroundColor: '#FFFFFF',
-          borderColor: '#E5E9EB',
-          '&:focus': {
-            borderColor: '#52B788'
-          }
-        },
-        label: {
-          fontWeight: 500,
-          fontSize: '12px',
-          color: '#6F767E',
-          marginBottom: '4px'
-        }
-      }
-    },
-    Select: {
-      defaultProps: {
-        radius: 'md',
-        size: 'sm'
-      },
-      styles: {
-        input: {
-          backgroundColor: '#FFFFFF',
-          borderColor: '#E5E9EB'
-        },
-        label: {
-          fontWeight: 500,
-          fontSize: '12px',
-          color: '#6F767E',
-          marginBottom: '4px'
-        }
-      }
-    },
-    NumberInput: {
-      defaultProps: {
-        radius: 'md',
-        size: 'sm'
-      },
-      styles: {
-        input: {
-          backgroundColor: '#FFFFFF',
-          borderColor: '#E5E9EB'
-        },
-        label: {
-          fontWeight: 500,
-          fontSize: '12px',
-          color: '#6F767E',
-          marginBottom: '4px'
-        }
-      }
-    },
-    Textarea: {
-      defaultProps: {
-        radius: 'md',
-        size: 'sm'
-      },
-      styles: {
-        input: {
-          backgroundColor: '#FFFFFF',
-          borderColor: '#E5E9EB'
-        },
-        label: {
-          fontWeight: 500,
-          fontSize: '12px',
-          color: '#6F767E',
-          marginBottom: '4px'
-        }
-      }
-    },
+    Button: { styles: { root: { fontWeight: 500 } } },
+    TextInput: { styles: inputStyles },
+    Select: { styles: inputStyles },
+    NumberInput: { styles: inputStyles },
+    Textarea: { styles: inputStyles },
     Badge: {
-      defaultProps: {
-        radius: 'sm',
-        size: 'sm',
-        variant: 'light'
-      },
+      defaultProps: { radius: 'sm', size: 'sm', variant: 'light' },
       styles: {
         root: {
           textTransform: 'uppercase' as const,
@@ -213,10 +127,7 @@ export const theme = createTheme({
           paddingTop: '10px',
           paddingBottom: '10px',
           fontWeight: 500,
-          backgroundColor: '#F8FAFB',
-          '&:hover': {
-            backgroundColor: 'rgba(82, 183, 136, 0.1)'
-          }
+          backgroundColor: '#F8FAFB'
         },
         content: {
           padding: '12px',
@@ -228,10 +139,6 @@ export const theme = createTheme({
       }
     },
     Modal: {
-      defaultProps: {
-        radius: 'md',
-        padding: 'md'
-      },
       styles: {
         content: {
           backgroundColor: '#FFFFFF'
@@ -269,14 +176,7 @@ export const theme = createTheme({
       defaultProps: {
         variant: 'subtle'
       },
-      styles: {
-        root: {
-          color: '#6F767E',
-          '&:hover': {
-            backgroundColor: 'rgba(82, 183, 136, 0.1)'
-          }
-        }
-      }
+      styles: { root: { color: '#6F767E' } }
     },
     Tooltip: {
       styles: {

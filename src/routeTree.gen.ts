@@ -16,8 +16,6 @@ import { Route as IncomesRouteImport } from './routes/incomes'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as InvestmentsIndexRouteImport } from './routes/investments.index'
 import { Route as InvestmentsIdRouteImport } from './routes/investments.$id'
-import { Route as InvestmentsNewRouteImport } from './routes/investments.new'
-import { Route as InvestmentsIdEditRouteImport } from './routes/investments.$id.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -54,16 +52,6 @@ const InvestmentsIdRoute = InvestmentsIdRouteImport.update({
   path: '/investments/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InvestmentsNewRoute = InvestmentsNewRouteImport.update({
-  id: '/investments/new',
-  path: '/investments/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvestmentsIdEditRoute = InvestmentsIdEditRouteImport.update({
-  id: '/edit',
-  path: '/edit',
-  getParentRoute: () => InvestmentsIdRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -71,10 +59,8 @@ export interface FileRoutesByFullPath {
   '/expenses': typeof ExpensesRoute
   '/incomes': typeof IncomesRoute
   '/settings': typeof SettingsRoute
-  '/investments/$id': typeof InvestmentsIdRouteWithChildren
-  '/investments/new': typeof InvestmentsNewRoute
+  '/investments/$id': typeof InvestmentsIdRoute
   '/investments/': typeof InvestmentsIndexRoute
-  '/investments/$id/edit': typeof InvestmentsIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -82,10 +68,8 @@ export interface FileRoutesByTo {
   '/expenses': typeof ExpensesRoute
   '/incomes': typeof IncomesRoute
   '/settings': typeof SettingsRoute
-  '/investments/$id': typeof InvestmentsIdRouteWithChildren
-  '/investments/new': typeof InvestmentsNewRoute
+  '/investments/$id': typeof InvestmentsIdRoute
   '/investments': typeof InvestmentsIndexRoute
-  '/investments/$id/edit': typeof InvestmentsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -94,10 +78,8 @@ export interface FileRoutesById {
   '/expenses': typeof ExpensesRoute
   '/incomes': typeof IncomesRoute
   '/settings': typeof SettingsRoute
-  '/investments/$id': typeof InvestmentsIdRouteWithChildren
-  '/investments/new': typeof InvestmentsNewRoute
+  '/investments/$id': typeof InvestmentsIdRoute
   '/investments/': typeof InvestmentsIndexRoute
-  '/investments/$id/edit': typeof InvestmentsIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -108,9 +90,7 @@ export interface FileRouteTypes {
     | '/incomes'
     | '/settings'
     | '/investments/$id'
-    | '/investments/new'
     | '/investments/'
-    | '/investments/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -119,9 +99,7 @@ export interface FileRouteTypes {
     | '/incomes'
     | '/settings'
     | '/investments/$id'
-    | '/investments/new'
     | '/investments'
-    | '/investments/$id/edit'
   id:
     | '__root__'
     | '/'
@@ -130,9 +108,7 @@ export interface FileRouteTypes {
     | '/incomes'
     | '/settings'
     | '/investments/$id'
-    | '/investments/new'
     | '/investments/'
-    | '/investments/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -141,8 +117,7 @@ export interface RootRouteChildren {
   ExpensesRoute: typeof ExpensesRoute
   IncomesRoute: typeof IncomesRoute
   SettingsRoute: typeof SettingsRoute
-  InvestmentsIdRoute: typeof InvestmentsIdRouteWithChildren
-  InvestmentsNewRoute: typeof InvestmentsNewRoute
+  InvestmentsIdRoute: typeof InvestmentsIdRoute
   InvestmentsIndexRoute: typeof InvestmentsIndexRoute
 }
 
@@ -197,34 +172,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvestmentsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/investments/new': {
-      id: '/investments/new'
-      path: '/investments/new'
-      fullPath: '/investments/new'
-      preLoaderRoute: typeof InvestmentsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/investments/$id/edit': {
-      id: '/investments/$id/edit'
-      path: '/edit'
-      fullPath: '/investments/$id/edit'
-      preLoaderRoute: typeof InvestmentsIdEditRouteImport
-      parentRoute: typeof InvestmentsIdRoute
-    }
   }
 }
-
-interface InvestmentsIdRouteChildren {
-  InvestmentsIdEditRoute: typeof InvestmentsIdEditRoute
-}
-
-const InvestmentsIdRouteChildren: InvestmentsIdRouteChildren = {
-  InvestmentsIdEditRoute: InvestmentsIdEditRoute,
-}
-
-const InvestmentsIdRouteWithChildren = InvestmentsIdRoute._addFileChildren(
-  InvestmentsIdRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -232,8 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExpensesRoute: ExpensesRoute,
   IncomesRoute: IncomesRoute,
   SettingsRoute: SettingsRoute,
-  InvestmentsIdRoute: InvestmentsIdRouteWithChildren,
-  InvestmentsNewRoute: InvestmentsNewRoute,
+  InvestmentsIdRoute: InvestmentsIdRoute,
   InvestmentsIndexRoute: InvestmentsIndexRoute,
 }
 export const routeTree = rootRouteImport

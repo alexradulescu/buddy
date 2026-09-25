@@ -1,6 +1,6 @@
 import { i, id, init, type InstaQLEntity } from '@instantdb/react'
 
-export const schema = i.schema({
+const schema = i.schema({
   entities: {
     accountBalances: i.entity({
       id: i.string(),
@@ -66,11 +66,10 @@ export const schema = i.schema({
 })
 
 export const db = init({ appId: import.meta.env.VITE_INSTANTDB_APP_ID || '', schema })
-export { id }
 
 type Schema = typeof schema
 type Entities = Schema['entities']
-export type EntityName = keyof Entities
+type EntityName = keyof Entities
 
 export type Expense = InstaQLEntity<Schema, 'expenses'>
 export type Income = InstaQLEntity<Schema, 'incomes'>
