@@ -73,7 +73,7 @@ export async function POST(req: Request) {
   const history: Past[] = JSON.parse(String(form.get('history') ?? '[]'))
 
   const { elementStream } = streamObject({
-    model: google('gemini-3-flash-preview'),
+    model: google('gemini-3.8-flash'),
     output: 'array',
     schema: expenseSchema,
     prompt: prompt(transactions, categories, history),

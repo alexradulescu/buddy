@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { HotTable } from '@handsontable/react'
+import { HotTable } from '@handsontable/react-wrapper'
 import Handsontable from 'handsontable'
 import { registerAllModules } from 'handsontable/registry'
 
@@ -65,7 +65,13 @@ function toHotColumn<T>(col: SheetColumn<T>): Handsontable.ColumnSettings {
   const base = { data: col.key, title: col.title, width: col.width, className: 'htMiddle htLeft' }
   switch (col.type) {
     case 'date':
-      return { ...base, type: 'date', dateFormat: 'YYYY-MM-DD', correctFormat: true, width: col.width ?? 72 }
+      return {
+        ...base,
+        type: 'intl-date',
+        locale: 'sv-SE',
+        dateFormat: { year: 'numeric', month: '2-digit', day: '2-digit' },
+        width: col.width ?? 72
+      }
     case 'money':
       return {
         ...base,
@@ -75,7 +81,12 @@ function toHotColumn<T>(col: SheetColumn<T>): Handsontable.ColumnSettings {
         width: col.width ?? 80
       }
     case 'number':
-      return { ...base, type: 'numeric', className: 'htMiddle htRight', numericFormat: { pattern: '0,0.00' } }
+      return {
+        ...base,
+        type: 'numeric',
+        className: 'htMiddle htRight',
+        numericFormat: { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+      }
     case 'checkbox':
       return { ...base, type: 'checkbox', className: 'htMiddle htCenter', width: col.width ?? 80 }
     case 'select':
