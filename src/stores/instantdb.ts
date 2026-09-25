@@ -1,83 +1,9 @@
-import { i, id, init, InstaQLEntity } from '@instantdb/react'
+import { db, id, type AccountBalance, type Expense, type ExpenseCategory, type Income, type IncomeCategory } from '@/db'
 
-export const schema = i.schema({
-  entities: {
-    accountBalances: i.entity({
-      id: i.string(),
-      title: i.string(),
-      amount: i.number(),
-      year: i.number(),
-      month: i.number(),
-      createdAt: i.number()
-    }),
-    expenses: i.entity({
-      id: i.string(),
-      date: i.string(),
-      amount: i.number(),
-      description: i.string(),
-      category: i.string().optional(),
-      categoryId: i.string(),
-      createdAt: i.number()
-    }),
-    expenseCategories: i.entity({
-      id: i.string(),
-      name: i.string(),
-      maxBudget: i.number(),
-      maxAnnualBudget: i.number(),
-      isArchived: i.boolean()
-    }),
-    incomes: i.entity({
-      id: i.string(),
-      date: i.string(),
-      amount: i.number(),
-      description: i.string(),
-      category: i.string().optional(),
-      categoryId: i.string(),
-      createdAt: i.number()
-    }),
-    incomeCategories: i.entity({
-      id: i.string(),
-      title: i.string(),
-      targetAmount: i.number(),
-      isArchived: i.boolean()
-    }),
-    investments: i.entity({
-      id: i.string(),
-      name: i.string(),
-      description: i.string().optional(),
-      createdDate: i.string(),
-      isActive: i.boolean()
-    }),
-    investmentContributions: i.entity({
-      id: i.string(),
-      investmentId: i.string(),
-      amount: i.number(),
-      date: i.string(),
-      description: i.string().optional()
-    }),
-    investmentValues: i.entity({
-      id: i.string(),
-      investmentId: i.string(),
-      value: i.number(),
-      date: i.string(),
-      description: i.string().optional()
-    })
-  }
-})
-
-export type Income = InstaQLEntity<typeof schema, 'incomes'>
-export type Expense = InstaQLEntity<typeof schema, 'expenses'>
-export type ExpenseCategory = InstaQLEntity<typeof schema, 'expenseCategories'>
-export type AccountBalance = InstaQLEntity<typeof schema, 'accountBalances'>
-export type IncomeCategory = InstaQLEntity<typeof schema, 'incomeCategories'>
-
-export const db = init({
-  appId: import.meta.env.VITE_INSTANTDB_APP_ID || '',
-  schema
-})
+export { db, id, schema } from '@/db'
+export type { AccountBalance, Expense, ExpenseCategory, Income, IncomeCategory } from '@/db'
 
 export const { useQuery, transact, tx } = db
-export { id } from '@instantdb/react'
 
 export function useAccountBalances(year: number, month: number) {
   const query = useQuery({

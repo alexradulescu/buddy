@@ -9,29 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as IncomesRouteImport } from './routes/incomes'
-import { Route as ExpensesRouteImport } from './routes/expenses'
-import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountsRouteImport } from './routes/accounts'
+import { Route as ExpensesRouteImport } from './routes/expenses'
+import { Route as IncomesRouteImport } from './routes/incomes'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as InvestmentsIndexRouteImport } from './routes/investments.index'
-import { Route as InvestmentsNewRouteImport } from './routes/investments.new'
 import { Route as InvestmentsIdRouteImport } from './routes/investments.$id'
+import { Route as InvestmentsNewRouteImport } from './routes/investments.new'
 import { Route as InvestmentsIdEditRouteImport } from './routes/investments.$id.edit'
 
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IncomesRoute = IncomesRouteImport.update({
-  id: '/incomes',
-  path: '/incomes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExpensesRoute = ExpensesRouteImport.update({
-  id: '/expenses',
-  path: '/expenses',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountsRoute = AccountsRouteImport.update({
@@ -39,9 +29,19 @@ const AccountsRoute = AccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ExpensesRoute = ExpensesRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncomesRoute = IncomesRouteImport.update({
+  id: '/incomes',
+  path: '/incomes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvestmentsIndexRoute = InvestmentsIndexRouteImport.update({
@@ -49,14 +49,14 @@ const InvestmentsIndexRoute = InvestmentsIndexRouteImport.update({
   path: '/investments/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InvestmentsNewRoute = InvestmentsNewRouteImport.update({
-  id: '/investments/new',
-  path: '/investments/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const InvestmentsIdRoute = InvestmentsIdRouteImport.update({
   id: '/investments/$id',
   path: '/investments/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestmentsNewRoute = InvestmentsNewRouteImport.update({
+  id: '/investments/new',
+  path: '/investments/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvestmentsIdEditRoute = InvestmentsIdEditRouteImport.update({
@@ -148,25 +148,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/incomes': {
-      id: '/incomes'
-      path: '/incomes'
-      fullPath: '/incomes'
-      preLoaderRoute: typeof IncomesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/expenses': {
-      id: '/expenses'
-      path: '/expenses'
-      fullPath: '/expenses'
-      preLoaderRoute: typeof ExpensesRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/accounts': {
@@ -176,11 +162,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/expenses': {
+      id: '/expenses'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof ExpensesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/incomes': {
+      id: '/incomes'
+      path: '/incomes'
+      fullPath: '/incomes'
+      preLoaderRoute: typeof IncomesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/investments/': {
@@ -190,18 +190,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvestmentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/investments/new': {
-      id: '/investments/new'
-      path: '/investments/new'
-      fullPath: '/investments/new'
-      preLoaderRoute: typeof InvestmentsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/investments/$id': {
       id: '/investments/$id'
       path: '/investments/$id'
       fullPath: '/investments/$id'
       preLoaderRoute: typeof InvestmentsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/investments/new': {
+      id: '/investments/new'
+      path: '/investments/new'
+      fullPath: '/investments/new'
+      preLoaderRoute: typeof InvestmentsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/investments/$id/edit': {
