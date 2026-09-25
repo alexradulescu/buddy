@@ -1,13 +1,7 @@
-import { useMemo } from 'react'
-import { HotTable } from '@handsontable/react-wrapper'
-import Handsontable from 'handsontable'
-import { registerAllModules } from 'handsontable/registry'
+import { DataGrid, renderTextEditor, type Column, type RenderEditCellProps } from 'react-data-grid'
 
-import 'handsontable/styles/handsontable.css'
-import 'handsontable/styles/ht-theme-main.css'
+import 'react-data-grid/lib/styles.css'
 import '@/styles/spreadsheet.css'
-
-registerAllModules()
 
 type Row = { id: string }
 
@@ -28,144 +22,139 @@ type Props<T extends Row> = {
   height?: number | 'auto'
 }
 
-// Numbers with 2 decimals; negatives (refunds) in green
-function moneyRenderer(
-  _hot: Handsontable,
-  td: HTMLTableCellElement,
-  _row: number,
-  _col: number,
-  _prop: unknown,
-  value: unknown
-) {
-  const n = Number(value)
-  const isNumber = value !== '' && value != null && !isNaN(n)
-  td.textContent = isNumber
-    ? n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    : String(value ?? '')
-  td.style.color = isNumber && n < 0 ? 'var(--mantine-color-green-6)' : ''
-  td.style.fontWeight = isNumber && n < 0 ? '500' : ''
-  return td
+const ROW_HEIGHT = 30
+const HEADER_HEIGHT = 30
+
+const twoDecimals = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+function DateEditor<T>({ row, column, onRowChange, onClose }: RenderEditCellProps<T>) {
+  const value = String(row[column.key as keyof T] ?? '')
+  return (
+    <input
+      type="date"
+      className="spreadsheet-editor"
+      autoFocus
+      value={value}
+      onChange={(e) => e.target.value && onRowChange({ ...row, [column.key]: e.target.value })}
+      onBlur={() => onClose(true, false)}
+    />
+  )
 }
 
-function deleteRenderer(onDelete: (row: number) => void) {
-  return (_hot: Handsontable, td: HTMLTableCellElement, row: number) => {
-    const button = document.createElement('button')
-    button.textContent = '🗑️'
-    button.className = 'spreadsheet-delete-button'
-    button.onclick = (e) => {
-      e.stopPropagation()
-      onDelete(row)
-    }
-    td.replaceChildren(button)
-    td.style.padding = '0'
-    return td
+function selectEditor<T>(options: { value: string; label: string }[]) {
+  return function SelectEditor({ row, column, onRowChange, onClose }: RenderEditCellProps<T>) {
+    return (
+      <select
+        className="spreadsheet-editor"
+        autoFocus
+        value={String(row[column.key as keyof T] ?? '')}
+        onChange={(e) => onRowChange({ ...row, [column.key]: e.target.value })}
+        onBlur={() => onClose(true, false)}
+      >
+        <option value="" />
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    )
   }
 }
 
-function toHotColumn<T>(col: SheetColumn<T>): Handsontable.ColumnSettings {
-  const base = { data: col.key, title: col.title, width: col.width, className: 'htMiddle htLeft' }
+function toGridColumn<T>(col: SheetColumn<T>): Column<T> {
+  const base = { key: col.key, name: col.title, width: col.width, resizable: true, renderEditCell: renderTextEditor }
+  const valueOf = (row: T) => row[col.key] as unknown
   switch (col.type) {
     case 'date':
-      return {
-        ...base,
-        type: 'intl-date',
-        locale: 'sv-SE',
-        dateFormat: { year: 'numeric', month: '2-digit', day: '2-digit' },
-        width: col.width ?? 72
-      }
+      return { ...base, width: col.width ?? 110, renderEditCell: DateEditor }
     case 'money':
-      return {
-        ...base,
-        type: 'numeric',
-        className: 'htMiddle htRight',
-        renderer: moneyRenderer,
-        width: col.width ?? 80
-      }
     case 'number':
       return {
         ...base,
-        type: 'numeric',
-        className: 'htMiddle htRight',
-        numericFormat: { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        width: col.width ?? 100,
+        cellClass: (row) =>
+          col.type === 'money' && Number(valueOf(row)) < 0 ? 'numeric-cell positive-money' : 'numeric-cell',
+        renderCell: ({ row }) => (valueOf(row) === '' || valueOf(row) == null ? '' : twoDecimals(Number(valueOf(row))))
       }
     case 'checkbox':
-      return { ...base, type: 'checkbox', className: 'htMiddle htCenter', width: col.width ?? 80 }
+      return {
+        ...base,
+        width: col.width ?? 80,
+        cellClass: 'checkbox-cell',
+        renderEditCell: null,
+        renderCell: ({ row, onRowChange, tabIndex }) => (
+          <input
+            type="checkbox"
+            tabIndex={tabIndex}
+            checked={!!valueOf(row)}
+            onChange={(e) => onRowChange({ ...row, [col.key]: e.target.checked })}
+          />
+        )
+      }
     case 'select':
       return {
         ...base,
-        type: 'dropdown',
-        source: col.options?.map((o) => o.label) ?? [],
-        filter: true,
-        filteringCaseSensitive: false,
-        allowInvalid: true,
-        width: col.width ?? 150
+        width: col.width ?? 150,
+        renderCell: ({ row }) => col.options?.find((o) => o.value === valueOf(row))?.label ?? '',
+        renderEditCell: selectEditor<T>(col.options ?? [])
       }
     default:
-      return { ...base, type: 'text' }
+      return base
   }
 }
 
-// Select columns show labels in the grid; translate back to values on edit
-const toLabel = <T,>(col: SheetColumn<T>, v: unknown) => col.options?.find((o) => o.value === v)?.label ?? ''
-const toValue = <T,>(col: SheetColumn<T>, v: unknown) => col.options?.find((o) => o.label === v)?.value ?? ''
-
 export function Sheet<T extends Row>({ rows, columns, onChange, onDelete, highlight, height = 400 }: Props<T>) {
-  const data = useMemo(
-    () =>
-      rows.map((row) => {
-        const cells: Record<string, unknown> = { ...row }
-        for (const col of columns) if (col.type === 'select') cells[col.key] = toLabel(col, row[col.key])
-        return cells
-      }),
-    [rows, columns]
-  )
+  const gridColumns: Column<T>[] = columns.map(toGridColumn)
+  if (onDelete)
+    gridColumns.push({
+      key: 'delete',
+      name: '',
+      width: 40,
+      renderCell: ({ row }) => (
+        <button className="spreadsheet-delete-button" onClick={() => onDelete(row)} aria-label="Delete row">
+          🗑️
+        </button>
+      )
+    })
 
-  const hotColumns = [
-    ...columns.map(toHotColumn),
-    ...(onDelete
-      ? [{ data: 'id', title: '', width: 36, readOnly: true, renderer: deleteRenderer((i) => onDelete(rows[i])) }]
-      : [])
-  ]
-
-  function afterChange(changes: Handsontable.CellChange[] | null, source: Handsontable.ChangeSource) {
-    if (!changes || source === 'loadData') return
-    const edited = new Map<number, T>() // a paste can touch several cells of one row
-    for (const [index, prop, oldValue, newValue] of changes) {
-      const col = columns.find((c) => c.key === prop)
-      if (!col || oldValue === newValue || !rows[index]) continue
-      if (col.type === 'date' && !newValue) continue
-      edited.set(index, { ...(edited.get(index) ?? rows[index]), [col.key]: parse(col, newValue) })
-    }
-    edited.forEach((row) => onChange(row))
+  // The text editor writes strings; turn money/number columns back into numbers
+  function normalize(row: T): T {
+    const result: Record<string, unknown> = { ...row }
+    for (const col of columns)
+      if (col.type === 'money' || col.type === 'number') result[col.key] = Number(result[col.key]) || 0
+    return result as T
   }
 
-  function parse(col: SheetColumn<T>, v: unknown) {
-    if (col.type === 'select') return toValue(col, v)
-    if (col.type === 'money' || col.type === 'number') return Number(v) || 0
-    if (col.type === 'checkbox') return !!v
-    return String(v ?? '')
+  function onRowsChange(newRows: T[], { indexes }: { indexes: number[] }) {
+    for (const i of indexes) onChange(normalize(newRows[i]))
   }
 
+  // Space toggles checkbox cells, like a spreadsheet
+  function toggleCheckbox(row: T, key: string) {
+    onChange({ ...row, [key]: !row[key as keyof T] })
+  }
+
+  const autoHeight = HEADER_HEIGHT + rows.length * ROW_HEIGHT + 2
   return (
-    <HotTable
-      data={data}
-      columns={hotColumns}
-      colHeaders
-      licenseKey="non-commercial-and-evaluation"
-      themeName="ht-theme-main"
-      className="spreadsheet"
-      height={height}
-      width="100%"
-      stretchH="all"
-      autoWrapRow
-      autoWrapCol
-      enterMoves={{ row: 1, col: 0 }}
-      tabMoves={{ row: 0, col: 1 }}
-      manualColumnResize
-      search
-      outsideClickDeselects={false}
-      afterChange={afterChange}
-      cells={(i) => (highlight && rows[i] && highlight(rows[i]) ? { className: 'spreadsheet-duplicate-row' } : {})}
+    <DataGrid
+      className="spreadsheet rdg-light"
+      rows={rows}
+      columns={gridColumns}
+      rowKeyGetter={(row) => row.id}
+      rowHeight={ROW_HEIGHT}
+      headerRowHeight={HEADER_HEIGHT}
+      onRowsChange={onRowsChange}
+      rowClass={(row) => (highlight?.(row) ? 'spreadsheet-duplicate-row' : undefined)}
+      style={{ blockSize: height === 'auto' ? autoHeight : height }}
+      onCellKeyDown={(args, event) => {
+        const col = columns.find((c) => c.key === args.column?.key)
+        if (args.mode === 'ACTIVE' && args.row && col?.type === 'checkbox' && event.key === ' ') {
+          event.preventGridDefault()
+          event.preventDefault()
+          toggleCheckbox(args.row, col.key)
+        }
+      }}
     />
   )
 }
