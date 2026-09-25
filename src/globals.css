@@ -427,3 +427,74 @@ textarea {
 .sheet-delete:hover {
   background: #fee;
 }
+
+/* Shell navigation */
+.nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.mobile-footer {
+  background-color: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+}
+
+.mobile-nav {
+  display: flex;
+  width: 100%;
+  padding: 2px;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+}
+
+.mobile-nav-link {
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 4px;
+  border-radius: 18px;
+}
+
+/* Header month picker: [<][Mar 25][>] joined into one bordered control */
+.month-picker .mantine-ActionIcon-root {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+.month-picker .mantine-ActionIcon-root:first-child {
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+}
+.month-picker .mantine-ActionIcon-root:last-child {
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+}
+.month-picker .mantine-ActionIcon-root:hover {
+  background-color: var(--color-accent-bg);
+  color: var(--color-primary);
+}
+.month-picker .mantine-InputWrapper-root {
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+.month-picker .mantine-Input-input {
+  border: none;
+  border-radius: 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: transparent;
+  height: 34px;
+  min-height: 34px;
+  padding: 0 4px;
+}

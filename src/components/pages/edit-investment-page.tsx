@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Route } from '@/routes/investments.$id.edit'
 import InvestmentForm from '@/components/investment/forms/investment-form'
-import { PageHeader } from '@/components/page-header'
+import { PageHeader } from '@/components/shell'
 import { Button, Card, Stack, Title, Text, Center } from '@mantine/core'
 
 export default function EditInvestmentPage() {
@@ -35,7 +35,7 @@ export default function EditInvestmentPage() {
         </Button>
       </div>
 
-      <PageHeader title="Edit Investment" description="Update your investment details" />
+      <PageHeader title="Edit Investment" />
 
       <Card>
         <InvestmentForm investment={investment} onSuccess={() => navigate({ to: '/investments/$id', params: { id } })} />

@@ -3,14 +3,14 @@ import { useInvestmentStore } from '@/stores/useInvestmentStore'
 import { Plus } from 'lucide-react'
 import InvestmentCard from '@/components/investment/investment-card'
 import InvestmentForm from '@/components/investment/forms/investment-form'
-import { useSetHeaderAction } from '@/contexts/header-action-context'
+import { PageHeader } from '@/components/shell'
 import { Button, Modal, Stack, Title, Text, Card, SimpleGrid, Center, ActionIcon } from '@mantine/core'
 
 export default function InvestmentsPage() {
   const { investments } = useInvestmentStore()
   const [addModalOpen, setAddModalOpen] = useState(false)
 
-  useSetHeaderAction(
+  const headerActions = (
     <>
       <Button
         onClick={() => setAddModalOpen(true)}
@@ -33,6 +33,7 @@ export default function InvestmentsPage() {
 
   return (
     <Stack gap="md">
+      <PageHeader actions={headerActions} />
       {investments.length === 0 ? (
         <Card p="lg">
           <Center>

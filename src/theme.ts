@@ -1,12 +1,22 @@
 import { createTheme } from '@mantine/core'
 
+export const palette = {
+  bg: '#F8FAFB',
+  white: '#FFFFFF',
+  border: '#E5E9EB',
+  text: '#1A1D1F',
+  muted: '#6F767E',
+  primary: '#1B4332',
+  accentBg: 'rgba(82, 183, 136, 0.15)'
+}
+
 export const theme = createTheme({
   // Typography - Clean, readable Inter
   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   fontFamilyMonospace: "'JetBrains Mono', ui-monospace, monospace",
   headings: {
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-    fontWeight: '600',
+    fontWeight: '600'
   },
 
   // Green Finance Color Palette
@@ -21,8 +31,8 @@ export const theme = createTheme({
       '#2D6A4F', // 6 - primary light
       '#1B4332', // 7 - primary
       '#143728', // 8
-      '#0D2818', // 9
-    ],
+      '#0D2818' // 9
+    ]
   },
   primaryColor: 'forest',
   primaryShade: 7,
@@ -33,7 +43,7 @@ export const theme = createTheme({
     sm: '0 1px 3px rgba(0, 0, 0, 0.06)',
     md: '0 4px 6px rgba(0, 0, 0, 0.06)',
     lg: '0 10px 15px rgba(0, 0, 0, 0.06)',
-    xl: '0 20px 25px rgba(0, 0, 0, 0.08)',
+    xl: '0 20px 25px rgba(0, 0, 0, 0.08)'
   },
 
   // Spacing
@@ -42,7 +52,7 @@ export const theme = createTheme({
     sm: '8px',
     md: '12px',
     lg: '16px',
-    xl: '24px',
+    xl: '24px'
   },
 
   // Rounded corners
@@ -51,7 +61,7 @@ export const theme = createTheme({
     sm: '6px',
     md: '8px',
     lg: '12px',
-    xl: '16px',
+    xl: '16px'
   },
   defaultRadius: 'md',
 
@@ -61,21 +71,21 @@ export const theme = createTheme({
       defaultProps: {
         padding: 'sm',
         radius: 'md',
-        withBorder: true,
+        withBorder: true
       },
       styles: {
         root: {
           borderColor: '#E5E9EB',
-          backgroundColor: '#FFFFFF',
-        },
-      },
+          backgroundColor: '#FFFFFF'
+        }
+      }
     },
     Table: {
       defaultProps: {
         highlightOnHover: true,
         verticalSpacing: '6px',
         horizontalSpacing: 'xs',
-        fz: 'sm',
+        fz: 'sm'
       },
       styles: {
         th: {
@@ -87,115 +97,115 @@ export const theme = createTheme({
           paddingTop: '8px',
           paddingBottom: '8px',
           backgroundColor: '#F8FAFB',
-          borderBottom: '1px solid #E5E9EB',
+          borderBottom: '1px solid #E5E9EB'
         },
         td: {
           paddingTop: '6px',
           paddingBottom: '6px',
-          borderBottom: '1px solid #F0F3F4',
-        },
-      },
+          borderBottom: '1px solid #F0F3F4'
+        }
+      }
     },
     Button: {
       defaultProps: {
         radius: 'md',
-        size: 'sm',
+        size: 'sm'
       },
       styles: {
         root: {
-          fontWeight: 500,
-        },
-      },
+          fontWeight: 500
+        }
+      }
     },
     TextInput: {
       defaultProps: {
         radius: 'md',
-        size: 'sm',
+        size: 'sm'
       },
       styles: {
         input: {
           backgroundColor: '#FFFFFF',
           borderColor: '#E5E9EB',
           '&:focus': {
-            borderColor: '#52B788',
-          },
+            borderColor: '#52B788'
+          }
         },
         label: {
           fontWeight: 500,
           fontSize: '12px',
           color: '#6F767E',
-          marginBottom: '4px',
-        },
-      },
+          marginBottom: '4px'
+        }
+      }
     },
     Select: {
       defaultProps: {
         radius: 'md',
-        size: 'sm',
+        size: 'sm'
       },
       styles: {
         input: {
           backgroundColor: '#FFFFFF',
-          borderColor: '#E5E9EB',
+          borderColor: '#E5E9EB'
         },
         label: {
           fontWeight: 500,
           fontSize: '12px',
           color: '#6F767E',
-          marginBottom: '4px',
-        },
-      },
+          marginBottom: '4px'
+        }
+      }
     },
     NumberInput: {
       defaultProps: {
         radius: 'md',
-        size: 'sm',
+        size: 'sm'
       },
       styles: {
         input: {
           backgroundColor: '#FFFFFF',
-          borderColor: '#E5E9EB',
+          borderColor: '#E5E9EB'
         },
         label: {
           fontWeight: 500,
           fontSize: '12px',
           color: '#6F767E',
-          marginBottom: '4px',
-        },
-      },
+          marginBottom: '4px'
+        }
+      }
     },
     Textarea: {
       defaultProps: {
         radius: 'md',
-        size: 'sm',
+        size: 'sm'
       },
       styles: {
         input: {
           backgroundColor: '#FFFFFF',
-          borderColor: '#E5E9EB',
+          borderColor: '#E5E9EB'
         },
         label: {
           fontWeight: 500,
           fontSize: '12px',
           color: '#6F767E',
-          marginBottom: '4px',
-        },
-      },
+          marginBottom: '4px'
+        }
+      }
     },
     Badge: {
       defaultProps: {
         radius: 'sm',
         size: 'sm',
-        variant: 'light',
+        variant: 'light'
       },
       styles: {
         root: {
           textTransform: 'uppercase' as const,
           letterSpacing: '0.02em',
           fontWeight: 600,
-          fontSize: '10px',
-        },
-      },
+          fontSize: '10px'
+        }
+      }
     },
     Accordion: {
       styles: {
@@ -205,77 +215,77 @@ export const theme = createTheme({
           fontWeight: 500,
           backgroundColor: '#F8FAFB',
           '&:hover': {
-            backgroundColor: 'rgba(82, 183, 136, 0.1)',
-          },
+            backgroundColor: 'rgba(82, 183, 136, 0.1)'
+          }
         },
         content: {
           padding: '12px',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#FFFFFF'
         },
         item: {
-          borderBottom: '1px solid #E5E9EB',
-        },
-      },
+          borderBottom: '1px solid #E5E9EB'
+        }
+      }
     },
     Modal: {
       defaultProps: {
         radius: 'md',
-        padding: 'md',
+        padding: 'md'
       },
       styles: {
         content: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#FFFFFF'
         },
         header: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#FFFFFF'
         },
         title: {
           fontWeight: 600,
-          fontSize: '18px',
-        },
-      },
+          fontSize: '18px'
+        }
+      }
     },
     Stack: {
       defaultProps: {
-        gap: 'sm',
-      },
+        gap: 'sm'
+      }
     },
     Title: {
       styles: {
         root: {
           fontWeight: 600,
-          color: '#1A1D1F',
-        },
-      },
+          color: '#1A1D1F'
+        }
+      }
     },
     Text: {
       styles: {
         root: {
-          color: '#1A1D1F',
-        },
-      },
+          color: '#1A1D1F'
+        }
+      }
     },
     ActionIcon: {
       defaultProps: {
-        variant: 'subtle',
+        variant: 'subtle'
       },
       styles: {
         root: {
           color: '#6F767E',
           '&:hover': {
-            backgroundColor: 'rgba(82, 183, 136, 0.1)',
-          },
-        },
-      },
+            backgroundColor: 'rgba(82, 183, 136, 0.1)'
+          }
+        }
+      }
     },
     Tooltip: {
       styles: {
         tooltip: {
           backgroundColor: '#1B4332',
           fontSize: '12px',
-          fontWeight: 500,
-        },
-      },
-    },
-  },
+          fontWeight: 500
+        }
+      }
+    }
+  }
 })

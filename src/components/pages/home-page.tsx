@@ -8,7 +8,7 @@ import { InvestmentOverview } from '@/components/investment/investment-overview'
 import { YTDOverview } from '@/components/ytd-overview'
 import { useSharedQueryParams } from '@/hooks/use-shared-query-params'
 import { useDashboardExport } from '@/hooks/use-dashboard-export'
-import { useSetHeaderAction } from '@/contexts/header-action-context'
+import { PageHeader } from '@/components/shell'
 import { Stack, Card, SimpleGrid, Button, ActionIcon, Menu } from '@mantine/core'
 import { Accordion } from '@mantine/core'
 import { Download, ChevronDown } from 'lucide-react'
@@ -22,7 +22,7 @@ export default function HomePage() {
   const { data: { incomes = [] } = {} } = useIncomeStore()
   const { investments, getLatestValue } = useInvestmentStore()
 
-  useSetHeaderAction(
+  const headerActions = (
     <>
       <Menu shadow="md" width={180} visibleFrom="sm">
         <Menu.Target>
@@ -79,6 +79,7 @@ export default function HomePage() {
 
   return (
     <Stack gap="md">
+      <PageHeader actions={headerActions} />
       {/* YTD and Monthly Overview side by side on desktop, stacked on mobile */}
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
         <YTDOverview />
