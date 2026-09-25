@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 
 export default defineConfig({
-  plugins: [TanStackRouterVite(), react()],
+  plugins: [TanStackRouterVite({ autoCodeSplitting: true }), react()],
   resolve: { tsconfigPaths: true },
   server: { port: 3000 },
 })

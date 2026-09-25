@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google'
-import { streamObject } from 'ai'
+import { Output, streamText } from 'ai'
 import { PDFParse } from 'pdf-parse'
 import { z } from 'zod'
 
@@ -72,10 +72,9 @@ export async function POST(req: Request) {
   const categories: Category[] = JSON.parse(String(form.get('categories') ?? '[]'))
   const history: Past[] = JSON.parse(String(form.get('history') ?? '[]'))
 
-  const { elementStream } = streamObject({
+  const { elementStream } = streamText({
     model: google('gemini-3.8-flash'),
-    output: 'array',
-    schema: expenseSchema,
+    output: Output.array({ element: expenseSchema }),
     prompt: prompt(transactions, categories, history),
     maxRetries: 2
   })
