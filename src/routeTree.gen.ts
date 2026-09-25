@@ -20,37 +20,37 @@ import { Route as InvestmentsIdRouteImport } from './routes/investments.$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootRouteImport
 } as any)
 const AccountsRoute = AccountsRouteImport.update({
   id: '/accounts',
   path: '/accounts',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootRouteImport
 } as any)
 const ExpensesRoute = ExpensesRouteImport.update({
   id: '/expenses',
   path: '/expenses',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootRouteImport
 } as any)
 const IncomesRoute = IncomesRouteImport.update({
   id: '/incomes',
   path: '/incomes',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootRouteImport
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootRouteImport
 } as any)
 const InvestmentsIndexRoute = InvestmentsIndexRouteImport.update({
   id: '/investments/',
   path: '/investments/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootRouteImport
 } as any)
 const InvestmentsIdRoute = InvestmentsIdRouteImport.update({
   id: '/investments/$id',
   path: '/investments/$id',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootRouteImport
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -83,32 +83,10 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/accounts'
-    | '/expenses'
-    | '/incomes'
-    | '/settings'
-    | '/investments/$id'
-    | '/investments/'
+  fullPaths: '/' | '/accounts' | '/expenses' | '/incomes' | '/settings' | '/investments/$id' | '/investments/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/accounts'
-    | '/expenses'
-    | '/incomes'
-    | '/settings'
-    | '/investments/$id'
-    | '/investments'
-  id:
-    | '__root__'
-    | '/'
-    | '/accounts'
-    | '/expenses'
-    | '/incomes'
-    | '/settings'
-    | '/investments/$id'
-    | '/investments/'
+  to: '/' | '/accounts' | '/expenses' | '/incomes' | '/settings' | '/investments/$id' | '/investments'
+  id: '__root__' | '/' | '/accounts' | '/expenses' | '/incomes' | '/settings' | '/investments/$id' | '/investments/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -182,8 +160,6 @@ const rootRouteChildren: RootRouteChildren = {
   IncomesRoute: IncomesRoute,
   SettingsRoute: SettingsRoute,
   InvestmentsIdRoute: InvestmentsIdRoute,
-  InvestmentsIndexRoute: InvestmentsIndexRoute,
+  InvestmentsIndexRoute: InvestmentsIndexRoute
 }
-export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()

@@ -34,7 +34,12 @@ export function ImportPanel({ categories, history, monthExpenses, year, month }:
     form.append('categories', JSON.stringify(categories.map((c) => ({ id: c.value, name: c.label }))))
     form.append(
       'history',
-      JSON.stringify(history.map(({ description, categoryId, amount }) => ({ description, categoryId, amount })))
+      JSON.stringify(
+        history
+          .toSorted((a, b) => b.date.localeCompare(a.date))
+          .slice(0, 200)
+          .map(({ description, categoryId, amount }) => ({ description, categoryId, amount }))
+      )
     )
 
     setLoading(true)

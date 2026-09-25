@@ -15,8 +15,11 @@ const expenseSchema = z.object({
 })
 
 type Category = { id: string; name: string }
+type Past = { description: string; categoryId: string; amount: number }
 
-const prompt = (transactions: string, categories: Category[], history: unknown[]) => `
+const MAX_HISTORY = 200
+
+const prompt = (transactions: string, categories: Category[], history: Past[]) => `
 You categorize bank transactions for a personal expense tracker.
 
 ## Rules
@@ -37,8 +40,11 @@ You categorize bank transactions for a personal expense tracker.
 ### Active categories (id: name)
 ${categories.map((c) => `${c.id}: ${c.name}`).join('\n')}
 
-### Recent categorized expenses
-${JSON.stringify(history.slice(0, 200))}
+### Recent categorized expenses (categoryId | amount | description)
+${history
+  .slice(0, MAX_HISTORY)
+  .map((h) => `${h.categoryId} | ${h.amount} | ${h.description}`)
+  .join('\n')}
 
 ### Transactions
 ---
@@ -64,7 +70,7 @@ export async function POST(req: Request) {
   if (!transactions.trim()) return Response.json({ error: 'No transactions found in the input' }, { status: 422 })
 
   const categories: Category[] = JSON.parse(String(form.get('categories') ?? '[]'))
-  const history: unknown[] = JSON.parse(String(form.get('history') ?? '[]'))
+  const history: Past[] = JSON.parse(String(form.get('history') ?? '[]'))
 
   const { elementStream } = streamObject({
     model: google('gemini-3-flash-preview'),
@@ -74,16 +80,12 @@ export async function POST(req: Request) {
     maxRetries: 2
   })
 
-  const encoder = new TextEncoder()
-  const body = new ReadableStream({
-    async start(controller) {
-      try {
-        for await (const expense of elementStream) controller.enqueue(encoder.encode(JSON.stringify(expense) + '\n'))
-        controller.close()
-      } catch (error) {
-        controller.error(error)
-      }
-    }
-  })
+  const body = elementStream
+    .pipeThrough(
+      new TransformStream<z.infer<typeof expenseSchema>, string>({
+        transform: (expense, out) => out.enqueue(JSON.stringify(expense) + '\n')
+      })
+    )
+    .pipeThrough(new TextEncoderStream())
   return new Response(body, { headers: { 'Content-Type': 'application/x-ndjson' } })
 }
