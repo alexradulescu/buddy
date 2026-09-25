@@ -1,18 +1,8 @@
 import { createTheme } from '@mantine/core'
 
-export const palette = {
-  bg: '#F8FAFB',
-  white: '#FFFFFF',
-  border: '#E5E9EB',
-  text: '#1A1D1F',
-  muted: '#6F767E',
-  primary: '#1B4332',
-  accentBg: 'rgba(82, 183, 136, 0.15)'
-}
-
-// Input backgrounds and borders come from globals.css
+// Colors are CSS variables defined in styles/base.css, so plain CSS and Mantine share one source
 const inputStyles = {
-  label: { fontWeight: 500, fontSize: '12px', color: '#6F767E', marginBottom: '4px' }
+  label: { fontWeight: 500, fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px' }
 }
 
 export const theme = createTheme({
@@ -74,8 +64,8 @@ export const theme = createTheme({
       defaultProps: { padding: 'sm', withBorder: true },
       styles: {
         root: {
-          borderColor: '#E5E9EB',
-          backgroundColor: '#FFFFFF'
+          borderColor: 'var(--color-border)',
+          backgroundColor: 'var(--color-surface)'
         }
       }
     },
@@ -92,16 +82,16 @@ export const theme = createTheme({
           fontSize: '11px',
           textTransform: 'uppercase' as const,
           letterSpacing: '0.03em',
-          color: '#6F767E',
+          color: 'var(--color-text-secondary)',
           paddingTop: '8px',
           paddingBottom: '8px',
-          backgroundColor: '#F8FAFB',
-          borderBottom: '1px solid #E5E9EB'
+          backgroundColor: 'var(--color-page-background)',
+          borderBottom: '1px solid var(--color-border)'
         },
         td: {
           paddingTop: '6px',
           paddingBottom: '6px',
-          borderBottom: '1px solid #F0F3F4'
+          borderBottom: '1px solid var(--color-border-light)'
         }
       }
     },
@@ -127,24 +117,24 @@ export const theme = createTheme({
           paddingTop: '10px',
           paddingBottom: '10px',
           fontWeight: 500,
-          backgroundColor: '#F8FAFB'
+          backgroundColor: 'var(--color-page-background)'
         },
         content: {
           padding: '12px',
-          backgroundColor: '#FFFFFF'
+          backgroundColor: 'var(--color-surface)'
         },
         item: {
-          borderBottom: '1px solid #E5E9EB'
+          borderBottom: '1px solid var(--color-border)'
         }
       }
     },
     Modal: {
       styles: {
         content: {
-          backgroundColor: '#FFFFFF'
+          backgroundColor: 'var(--color-surface)'
         },
         header: {
-          backgroundColor: '#FFFFFF'
+          backgroundColor: 'var(--color-surface)'
         },
         title: {
           fontWeight: 600,
@@ -161,14 +151,14 @@ export const theme = createTheme({
       styles: {
         root: {
           fontWeight: 600,
-          color: '#1A1D1F'
+          color: 'var(--color-text)'
         }
       }
     },
     Text: {
       styles: {
         root: {
-          color: '#1A1D1F'
+          color: 'var(--color-text)'
         }
       }
     },
@@ -176,12 +166,12 @@ export const theme = createTheme({
       defaultProps: {
         variant: 'subtle'
       },
-      styles: { root: { color: '#6F767E' } }
+      styles: { root: { color: 'var(--color-text-secondary)' } }
     },
     Tooltip: {
       styles: {
         tooltip: {
-          backgroundColor: '#1B4332',
+          backgroundColor: 'var(--color-primary)',
           fontSize: '12px',
           fontWeight: 500
         }

@@ -19,7 +19,7 @@ import { Edit, Trash2, TrendingUp } from 'lucide-react'
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
-import { CardTitle } from '@/components/summary'
+import { CardTitle, Money } from '@/components/ui'
 import { save, type Investment, type InvestmentContribution, type InvestmentValue } from '@/db'
 import { performanceSeries } from '@/lib/finance'
 import { formatMoney } from '@/lib/format'
@@ -178,8 +178,8 @@ export function EntriesCard({ title, icon, amountLabel, emptyText, rows, onSave,
             {newest.map((row) => (
               <Table.Tr key={row.id}>
                 <Table.Td>{dayjs(row.date).format('M/D/YYYY')}</Table.Td>
-                <Table.Td ta="right" className="numeric-value">
-                  {formatMoney(row.amount)}
+                <Table.Td ta="right">
+                  <Money value={row.amount} />
                 </Table.Td>
                 <Table.Td c="dimmed">{row.description || '-'}</Table.Td>
                 <Table.Td ta="right">

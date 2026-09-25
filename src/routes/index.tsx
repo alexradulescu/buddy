@@ -19,7 +19,7 @@ import dayjs from 'dayjs'
 import { Calendar, ChevronDown, Download } from 'lucide-react'
 
 import { PageHeader } from '@/components/shell'
-import { CardTitle, MetricList, Stat } from '@/components/summary'
+import { CardTitle, colorBySign, MetricList, Money, Stat } from '@/components/ui'
 import { db } from '@/db'
 import { useMonth } from '@/hooks/use-month'
 import { downloadCSV, fullCSV, overviewCSV, type ExportData } from '@/lib/csv'
@@ -144,16 +144,12 @@ function HomePage() {
                         {category.name}
                       </CategoryLink>
                     </Table.Td>
-                    <Table.Td
-                      ta="right"
-                      className="numeric-value"
-                      c={spent.month > budget.month ? negative : undefined}
-                    >
-                      {formatMoney(spent.month)}
+                    <Table.Td ta="right" c={spent.month > budget.month ? negative : undefined}>
+                      <Money value={spent.month} />
                     </Table.Td>
                     <BudgetCell budget={budget.month} delta={delta.month} />
-                    <Table.Td ta="right" className="numeric-value">
-                      {formatMoney(spent.ytd)}
+                    <Table.Td ta="right">
+                      <Money value={spent.ytd} />
                     </Table.Td>
                     <BudgetCell budget={budget.ytd} delta={delta.ytd} />
                     <BudgetCell budget={budget.annual} delta={delta.annual} pr="md" />
@@ -187,14 +183,8 @@ function HomePage() {
                     </CategoryLink>
                   </Table.Td>
                   {[row.month, row.ytd, row.annual].map((amount, i) => (
-                    <Table.Td
-                      key={i}
-                      ta="right"
-                      pr={i === 2 ? 'md' : undefined}
-                      className="numeric-value"
-                      c={amount > 0 ? positive : undefined}
-                    >
-                      {formatMoney(amount)}
+                    <Table.Td key={i} ta="right" pr={i === 2 ? 'md' : undefined} c={amount > 0 ? positive : undefined}>
+                      <Money value={amount} />
                     </Table.Td>
                   ))}
                 </Table.Tr>
@@ -213,7 +203,7 @@ function HomePage() {
               size="md"
               label="Total P&L"
               value={`${formatMoney(investments.profit)} (${formatPercent(investments.returnRate, 2)})`}
-              color={investments.profit >= 0 ? 'green.6' : 'red.6'}
+              color={colorBySign(investments.profit)}
             />
           </SimpleGrid>
           <ScrollArea mt="sm">
@@ -232,13 +222,13 @@ function HomePage() {
                 {investments.rows.map((r) => (
                   <Table.Tr key={r.investment.id}>
                     <Table.Td pl="md">{r.investment.name}</Table.Td>
-                    <Table.Td ta="right" className="numeric-value">
-                      {formatMoney(r.value)}
+                    <Table.Td ta="right">
+                      <Money value={r.value} />
                     </Table.Td>
-                    <Table.Td ta="right" className="numeric-value">
-                      {formatMoney(r.invested)}
+                    <Table.Td ta="right">
+                      <Money value={r.invested} />
                     </Table.Td>
-                    <Table.Td ta="right" pr="md" className="numeric-value" c={r.profit >= 0 ? 'green.6' : 'red.6'}>
+                    <Table.Td ta="right" pr="md" className="tabular-number" c={colorBySign(r.profit)}>
                       {formatMoney(r.profit)} ({formatPercent(r.returnRate, 2)})
                     </Table.Td>
                   </Table.Tr>
@@ -278,7 +268,7 @@ function CategoryLink({ to, search, children }: { to: string; search: object; ch
 function BudgetCell({ budget, delta, pr }: { budget: number; delta: number; pr?: string }) {
   const color = delta >= 0 ? positive : negative
   return (
-    <Table.Td ta="right" pr={pr} className="numeric-value">
+    <Table.Td ta="right" pr={pr} className="tabular-number">
       <Stack gap={0} align="flex-end">
         <Text fz="sm">{formatMoney(budget)}</Text>
         <Badge size="xs" styles={{ root: { color, backgroundColor: `${color}1A` } }}>

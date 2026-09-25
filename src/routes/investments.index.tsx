@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react'
 
 import { InvestmentModal } from '@/components/investment'
 import { PageHeader } from '@/components/shell'
-import { Stat } from '@/components/summary'
+import { colorBySign, Stat } from '@/components/ui'
 import { db } from '@/db'
 import { investmentStats } from '@/lib/finance'
 import { formatMoney, formatPercent } from '@/lib/format'
@@ -72,11 +72,11 @@ function InvestmentsPage() {
 }
 
 function InvestmentCard({ investment, invested, value, profit, returnRate }: ReturnType<typeof investmentStats>) {
-  const profitColor = profit >= 0 ? 'green.6' : 'red.6'
+  const profitColor = colorBySign(profit)
 
   return (
-    <Link to="/investments/$id" params={{ id: investment.id }} className="card-link">
-      <Card h="100%" className="hover-card">
+    <Link to="/investments/$id" params={{ id: investment.id }} className="plain-link">
+      <Card h="100%" className="clickable-card">
         <Group justify="space-between" align="center" mb="xs">
           <Text fw={600}>{investment.name}</Text>
           <Badge color={investment.isActive ? 'green' : 'gray'}>{investment.isActive ? 'Active' : 'Inactive'}</Badge>

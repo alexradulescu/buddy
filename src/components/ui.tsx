@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { Group, Stack, Text, Title } from '@mantine/core'
 
+import { formatMoney } from '@/lib/format'
+
 type Metric = { label: string; value: string; color?: string }
 
 // "Label ........ value" rows, used by the summary cards
@@ -12,7 +14,7 @@ export function MetricList({ metrics }: { metrics: Metric[] }) {
           <Text size="sm" c="dimmed">
             {m.label}
           </Text>
-          <Text size="sm" fw={600} className="numeric-value" c={m.color}>
+          <Text size="sm" fw={600} className="tabular-number" c={m.color}>
             {m.value}
           </Text>
         </Group>
@@ -38,9 +40,19 @@ export function Stat({ label, value, color, size = 'sm' }: Metric & { size?: 'sm
       <Text size="xs" c="dimmed">
         {label}
       </Text>
-      <Text fz={size} fw={size === 'md' ? 600 : 500} c={color} className="numeric-value">
+      <Text fz={size} fw={size === 'md' ? 600 : 500} c={color} className="tabular-number">
         {value}
       </Text>
     </Stack>
   )
+}
+
+// A currency amount in tabular monospace digits; inherits size and color from its parent
+export function Money({ value }: { value: number | null | undefined }) {
+  return <span className="tabular-number">{formatMoney(value)}</span>
+}
+
+// Green for gains and zero, red for losses
+export function colorBySign(amount: number) {
+  return amount >= 0 ? 'green.6' : 'red.6'
 }
