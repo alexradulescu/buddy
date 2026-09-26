@@ -23,7 +23,7 @@ type Props<T extends Row> = {
   columns: SheetColumn<T>[]
   onChange: (row: T) => void
   onDelete?: (row: T) => void
-  highlight?: (row: T) => boolean // adds the 'duplicate-row' class
+  highlight?: (row: T) => boolean // adds the 'spreadsheet-duplicate-row' class
   height?: number | 'auto'
 }
 
@@ -50,7 +50,7 @@ function deleteRenderer(onDelete: (row: number) => void) {
   return (_hot: Handsontable, td: HTMLTableCellElement, row: number) => {
     const button = document.createElement('button')
     button.textContent = '🗑️'
-    button.className = 'sheet-delete'
+    button.className = 'spreadsheet-delete-button'
     button.onclick = (e) => {
       e.stopPropagation()
       onDelete(row)
@@ -141,7 +141,7 @@ export function Sheet<T extends Row>({ rows, columns, onChange, onDelete, highli
       colHeaders
       licenseKey="non-commercial-and-evaluation"
       themeName="ht-theme-main"
-      className="sheet"
+      className="spreadsheet"
       height={height}
       width="100%"
       stretchH="all"
@@ -153,7 +153,7 @@ export function Sheet<T extends Row>({ rows, columns, onChange, onDelete, highli
       search
       outsideClickDeselects={false}
       afterChange={afterChange}
-      cells={(i) => (highlight && rows[i] && highlight(rows[i]) ? { className: 'duplicate-row' } : {})}
+      cells={(i) => (highlight && rows[i] && highlight(rows[i]) ? { className: 'spreadsheet-duplicate-row' } : {})}
     />
   )
 }

@@ -5,7 +5,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Calculator, Edit2, Trash2, Wallet } from 'lucide-react'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
-import { CardTitle, MetricList } from '@/components/summary'
+import { CardTitle, colorBySign, MetricList } from '@/components/ui'
 import { db, remove, save, type AccountBalance } from '@/db'
 import { useMonth } from '@/hooks/use-month'
 import { monthTotal, prevMonth, sum } from '@/lib/finance'
@@ -44,7 +44,7 @@ function AccountsPage() {
             { label: 'Total Income', value: formatMoney(income) },
             { label: 'Expected Accounts Total', value: formatMoney(expected) },
             { label: 'Real Accounts Total', value: formatMoney(real) },
-            { label: 'Discrepancy', value: formatMoney(discrepancy), color: discrepancy >= 0 ? 'green.6' : 'red.6' }
+            { label: 'Discrepancy', value: formatMoney(discrepancy), color: colorBySign(discrepancy) }
           ]}
         />
       </Card>
@@ -68,7 +68,7 @@ function AccountsPage() {
                   {balance.title}
                 </Text>
                 <Group gap="xs" wrap="nowrap">
-                  <Text size="sm" fw={600} className="numeric-value">
+                  <Text size="sm" fw={600} className="tabular-number">
                     {formatMoney(balance.amount)}
                   </Text>
                   <Button size="compact-xs" variant="subtle" onClick={() => setEditing(balance)}>

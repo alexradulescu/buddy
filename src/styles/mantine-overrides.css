@@ -1,0 +1,60 @@
+/* Mantine class overrides. Delete this file when moving off Mantine. */
+
+.mantine-Table-tr:hover {
+  background-color: var(--color-accent-background);
+}
+
+.mantine-Input-input {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.mantine-Input-input:focus {
+  border-color: var(--color-accent);
+}
+
+.mantine-Button-root[data-variant='filled'] {
+  background-color: var(--color-primary);
+}
+
+.mantine-Button-root[data-variant='filled']:hover {
+  background-color: var(--color-primary-light);
+}
+
+.mantine-Button-root[data-variant='light'] {
+  background-color: var(--color-accent-background);
+  color: var(--color-primary);
+}
+
+.mantine-Button-root[data-variant='default'] {
+  border-color: var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.mantine-Button-root[data-variant='default']:hover {
+  background-color: var(--color-page-background);
+}
+
+.mantine-Modal-overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.mantine-Select-dropdown,
+.mantine-Combobox-dropdown {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.mantine-Select-option[data-selected],
+.mantine-Combobox-option[data-selected] {
+  background-color: var(--color-accent-background);
+  color: var(--color-text);
+}
+
+.mantine-Notification-root {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}

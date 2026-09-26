@@ -1,0 +1,81 @@
+/* Design tokens and document-level defaults. Plain CSS: portable to any component library. */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --color-primary: #1b4332;
+  --color-primary-light: #2d6a4f;
+  --color-accent: #52b788;
+  --color-accent-background: rgba(82, 183, 136, 0.1);
+  --color-accent-background-strong: rgba(82, 183, 136, 0.15);
+
+  --color-page-background: #f8fafb;
+  --color-surface: #ffffff;
+  --color-border: #e5e9eb;
+  --color-border-light: #f0f3f4;
+
+  --color-text: #1a1d1f;
+  --color-text-secondary: #6f767e;
+  --color-text-muted: #9a9fa5;
+
+  --color-negative: #d64550;
+  --color-negative-background: rgba(214, 69, 80, 0.08);
+
+  --shadow-popover: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  background-color: var(--color-page-background);
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-page-background);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Numbers line up in columns */
+input[type='number'],
+.tabular-number {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+textarea {
+  field-sizing: content;
+}
+
+.plain-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.clickable-card {
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.clickable-card:hover {
+  border-color: var(--color-accent);
+}

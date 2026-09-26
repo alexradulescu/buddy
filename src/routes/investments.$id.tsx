@@ -5,7 +5,7 @@ import { ArrowLeft, BarChart3, DollarSign, Edit, PiggyBank, Trash2 } from 'lucid
 
 import { ConfirmDelete } from '@/components/confirm-delete'
 import { EntriesCard, InvestmentModal, PerformanceChart } from '@/components/investment'
-import { CardTitle, MetricList } from '@/components/summary'
+import { CardTitle, colorBySign, MetricList } from '@/components/ui'
 import { db, remove, save } from '@/db'
 import { investmentStats } from '@/lib/finance'
 import { formatMoney, formatPercent } from '@/lib/format'
@@ -30,7 +30,7 @@ function InvestmentDetailPage() {
   const contributions = data.investmentContributions
   const values = data.investmentValues
   const { invested, value, profit, returnRate } = investmentStats(investment, contributions, values)
-  const profitColor = profit >= 0 ? 'green.6' : 'red.6'
+  const profitColor = colorBySign(profit)
 
   return (
     <Stack gap="md">

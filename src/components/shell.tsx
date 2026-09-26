@@ -1,11 +1,10 @@
 import type { ReactNode } from 'react'
-import { ActionIcon, AppShell, Box, Group, rem, Stack, Text, Title, Tooltip } from '@mantine/core'
+import { ActionIcon, AppShell, Box, Group, Stack, Text, Title, Tooltip } from '@mantine/core'
 import { MonthPickerInput } from '@mantine/dates'
 import { Link, useRouterState } from '@tanstack/react-router'
 import { BarChart2, ChevronLeft, ChevronRight, CreditCard, Home, PiggyBank, Settings, TrendingUp } from 'lucide-react'
 
 import { useMonth } from '@/hooks/use-month'
-import { palette } from '@/theme'
 
 const nav = [
   { href: '/', label: 'Home', title: 'Budget Overview', icon: Home },
@@ -21,11 +20,6 @@ export function Shell({ children }: { children: ReactNode }) {
   const { year, month } = useMonth()
   const search = { year, month } as never
 
-  const linkColors = (href: string) => ({
-    color: pathname === href ? palette.primary : palette.muted,
-    backgroundColor: pathname === href ? palette.accentBg : 'transparent'
-  })
-
   return (
     <AppShell
       header={{ height: 60 }}
@@ -33,7 +27,7 @@ export function Shell({ children }: { children: ReactNode }) {
       footer={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))' }}
       padding="md"
       withBorder={false}
-      bg={palette.bg}
+      bg="var(--color-page-background)"
     >
       <AppShell.Header>
         <Group justify="space-between" h="100%" px="md">
@@ -44,15 +38,15 @@ export function Shell({ children }: { children: ReactNode }) {
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar bg={palette.white} style={{ borderRight: `1px solid ${palette.border}` }}>
+      <AppShell.Navbar bg="var(--color-surface)" className="desktop-sidebar">
         <Stack gap="xs" p="xs" align="center">
           {nav.map((item) => (
             <Tooltip key={item.href} label={item.label} position="right">
               <Link
                 to={item.href}
                 search={search}
-                className="nav-link"
-                style={{ ...linkColors(item.href), width: rem(36), height: rem(36) }}
+                className="navigation-link desktop-sidebar-link"
+                data-active={pathname === item.href || undefined}
               >
                 <item.icon size={18} strokeWidth={pathname === item.href ? 2 : 1.5} />
               </Link>
@@ -61,15 +55,15 @@ export function Shell({ children }: { children: ReactNode }) {
         </Stack>
       </AppShell.Navbar>
 
-      <AppShell.Footer hiddenFrom="sm" className="mobile-footer">
-        <Box className="mobile-nav">
+      <AppShell.Footer hiddenFrom="sm" className="mobile-bottom-navigation-bar">
+        <Box className="mobile-bottom-navigation">
           {nav.map((item) => (
             <Link
               key={item.href}
               to={item.href}
               search={search}
-              className="nav-link mobile-nav-link"
-              style={linkColors(item.href)}
+              className="navigation-link mobile-bottom-navigation-link"
+              data-active={pathname === item.href || undefined}
             >
               <item.icon size={22} strokeWidth={pathname === item.href ? 2 : 1.5} />
               <Text fw={pathname === item.href ? 600 : 400} fz={10} lh={1.2} c="inherit">
@@ -80,8 +74,8 @@ export function Shell({ children }: { children: ReactNode }) {
         </Box>
       </AppShell.Footer>
 
-      <AppShell.Main bg={palette.bg}>
-        <Box className="scrollable-zone" h="100%">
+      <AppShell.Main bg="var(--color-page-background)">
+        <Box className="scrollable-page-content" h="100%">
           {children}
         </Box>
       </AppShell.Main>
@@ -98,7 +92,7 @@ function MonthPicker() {
   }
 
   return (
-    <Group gap={0} wrap="nowrap" className="month-picker">
+    <Group gap={0} wrap="nowrap" className="header-month-picker">
       <ActionIcon size="lg" radius={0} aria-label="Previous month" onClick={() => go(new Date(year, month - 1))}>
         <ChevronLeft size={16} strokeWidth={1.5} />
       </ActionIcon>

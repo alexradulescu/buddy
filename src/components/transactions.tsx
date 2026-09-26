@@ -19,6 +19,7 @@ import { useQueryState } from 'nuqs'
 import { ConfirmDelete } from '@/components/confirm-delete'
 import { EntryModal, type Entry, type Option } from '@/components/entry-modal'
 import { Sheet, type SheetColumn } from '@/components/sheet'
+import { Money } from '@/components/ui'
 import { remove, save } from '@/db'
 import { inMonth } from '@/lib/finance'
 import { formatMoney } from '@/lib/format'
@@ -181,8 +182,8 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
                     <Table.Td>{dayjs(row.date).format('DD MMM YYYY')}</Table.Td>
                     <Table.Td>{row.description}</Table.Td>
                     <Table.Td c="dimmed">{row.category}</Table.Td>
-                    <Table.Td ta="right" className="numeric-value" c={row.amount < 0 ? 'green.6' : undefined}>
-                      {formatMoney(row.amount)}
+                    <Table.Td ta="right" c={row.amount < 0 ? 'green.6' : undefined}>
+                      <Money value={row.amount} />
                     </Table.Td>
                     <Table.Td>
                       <Group gap={4} wrap="nowrap">
