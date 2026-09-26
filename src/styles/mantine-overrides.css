@@ -1,60 +1,170 @@
 /* Mantine class overrides. Delete this file when moving off Mantine. */
 
+/* Mantine's own surface variables follow our tokens so light/dark stay in sync */
+:root {
+  --mantine-color-body: var(--color-page-background);
+  --mantine-color-text: var(--color-text);
+  --mantine-color-dimmed: var(--color-text-secondary);
+  --mantine-color-default: var(--color-surface);
+  --mantine-color-default-border: var(--color-border);
+  --mantine-color-default-hover: var(--color-fill-secondary);
+}
+
 .mantine-Table-tr:hover {
-  background-color: var(--color-accent-background);
+  background-color: var(--color-fill-secondary);
 }
 
+.mantine-Table-table[data-striped] .mantine-Table-tr:nth-of-type(odd) {
+  background-color: var(--color-surface-secondary);
+}
+
+.mantine-Table-thead[data-sticky] {
+  background-color: var(--material-bar);
+  backdrop-filter: var(--material-blur);
+}
+
+/* Inputs: filled, borderless, focus ring in tint (macOS / iOS text fields) */
 .mantine-Input-input {
-  background-color: var(--color-surface);
-  border-color: var(--color-border);
+  background-color: var(--color-fill-secondary);
+  border: 1px solid transparent;
   color: var(--color-text);
+  transition:
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
 }
 
-.mantine-Input-input:focus {
-  border-color: var(--color-accent);
+.mantine-Input-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.mantine-Input-input:focus,
+.mantine-Input-input:focus-within {
+  border-color: var(--color-tint);
+  background-color: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-tint-fill-strong);
+}
+
+.mantine-Button-root {
+  transition:
+    transform 0.2s var(--ease-spring),
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.mantine-Button-root:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .mantine-Button-root[data-variant='filled'] {
-  background-color: var(--color-primary);
+  background-color: var(--mantine-color-tint-filled, var(--color-tint));
 }
 
-.mantine-Button-root[data-variant='filled']:hover {
-  background-color: var(--color-primary-light);
+.mantine-Button-root[data-variant='filled']:not([data-disabled]):hover {
+  opacity: 0.9;
 }
 
 .mantine-Button-root[data-variant='light'] {
-  background-color: var(--color-accent-background);
-  color: var(--color-primary);
+  background-color: var(--color-tint-fill);
+  color: var(--color-tint);
 }
 
 .mantine-Button-root[data-variant='default'] {
-  border-color: var(--color-border);
-  background-color: var(--color-surface);
-}
-
-.mantine-Button-root[data-variant='default']:hover {
-  background-color: var(--color-page-background);
-}
-
-.mantine-Modal-overlay {
-  background-color: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
-}
-
-.mantine-Select-dropdown,
-.mantine-Combobox-dropdown {
-  background-color: var(--color-surface);
-  border-color: var(--color-border);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.mantine-Select-option[data-selected],
-.mantine-Combobox-option[data-selected] {
-  background-color: var(--color-accent-background);
+  border-color: transparent;
+  background-color: var(--color-fill);
   color: var(--color-text);
 }
 
-.mantine-Notification-root {
+.mantine-Button-root[data-variant='default']:hover {
+  background-color: var(--color-fill);
+  opacity: 0.85;
+}
+
+/* Segmented control: grey track, raised white thumb */
+.mantine-SegmentedControl-root {
+  background-color: var(--color-fill);
+  padding: 2px;
+}
+
+.mantine-SegmentedControl-indicator {
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.12),
+    0 3px 1px rgba(0, 0, 0, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  .mantine-SegmentedControl-indicator {
+    background-color: #636366;
+  }
+}
+
+.mantine-SegmentedControl-label {
+  font-weight: 500;
+}
+
+.mantine-SegmentedControl-label[data-active] {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Sheets and popovers use the thick material */
+.mantine-Modal-overlay {
+  background-color: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(6px);
+}
+
+.mantine-Select-dropdown,
+.mantine-Combobox-dropdown,
+.mantine-Menu-dropdown,
+.mantine-Popover-dropdown {
+  background-color: var(--material-bar);
+  backdrop-filter: var(--material-blur);
+  -webkit-backdrop-filter: var(--material-blur);
+  border: none;
+  box-shadow: var(--shadow-popover);
+  padding: 5px;
+}
+
+.mantine-Select-option,
+.mantine-Combobox-option,
+.mantine-Menu-item {
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.mantine-Select-option[data-combobox-selected],
+.mantine-Combobox-option[data-combobox-selected],
+.mantine-Combobox-option:hover,
+.mantine-Menu-item:hover,
+.mantine-Menu-item[data-hovered] {
+  background-color: var(--color-tint);
+  color: #fff;
+}
+
+.mantine-Notification-root {
+  background-color: var(--material-bar);
+  backdrop-filter: var(--material-blur);
+  -webkit-backdrop-filter: var(--material-blur);
+  border: none;
+  border-radius: 14px;
+  box-shadow: var(--shadow-popover);
+}
+
+/* Accordion inside cards: the chevron is the only chrome */
+.mantine-Accordion-control:hover {
+  background-color: var(--color-surface);
+}
+
+.mantine-Accordion-chevron {
+  color: var(--color-text-muted);
+}
+
+.mantine-Badge-root[data-variant='light'][data-color='green'] {
+  background-color: var(--color-positive-background);
+  color: var(--color-positive);
+}
+
+.mantine-Badge-root[data-variant='light'][data-color='gray'] {
+  background-color: var(--color-fill);
+  color: var(--color-text-secondary);
 }

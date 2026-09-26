@@ -1,35 +1,95 @@
-/* Design tokens and document-level defaults. Plain CSS: portable to any component library. */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/*
+ * Design tokens and document-level defaults. Plain CSS: portable to any component library.
+ * Modelled on Apple's system colors and materials; light and dark follow the OS setting.
+ */
 
 :root {
-  --color-primary: #1b4332;
-  --color-primary-light: #2d6a4f;
-  --color-accent: #52b788;
-  --color-accent-background: rgba(82, 183, 136, 0.1);
-  --color-accent-background-strong: rgba(82, 183, 136, 0.15);
+  color-scheme: light dark;
 
-  --color-page-background: #f8fafb;
+  /* Tint: systemBlue drives every interactive element */
+  --color-tint: #007aff;
+  --color-tint-pressed: #0062cc;
+  --color-tint-fill: rgba(0, 122, 255, 0.1);
+  --color-tint-fill-strong: rgba(0, 122, 255, 0.16);
+
+  /* Legacy names kept so plain CSS elsewhere keeps working */
+  --color-primary: var(--color-tint);
+  --color-primary-light: var(--color-tint-pressed);
+  --color-accent: var(--color-tint);
+  --color-accent-background: var(--color-tint-fill);
+  --color-accent-background-strong: var(--color-tint-fill-strong);
+
+  /* Grouped backgrounds: grey page, white cards */
+  --color-page-background: #f2f2f7;
   --color-surface: #ffffff;
-  --color-border: #e5e9eb;
-  --color-border-light: #f0f3f4;
+  --color-surface-secondary: #f9f9fb;
+  --color-fill: rgba(118, 118, 128, 0.12);
+  --color-fill-secondary: rgba(118, 118, 128, 0.08);
+  --color-border: rgba(60, 60, 67, 0.18);
+  --color-border-light: rgba(60, 60, 67, 0.1);
 
-  --color-text: #1a1d1f;
-  --color-text-secondary: #6f767e;
-  --color-text-muted: #9a9fa5;
+  /* Labels */
+  --color-text: #1d1d1f;
+  --color-text-secondary: rgba(60, 60, 67, 0.72);
+  --color-text-muted: rgba(60, 60, 67, 0.45);
 
-  --color-negative: #d64550;
-  --color-negative-background: rgba(214, 69, 80, 0.08);
+  /* Accessible (text-safe) variants of systemGreen / systemRed */
+  --color-positive: #248a3d;
+  --color-positive-background: rgba(52, 199, 89, 0.14);
+  --color-negative: #d70015;
+  --color-negative-background: rgba(255, 59, 48, 0.1);
 
-  --shadow-popover: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Materials */
+  --material-bar: rgba(249, 249, 251, 0.78);
+  --material-sidebar: rgba(242, 242, 247, 0.72);
+  --material-blur: saturate(180%) blur(20px);
 
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --shadow-card: 0 0 0 0.5px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-popover: 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 10px 30px rgba(0, 0, 0, 0.12);
+
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-tint: #0a84ff;
+    --color-tint-pressed: #409cff;
+    --color-tint-fill: rgba(10, 132, 255, 0.18);
+    --color-tint-fill-strong: rgba(10, 132, 255, 0.26);
+
+    --color-page-background: #000000;
+    --color-surface: #1c1c1e;
+    --color-surface-secondary: #242426;
+    --color-fill: rgba(118, 118, 128, 0.24);
+    --color-fill-secondary: rgba(118, 118, 128, 0.16);
+    --color-border: rgba(84, 84, 88, 0.6);
+    --color-border-light: rgba(84, 84, 88, 0.36);
+
+    --color-text: #f5f5f7;
+    --color-text-secondary: rgba(235, 235, 245, 0.64);
+    --color-text-muted: rgba(235, 235, 245, 0.36);
+
+    --color-positive: #30d158;
+    --color-positive-background: rgba(48, 209, 88, 0.16);
+    --color-negative: #ff453a;
+    --color-negative-background: rgba(255, 69, 58, 0.16);
+
+    --material-bar: rgba(29, 29, 31, 0.72);
+    --material-sidebar: rgba(28, 28, 30, 0.7);
+
+    --shadow-card: 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+    --shadow-popover: 0 0 0 0.5px rgba(255, 255, 255, 0.1), 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
 }
 
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
@@ -40,7 +100,8 @@ body {
   font-family: var(--font-body);
   background-color: var(--color-page-background);
   color: var(--color-text);
-  line-height: 1.5;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
 }
 
 h1,
@@ -49,16 +110,17 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-weight: 600;
   color: var(--color-text);
+  letter-spacing: -0.02em;
 }
 
-/* Numbers line up in columns */
+/* Numbers line up in columns: SF's tabular figures, not a monospace face */
 input[type='number'],
 .tabular-number {
-  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
   font-weight: 500;
 }
 
@@ -73,9 +135,193 @@ textarea {
 
 .clickable-card {
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    transform 0.25s var(--ease-spring),
+    box-shadow 0.25s var(--ease-spring);
 }
 
 .clickable-card:hover {
-  border-color: var(--color-accent);
+  box-shadow: var(--shadow-popover);
+}
+
+.clickable-card:active {
+  transform: scale(0.985);
+}
+
+.positive {
+  color: var(--color-positive);
+}
+
+.negative {
+  color: var(--color-negative);
+}
+
+/*
+ * iOS inset-grouped list: section header, rows separated by inset hairlines, optional disclosure.
+ * Used on phones where wide tables would need horizontal scrolling.
+ */
+.grouped-list-header {
+  padding: 0 16px 6px;
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  color: var(--color-text-secondary);
+}
+
+.grouped-list {
+  background: var(--color-surface);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.grouped-list-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 16px;
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+  background: var(--color-surface);
+  border: none;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+}
+
+a.grouped-list-row:active,
+button.grouped-list-row:active {
+  background: var(--color-fill);
+}
+
+.grouped-list-row + .grouped-list-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 0;
+  height: 0.5px;
+  background: var(--color-border);
+}
+
+.grouped-list-row-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.grouped-list-row-title {
+  font-size: 17px;
+  line-height: 22px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grouped-list-row-subtitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.grouped-list-row-value {
+  font-size: 17px;
+  line-height: 22px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.grouped-list-chevron {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/* Small rounded pill for +/- budget deltas */
+.delta-pill {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 16px;
+}
+
+.delta-pill.positive {
+  background: var(--color-positive-background);
+}
+
+.delta-pill.negative {
+  background: var(--color-negative-background);
+}
+
+/* Label/value rows with inset hairlines, like a Settings detail list */
+.metric-list-row {
+  padding: 7px 0;
+  border-bottom: 0.5px solid var(--color-border-light);
+}
+
+.metric-list-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+@media (max-width: 48em) {
+  .metric-list-row {
+    padding: 10px 0;
+  }
+
+  .metric-list-row p {
+    font-size: 15px;
+  }
+}
+
+/* Home sections: card with accordion on desktop; on phones the card chrome goes and the
+   accordion title becomes the grouped-list section header */
+@media (max-width: 48em) {
+  .home-section {
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible;
+  }
+
+  .home-section .mantine-Accordion-item,
+  .home-section .mantine-Accordion-content {
+    background: transparent;
+  }
+
+  .home-section .mantine-Accordion-control,
+  .home-section .mantine-Accordion-control:hover {
+    background: transparent;
+    padding: 0 16px;
+    height: 32px;
+  }
+
+  .home-section .mantine-Accordion-label {
+    font-size: 13px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    padding: 0;
+  }
+}
+
+/* Transaction rows sit inside a card on phones: flatten to the card's edges */
+.transaction-list {
+  box-shadow: none;
+  margin: 0 -16px -16px;
+  border-radius: 0;
+  border-top: 0.5px solid var(--color-border);
+}
+
+.transaction-list .grouped-list-row {
+  padding-right: 8px;
 }

@@ -9,6 +9,9 @@
   width: 100%;
   min-width: 100%;
   line-height: 1.4;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 0 0.5px var(--color-border);
 }
 
 .spreadsheet .ht_master .wtHolder {
@@ -16,58 +19,56 @@
 }
 
 .spreadsheet td {
+  background: var(--color-surface);
   border-color: var(--color-border-light) !important;
-  padding: 0 4px !important;
+  padding: 0 6px !important;
   color: var(--color-text);
 }
 
 .spreadsheet th {
-  background: var(--color-page-background) !important;
-  border-color: var(--color-border) !important;
+  background: var(--color-surface-secondary) !important;
+  border-color: var(--color-border-light) !important;
   color: var(--color-text-secondary);
   font-family: var(--font-body);
-  font-weight: 600;
-  padding: 0 4px !important;
-  height: 24px !important;
-  line-height: 24px !important;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  font-weight: 500;
+  padding: 0 6px !important;
+  height: 26px !important;
+  line-height: 26px !important;
+  font-size: 12px;
   vertical-align: middle;
   text-align: inherit;
 }
 
 .spreadsheet .ht_clone_top th {
-  height: 24px !important;
-  line-height: 24px !important;
+  height: 26px !important;
+  line-height: 26px !important;
 }
 
 .spreadsheet .ht_clone_top_inline_start_corner th {
-  height: 24px !important;
+  height: 26px !important;
 }
 
 /* Selection */
 .spreadsheet .ht__highlight {
-  background: var(--color-accent-background) !important;
+  background: var(--color-tint-fill) !important;
 }
 
 .spreadsheet .area {
-  background: var(--color-accent-background-strong) !important;
+  background: var(--color-tint-fill-strong) !important;
 }
 
 .spreadsheet .current.area {
-  border: 2px solid var(--color-accent) !important;
+  border: 2px solid var(--color-tint) !important;
 }
 
 /* Right-aligned (numeric) cells */
 .spreadsheet td.htRight {
-  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   font-weight: 500;
 }
 
 .spreadsheet .ht__row_header {
-  background: var(--color-page-background) !important;
+  background: var(--color-surface-secondary) !important;
   color: var(--color-text-muted);
   font-size: 11px;
 }
@@ -81,10 +82,11 @@
   font-family: var(--font-body);
   font-size: 13px;
   padding: 4px 6px;
-  border: 2px solid var(--color-accent) !important;
-  border-radius: 4px;
+  border: 2px solid var(--color-tint) !important;
+  border-radius: 6px;
   background: var(--color-surface);
   color: var(--color-text);
+  box-shadow: 0 0 0 3px var(--color-tint-fill-strong) !important;
 }
 
 .spreadsheet input[type='text'] {
@@ -95,19 +97,25 @@
 .handsontable.listbox {
   font-family: var(--font-body);
   font-size: 13px;
-  border: 1px solid var(--color-border);
+  border: none;
   background: var(--color-surface);
   box-shadow: var(--shadow-popover);
-  border-radius: 8px;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .handsontable.listbox .ht_master table {
   border: none;
 }
 
-.handsontable.listbox td.current {
-  background: var(--color-accent-background) !important;
+.handsontable.listbox td {
+  background: var(--color-surface);
   color: var(--color-text);
+}
+
+.handsontable.listbox td.current {
+  background: var(--color-tint) !important;
+  color: #fff;
 }
 
 .spreadsheet .spreadsheet-duplicate-row {
@@ -117,7 +125,7 @@
 /* Read-only cells */
 .spreadsheet .htDimmed {
   color: var(--color-text-muted);
-  font-style: italic;
+  font-style: normal;
 }
 
 .spreadsheet-delete-button {
@@ -125,11 +133,12 @@
   height: 100%;
   border: none;
   background: transparent;
+  color: var(--color-negative);
   cursor: pointer;
   font-size: 14px;
   padding: 2px;
 }
 
 .spreadsheet-delete-button:hover {
-  background: #fee;
+  background: var(--color-negative-background);
 }

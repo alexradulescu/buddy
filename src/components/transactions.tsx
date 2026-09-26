@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import {
+  ActionIcon,
+  Box,
   Button,
   Group,
   NumberInput,
@@ -127,7 +129,7 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
     return (
       <UnstyledButton onClick={() => setSort({ key, asc: sort.key === key ? !sort.asc : true })}>
         <Group gap={4} wrap="nowrap" justify={key === 'amount' ? 'flex-end' : 'flex-start'}>
-          <Text fw={700} size="sm">
+          <Text fw={500} size="xs" c="dimmed">
             {label}
           </Text>
           <Icon size={14} opacity={sort.key === key ? 1 : 0.4} />
@@ -165,7 +167,25 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
           <Text size="xs" c="dimmed">
             {visible.length} {visible.length === 1 ? 'item' : 'items'}
           </Text>
-          <ScrollArea mah={500}>
+          <Box className="grouped-list transaction-list" hiddenFrom="sm">
+            {visible.map((row) => (
+              <Box key={row.id} className="grouped-list-row">
+                <UnstyledButton className="grouped-list-row-main" onClick={() => setEditing(row)}>
+                  <Text className="grouped-list-row-title">{row.description || 'Untitled'}</Text>
+                  <Text className="grouped-list-row-subtitle">
+                    {dayjs(row.date).format('D MMM')} · {row.category || 'Uncategorized'}
+                  </Text>
+                </UnstyledButton>
+                <Text className="grouped-list-row-value" c={row.amount < 0 ? 'var(--color-positive)' : undefined}>
+                  {formatMoney(row.amount)}
+                </Text>
+                <ActionIcon color="red" c="var(--color-negative)" aria-label="Delete" onClick={() => setDeleting(row)}>
+                  <Trash size={16} />
+                </ActionIcon>
+              </Box>
+            ))}
+          </Box>
+          <ScrollArea mah={500} visibleFrom="sm">
             <Table miw={450} stickyHeader>
               <Table.Thead>
                 <Table.Tr>
@@ -182,17 +202,22 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
                     <Table.Td>{dayjs(row.date).format('DD MMM YYYY')}</Table.Td>
                     <Table.Td>{row.description}</Table.Td>
                     <Table.Td c="dimmed">{row.category}</Table.Td>
-                    <Table.Td ta="right" c={row.amount < 0 ? 'green.6' : undefined}>
+                    <Table.Td ta="right" c={row.amount < 0 ? 'var(--color-positive)' : undefined}>
                       <Money value={row.amount} />
                     </Table.Td>
                     <Table.Td>
                       <Group gap={4} wrap="nowrap">
-                        <Button size="compact-xs" variant="subtle" color="gray" onClick={() => setEditing(row)}>
-                          <Edit size={12} />
-                        </Button>
-                        <Button size="compact-xs" variant="subtle" color="red" onClick={() => setDeleting(row)}>
-                          <Trash size={12} />
-                        </Button>
+                        <ActionIcon size="sm" aria-label="Edit" onClick={() => setEditing(row)}>
+                          <Edit size={14} />
+                        </ActionIcon>
+                        <ActionIcon
+                          size="sm"
+                          c="var(--color-negative)"
+                          aria-label="Delete"
+                          onClick={() => setDeleting(row)}
+                        >
+                          <Trash size={14} />
+                        </ActionIcon>
                       </Group>
                     </Table.Td>
                   </Table.Tr>

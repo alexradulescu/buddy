@@ -1,142 +1,207 @@
-/* App frame: header, desktop sidebar, mobile bottom navigation, scrolling content, month picker */
+/* App frame: toolbar, desktop sidebar, mobile tab bar, scrolling content, month picker */
 
-.mantine-AppShell-header {
-  background-color: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+/* Translucent toolbar; content scrolls up behind it on every screen size */
+.toolbar {
+  background-color: var(--material-bar);
+  backdrop-filter: var(--material-blur);
+  -webkit-backdrop-filter: var(--material-blur);
+  border-bottom: 0.5px solid var(--color-border);
 }
 
+.toolbar-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mantine-AppShell-main {
+  padding-top: 0;
+}
+
+/* macOS source list */
 .desktop-sidebar {
-  border-right: 1px solid var(--color-border);
+  background-color: var(--material-sidebar);
+  backdrop-filter: var(--material-blur);
+  -webkit-backdrop-filter: var(--material-blur);
+  border-right: 0.5px solid var(--color-border);
+  /* sit beside the toolbar rather than under it */
+  top: 0 !important;
+  height: 100dvh !important;
+  z-index: 110;
+}
+
+.sidebar-app-name {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 
 .navigation-link {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 8px;
+  gap: 8px;
+  border-radius: 7px;
   text-decoration: none;
-  transition: all 0.15s ease;
-  color: var(--color-text-secondary);
-  background-color: transparent;
-}
-
-.navigation-link[data-active] {
-  color: var(--color-primary);
-  background-color: var(--color-accent-background-strong);
+  color: var(--color-text);
+  transition: background-color 0.15s ease;
 }
 
 .desktop-sidebar-link {
-  width: 2.25rem;
-  height: 2.25rem;
+  height: 30px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
-.mobile-bottom-navigation-bar {
-  background-color: transparent;
-  border: none;
+.desktop-sidebar-link:hover {
+  background-color: var(--color-fill-secondary);
+}
+
+.desktop-sidebar-link .sidebar-icon {
+  color: var(--color-tint);
+  flex-shrink: 0;
+}
+
+.desktop-sidebar-link[data-active] {
+  background-color: var(--color-fill);
+}
+
+/* Narrow rail between tablet and wide desktop: icons only */
+@media (max-width: 74.99em) {
+  .sidebar-app-name,
+  .sidebar-label {
+    display: none;
+  }
+
+  .desktop-sidebar {
+    padding-top: 60px;
+  }
+
+  .desktop-sidebar-link {
+    justify-content: center;
+    height: 36px;
+    padding: 0;
+  }
+}
+
+/* Toolbar starts after the sidebar on desktop */
+@media (min-width: 48em) {
+  .toolbar {
+    left: var(--app-shell-navbar-offset, 0) !important;
+  }
+}
+
+/* iOS tab bar: full width, translucent, hairline on top, tinted active item */
+.tab-bar {
   display: flex;
-  align-items: center;
-  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  align-items: flex-start;
+  padding: 0 4px env(safe-area-inset-bottom, 0px);
+  background-color: var(--material-bar);
+  backdrop-filter: var(--material-blur);
+  -webkit-backdrop-filter: var(--material-blur);
+  border-top: 0.5px solid var(--color-border);
 }
 
-.mobile-bottom-navigation {
-  display: flex;
-  width: 100%;
-  padding: 2px;
-  background-color: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
-}
-
-.mobile-bottom-navigation-link {
+.tab-bar-item {
   flex: 1;
+  min-width: 0;
+  height: 50px;
+  display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 2px;
-  padding: 6px 4px;
-  border-radius: 18px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition:
+    color 0.15s ease,
+    transform 0.2s var(--ease-spring);
 }
 
-/* Page content scrolls inside this zone */
+.tab-bar-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.tab-bar-item[data-active] {
+  color: var(--color-tint);
+}
+
+.tab-bar-item:active {
+  transform: scale(0.92);
+}
+
+/* Page content scrolls inside this zone, starting behind the toolbar */
 .scrollable-page-content {
   overflow-y: auto;
+  padding-top: 52px;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
 }
 
-.scrollable-page-content::-webkit-scrollbar {
-  width: 6px;
+.page-content {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 8px 32px;
 }
 
-.scrollable-page-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.scrollable-page-content::-webkit-scrollbar-thumb {
-  background-color: var(--color-border);
-  border-radius: 3px;
-}
-
-.scrollable-page-content::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-text-muted);
-}
-
-/* Mobile: frosted glass header, content scrolls up behind it like iOS nav bars */
 @media (max-width: 48em) {
-  .mantine-AppShell-header {
-    background-color: rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(229, 233, 235, 0.6);
+  .toolbar {
     padding-top: env(safe-area-inset-top, 0px);
   }
 
-  /* Remove Mantine's padding so the scroll container starts at y=0, behind the header */
-  .mantine-AppShell-main {
-    padding-top: 0;
-  }
-
-  /* Push the initial content below the glass header */
   .scrollable-page-content {
-    padding-top: calc(60px + env(safe-area-inset-top, 0px));
+    padding-top: calc(52px + env(safe-area-inset-top, 0px));
+  }
+
+  .page-content {
+    padding: 16px 0 24px;
   }
 }
 
-/* Header month picker: [<][Mar 25][>] joined into one bordered control */
+/* Header month picker: ‹ Sep 2026 › in one capsule */
+.header-month-picker {
+  background-color: var(--color-fill);
+  border-radius: 9px;
+  padding: 2px;
+}
+
 .header-month-picker .mantine-ActionIcon-root {
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-}
-
-.header-month-picker .mantine-ActionIcon-root:first-child {
-  border-right: none;
-  border-radius: 8px 0 0 8px;
-}
-
-.header-month-picker .mantine-ActionIcon-root:last-child {
-  border-left: none;
-  border-radius: 0 8px 8px 0;
+  color: var(--color-tint);
+  border-radius: 7px;
 }
 
 .header-month-picker .mantine-ActionIcon-root:hover {
-  background-color: var(--color-accent-background);
-  color: var(--color-primary);
-}
-
-.header-month-picker .mantine-InputWrapper-root {
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
 }
 
 .header-month-picker .mantine-Input-input {
   border: none;
-  border-radius: 0;
+  border-radius: 7px;
   text-align: center;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   background-color: transparent;
-  height: 34px;
-  min-height: 34px;
+  box-shadow: none;
+  height: 28px;
+  min-height: 28px;
   padding: 0 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.header-month-picker .mantine-Input-input:focus {
+  background-color: var(--color-surface);
+  box-shadow: none;
 }
