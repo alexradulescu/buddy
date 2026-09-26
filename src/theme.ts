@@ -36,19 +36,20 @@ export const theme = createTheme({
     xl: '28px'
   },
 
+  // Capsules for controls, large continuous corners for containers (iOS 27)
   radius: {
-    xs: '6px',
-    sm: '8px',
-    md: '10px',
-    lg: '12px',
-    xl: '16px'
+    xs: '8px',
+    sm: '12px',
+    md: '14px',
+    lg: '26px',
+    xl: '999px'
   },
   defaultRadius: 'md',
 
   components: {
     // Inset-grouped cards: no border, soft elevation, 12px corners
     Card: {
-      defaultProps: { padding: 'md', withBorder: false, radius: 'lg', shadow: 'sm' },
+      defaultProps: { padding: 18, withBorder: false, radius: 'lg', shadow: 'sm' },
       styles: { root: { backgroundColor: 'var(--color-surface)' } }
     },
     Table: {
@@ -75,44 +76,47 @@ export const theme = createTheme({
       }
     },
     Button: {
-      defaultProps: { radius: 'md' },
-      styles: { root: { fontWeight: 500, letterSpacing: '-0.01em' } }
+      defaultProps: { radius: 'xl' },
+      styles: { root: { fontWeight: 600, letterSpacing: '-0.01em' } }
     },
     TextInput: { styles: inputStyles },
     Select: { styles: inputStyles },
-    NumberInput: { styles: inputStyles },
     Textarea: { styles: inputStyles },
     Badge: {
       defaultProps: { radius: 'xl', size: 'sm', variant: 'light' },
       styles: { root: { textTransform: 'none' as const, fontWeight: 600, fontSize: '11px' } }
     },
     SegmentedControl: {
-      defaultProps: { radius: 'md', size: 'sm' }
+      defaultProps: { radius: 'xl', size: 'sm' }
     },
     Accordion: {
       defaultProps: { chevronPosition: 'right' },
       styles: {
-        control: { fontWeight: 600, backgroundColor: 'var(--color-surface)' },
-        label: { fontSize: '15px', letterSpacing: '-0.01em' },
+        control: { fontWeight: 700, paddingInline: 18 },
+        label: { fontSize: '17px', letterSpacing: '-0.02em' },
         item: { borderBottom: 'none' }
       }
     },
     Modal: {
-      defaultProps: { radius: 'lg', centered: true },
+      defaultProps: { radius: 34, centered: true },
       styles: {
         content: { backgroundColor: 'var(--color-surface)' },
         header: { backgroundColor: 'var(--color-surface)' },
-        title: { fontWeight: 600, fontSize: '17px' }
+        title: { fontWeight: 700, fontSize: '20px', letterSpacing: '-0.02em' }
       }
     },
     Stack: { defaultProps: { gap: 'sm' } },
     Title: { styles: { root: { fontWeight: 600, color: 'var(--color-text)' } } },
     Text: { styles: { root: { color: 'var(--color-text)' } } },
     ActionIcon: {
-      defaultProps: { variant: 'subtle', radius: 'md' },
+      defaultProps: { variant: 'subtle', radius: 'xl' },
       styles: { root: { color: 'var(--color-tint)' } }
     },
-    Menu: { defaultProps: { radius: 'lg', shadow: 'md' } },
+    Menu: { defaultProps: { radius: 20, shadow: 'md' } },
+    Input: { defaultProps: { radius: 'md' } },
+    NumberInput: { defaultProps: { radius: 'md', hideControls: true }, styles: inputStyles },
+    DatePickerInput: { styles: inputStyles },
+    MonthPickerInput: { styles: inputStyles },
     Tooltip: {
       defaultProps: { openDelay: 400 },
       styles: {

@@ -9,7 +9,7 @@
   width: 100%;
   min-width: 100%;
   line-height: 1.4;
-  border-radius: 10px;
+  border-radius: var(--radius-inner);
   overflow: hidden;
   box-shadow: 0 0 0 0.5px var(--color-border);
 }
@@ -100,7 +100,7 @@
   border: none;
   background: var(--color-surface);
   box-shadow: var(--shadow-popover);
-  border-radius: 10px;
+  border-radius: 16px;
   overflow: hidden;
 }
 

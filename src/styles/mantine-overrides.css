@@ -15,7 +15,7 @@
 }
 
 .mantine-Table-table[data-striped] .mantine-Table-tr:nth-of-type(odd) {
-  background-color: var(--color-surface-secondary);
+  background-color: transparent;
 }
 
 .mantine-Table-thead[data-sticky] {
@@ -25,6 +25,7 @@
 
 /* Inputs: filled, borderless, focus ring in tint (macOS / iOS text fields) */
 .mantine-Input-input {
+  min-height: 40px;
   background-color: var(--color-fill-secondary);
   border: 1px solid transparent;
   color: var(--color-text);
@@ -51,8 +52,13 @@
     opacity 0.15s ease;
 }
 
-.mantine-Button-root:active:not(:disabled) {
-  transform: scale(0.97);
+.mantine-Button-root:active:not(:disabled),
+.mantine-ActionIcon-root:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.mantine-ActionIcon-root {
+  transition: transform 0.3s var(--ease-spring);
 }
 
 .mantine-Button-root[data-variant='filled'] {
@@ -109,8 +115,50 @@
 
 /* Sheets and popovers use the thick material */
 .mantine-Modal-overlay {
-  background-color: rgba(0, 0, 0, 0.32);
-  backdrop-filter: blur(6px);
+  background-color: rgba(0, 0, 0, 0.28);
+}
+
+.mantine-Modal-content {
+  box-shadow: var(--shadow-floating);
+}
+
+.mantine-Modal-header {
+  padding-top: 20px;
+}
+
+/* Phones: modals become bottom sheets with a grabber, inset and rounded like iOS 27 */
+@media (max-width: 48em) {
+  .mantine-Modal-inner {
+    align-items: flex-end !important;
+    padding: 0 8px calc(env(safe-area-inset-bottom, 0px) + 8px) !important;
+  }
+
+  .mantine-Modal-content {
+    flex: 1 1 100% !important;
+    max-height: 90dvh !important;
+    border-radius: 38px !important;
+    animation: sheet-up 0.5s var(--ease-spring);
+  }
+
+  .mantine-Modal-content::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--color-text-muted);
+    margin: 8px auto 0;
+  }
+
+  .mantine-Modal-header {
+    padding-top: 8px;
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
 }
 
 .mantine-Select-dropdown,
@@ -122,31 +170,40 @@
   -webkit-backdrop-filter: var(--material-blur);
   border: none;
   box-shadow: var(--shadow-popover);
-  padding: 5px;
+  padding: 6px;
+  background-color: var(--material-bar-solid);
+  backdrop-filter: none;
 }
 
 .mantine-Select-option,
 .mantine-Combobox-option,
 .mantine-Menu-item {
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 14px; /* 20 menu radius - 6 inset */
+  font-size: 15px;
+  min-height: 40px;
+  padding-inline: 12px;
 }
 
+/* iOS 27 menus: grey highlight, tint only for the selected value */
 .mantine-Select-option[data-combobox-selected],
-.mantine-Combobox-option[data-combobox-selected],
+.mantine-Combobox-option[data-combobox-selected] {
+  background-color: transparent;
+  color: var(--color-tint);
+  font-weight: 600;
+}
+
 .mantine-Combobox-option:hover,
+.mantine-Combobox-option[data-combobox-active],
 .mantine-Menu-item:hover,
 .mantine-Menu-item[data-hovered] {
-  background-color: var(--color-tint);
-  color: #fff;
+  background-color: var(--color-fill);
+  color: var(--color-text);
 }
 
 .mantine-Notification-root {
-  background-color: var(--material-bar);
-  backdrop-filter: var(--material-blur);
-  -webkit-backdrop-filter: var(--material-blur);
+  background-color: var(--material-bar-solid);
   border: none;
-  border-radius: 14px;
+  border-radius: 26px;
   box-shadow: var(--shadow-popover);
 }
 
@@ -165,6 +222,36 @@
 }
 
 .mantine-Badge-root[data-variant='light'][data-color='gray'] {
+  background-color: var(--color-fill);
+  color: var(--color-text-secondary);
+}
+
+.mantine-Button-root[data-variant='light'][data-color='red'] {
+  background-color: var(--color-negative-background);
+  color: var(--color-negative);
+}
+
+.back-button {
+  padding-left: 8px;
+}
+
+.mantine-Accordion-control {
+  background-color: var(--color-surface);
+}
+
+/* Secondary buttons are grey capsules, never outlines */
+.mantine-Button-root[data-variant='outline'] {
+  border-color: transparent;
+  background-color: var(--color-fill);
+  color: var(--color-text);
+}
+
+/* Sheet close: circular grey button */
+.mantine-Modal-close {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
   background-color: var(--color-fill);
   color: var(--color-text-secondary);
 }

@@ -1,13 +1,43 @@
-/* App frame: toolbar, desktop sidebar, mobile tab bar, scrolling content, month picker */
+/*
+ * App frame, iOS 27 structure without Liquid Glass: controls float over edge-to-edge content,
+ * a scroll-edge fade replaces bar backgrounds and hairlines, large titles collapse into the
+ * toolbar, and the tab bar is a floating capsule that minimizes while scrolling.
+ */
 
-/* Translucent toolbar; content scrolls up behind it on every screen size */
+/* Toolbar: no bar. A soft fade (scroll-edge effect) keeps floating controls legible over content. */
 .toolbar {
-  background-color: var(--material-bar);
-  backdrop-filter: var(--material-blur);
-  -webkit-backdrop-filter: var(--material-blur);
-  border-bottom: 0.5px solid var(--color-border);
+  background: transparent;
+  pointer-events: none;
 }
 
+.toolbar::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 -20px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-page-background) 0%,
+    color-mix(in srgb, var(--color-page-background) 85%, transparent) 55%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+[data-scrolled] .toolbar::before {
+  opacity: 1;
+}
+
+.toolbar-row {
+  position: relative;
+}
+
+.toolbar-row > * {
+  pointer-events: auto;
+}
+
+/* Inline title appears only once the large title has scrolled away */
 .toolbar-title {
   font-size: 17px;
   font-weight: 600;
@@ -15,26 +45,78 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.35s var(--ease-spring);
+}
+
+[data-scrolled] .toolbar-title {
+  opacity: 1;
+  transform: none;
 }
 
 .mantine-AppShell-main {
   padding-top: 0;
+  padding-bottom: 0;
 }
 
-/* macOS source list */
-.desktop-sidebar {
-  background-color: var(--material-sidebar);
-  backdrop-filter: var(--material-blur);
-  -webkit-backdrop-filter: var(--material-blur);
-  border-right: 0.5px solid var(--color-border);
-  /* sit beside the toolbar rather than under it */
-  top: 0 !important;
-  height: 100dvh !important;
-  z-index: 110;
+/* Large title (34pt on iPhone, 26pt on Mac) at the top of every tab */
+.large-title-row {
+  padding: 4px 4px 14px;
+  min-height: 56px;
+}
+
+.large-title {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+}
+
+@media (max-width: 48em) {
+  .large-title {
+    font-size: 34px;
+    letter-spacing: 0.01em;
+  }
+
+  .large-title-row {
+    padding: 0 4px 10px;
+  }
+
+  .toolbar-row {
+    justify-content: center;
+  }
+
+  /* Phones: inline title centred, month picker floats at the trailing edge */
+  .toolbar-row .header-month-picker {
+    position: absolute;
+    right: 16px;
+  }
+
+  [data-scrolled] .toolbar-row .header-month-picker {
+    transform: scale(0.94);
+  }
+}
+
+/* Floating sidebar: an inset, rounded panel beside the content (macOS / iPadOS 27) */
+@media (min-width: 48em) {
+  .desktop-sidebar {
+    top: 10px !important;
+    left: 10px !important;
+    height: calc(100dvh - 20px) !important;
+    width: calc(var(--app-shell-navbar-width) - 20px) !important;
+    background-color: var(--material-sidebar-solid);
+    border-radius: 22px;
+    box-shadow: var(--shadow-floating);
+    z-index: 110;
+    overflow: hidden;
+  }
 }
 
 .sidebar-app-name {
-  height: 52px;
+  height: 56px;
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -46,22 +128,29 @@
 .navigation-link {
   display: flex;
   align-items: center;
-  gap: 8px;
-  border-radius: 7px;
+  gap: 10px;
   text-decoration: none;
   color: var(--color-text);
-  transition: background-color 0.15s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.3s var(--ease-spring);
 }
 
+/* Inner radius = panel radius (22) - inset (10): concentric corners */
 .desktop-sidebar-link {
-  height: 30px;
-  padding: 0 10px;
-  font-size: 13px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 14px;
   font-weight: 500;
 }
 
 .desktop-sidebar-link:hover {
   background-color: var(--color-fill-secondary);
+}
+
+.desktop-sidebar-link:active {
+  transform: scale(0.97);
 }
 
 .desktop-sidebar-link .sidebar-icon {
@@ -70,7 +159,9 @@
 }
 
 .desktop-sidebar-link[data-active] {
-  background-color: var(--color-fill);
+  background-color: var(--color-tint-fill-strong);
+  color: var(--color-tint);
+  font-weight: 600;
 }
 
 /* Narrow rail between tablet and wide desktop: icons only */
@@ -81,51 +172,61 @@
   }
 
   .desktop-sidebar {
-    padding-top: 60px;
+    padding-top: 12px;
   }
 
   .desktop-sidebar-link {
     justify-content: center;
-    height: 36px;
+    height: 40px;
     padding: 0;
   }
 }
 
-/* Toolbar starts after the sidebar on desktop */
 @media (min-width: 48em) {
   .toolbar {
     left: var(--app-shell-navbar-offset, 0) !important;
   }
 }
 
-/* iOS tab bar: full width, translucent, hairline on top, tinted active item */
+/* Floating capsule tab bar */
 .tab-bar {
+  position: fixed;
+  z-index: 120;
+  left: 16px;
+  right: 16px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+  height: 62px;
+  padding: 4px;
   display: flex;
-  align-items: flex-start;
-  padding: 0 4px env(safe-area-inset-bottom, 0px);
-  background-color: var(--material-bar);
-  backdrop-filter: var(--material-blur);
-  -webkit-backdrop-filter: var(--material-blur);
-  border-top: 0.5px solid var(--color-border);
+  gap: 0;
+  border-radius: 31px;
+  background-color: var(--material-bar-solid);
+  box-shadow: var(--shadow-floating);
+  transition:
+    right 0.45s var(--ease-spring),
+    height 0.45s var(--ease-spring),
+    border-radius 0.45s var(--ease-spring);
 }
 
 .tab-bar-item {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
-  height: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  color: var(--color-text-muted);
+  gap: 1px;
+  border-radius: 27px; /* 31 - 4 inset */
+  color: var(--color-text);
   text-decoration: none;
   font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  font-weight: 600;
+  overflow: hidden;
   transition:
-    color 0.15s ease,
-    transform 0.2s var(--ease-spring);
+    flex 0.45s var(--ease-spring),
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.3s var(--ease-spring);
 }
 
 .tab-bar-item span {
@@ -137,16 +238,40 @@
 
 .tab-bar-item[data-active] {
   color: var(--color-tint);
+  background-color: var(--color-fill);
 }
 
 .tab-bar-item:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
-/* Page content scrolls inside this zone, starting behind the toolbar */
+/* Minimized: only the current tab, as a compact capsule at the leading edge */
+.tab-bar[data-minimized] {
+  right: calc(100% - 16px - 56px);
+  height: 48px;
+  border-radius: 24px;
+  cursor: pointer;
+}
+
+.tab-bar[data-minimized] .tab-bar-item:not([data-active]) {
+  flex: 0 0 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tab-bar[data-minimized] .tab-bar-item[data-active] {
+  border-radius: 20px;
+  background-color: transparent;
+}
+
+.tab-bar[data-minimized] .tab-bar-item span {
+  display: none;
+}
+
+/* Content runs edge to edge, under the toolbar and the tab bar */
 .scrollable-page-content {
   overflow-y: auto;
-  padding-top: 52px;
+  padding-top: 56px;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
 }
@@ -154,7 +279,7 @@
 .page-content {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 20px 8px 32px;
+  padding: 4px 20px 40px;
 }
 
 @media (max-width: 48em) {
@@ -163,45 +288,63 @@
   }
 
   .scrollable-page-content {
-    padding-top: calc(52px + env(safe-area-inset-top, 0px));
+    padding-top: calc(56px + env(safe-area-inset-top, 0px));
   }
 
   .page-content {
-    padding: 16px 0 24px;
+    padding: 0 16px calc(96px + env(safe-area-inset-bottom, 0px));
   }
 }
 
-/* Header month picker: ‹ Sep 2026 › in one capsule */
+/* Month picker: one floating capsule ‹ Sep 2026 › */
 .header-month-picker {
-  background-color: var(--color-fill);
-  border-radius: 9px;
+  background-color: var(--material-bar-solid);
+  border-radius: 999px;
   padding: 2px;
+  box-shadow: var(--shadow-floating);
+  transition: transform 0.35s var(--ease-spring);
 }
 
 .header-month-picker .mantine-ActionIcon-root {
-  color: var(--color-tint);
-  border-radius: 7px;
+  color: var(--color-text);
 }
 
 .header-month-picker .mantine-ActionIcon-root:hover {
-  background-color: var(--color-surface);
+  background-color: var(--color-fill-secondary);
 }
 
 .header-month-picker .mantine-Input-input {
   border: none;
-  border-radius: 7px;
+  border-radius: 999px;
   text-align: center;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   background-color: transparent;
   box-shadow: none;
-  height: 28px;
-  min-height: 28px;
-  padding: 0 4px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 2px;
   font-variant-numeric: tabular-nums;
 }
 
 .header-month-picker .mantine-Input-input:focus {
-  background-color: var(--color-surface);
+  background-color: var(--color-fill-secondary);
   box-shadow: none;
+}
+
+/* Phones: once scrolled, the month picker compacts to just its label so the centred title fits */
+@media (max-width: 48em) {
+  [data-scrolled] .header-month-picker .mantine-ActionIcon-root {
+    width: 0;
+    min-width: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .header-month-picker .mantine-ActionIcon-root {
+    transition:
+      width 0.4s var(--ease-spring),
+      min-width 0.4s var(--ease-spring),
+      opacity 0.2s ease;
+  }
 }

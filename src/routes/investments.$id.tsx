@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Card, Center, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, BarChart3, DollarSign, Edit, PiggyBank, Trash2 } from 'lucide-react'
+import { ChevronLeft, BarChart3, DollarSign, Edit, PiggyBank, Trash2 } from 'lucide-react'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
 import { EntriesCard, InvestmentModal, PerformanceChart } from '@/components/investment'
@@ -34,22 +34,30 @@ function InvestmentDetailPage() {
 
   return (
     <Stack gap="md">
-      <Group justify="space-between">
-        <Button variant="subtle" color="gray" component={Link} to="/investments" leftSection={<ArrowLeft size={14} />}>
-          Back to Investments
+      <Group justify="space-between" wrap="nowrap">
+        <Button
+          variant="default"
+          component={Link}
+          to="/investments"
+          leftSection={<ChevronLeft size={18} strokeWidth={2.4} />}
+          className="back-button"
+        >
+          Investments
         </Button>
-        <Group gap="xs">
+        <Group gap="xs" wrap="nowrap">
           <Button variant="default" onClick={() => setEditing(true)} leftSection={<Edit size={14} />}>
             Edit
           </Button>
-          <Button color="red" onClick={() => setDeleting(true)} leftSection={<Trash2 size={14} />}>
+          <Button variant="light" color="red" onClick={() => setDeleting(true)} leftSection={<Trash2 size={14} />}>
             Delete
           </Button>
         </Group>
       </Group>
 
-      <Stack gap={2}>
-        <Title order={3}>{investment.name}</Title>
+      <Stack gap={2} px={4}>
+        <Title order={1} className="large-title">
+          {investment.name}
+        </Title>
         <Text c="dimmed" size="sm">
           {investment.description || 'No description provided'}
         </Text>
@@ -114,7 +122,7 @@ function NotFound() {
           Investment not found
         </Title>
         <Text c="dimmed">The investment you're looking for doesn't exist.</Text>
-        <Button component={Link} to="/investments" leftSection={<ArrowLeft size={14} />}>
+        <Button component={Link} to="/investments" leftSection={<ChevronLeft size={16} />}>
           Back to Investments
         </Button>
       </Stack>
