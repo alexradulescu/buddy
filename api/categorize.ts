@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google'
-import { streamObject } from 'ai'
+import { Output, streamText } from 'ai'
 import { z } from 'zod'
 
 export const maxDuration = 300
@@ -73,18 +73,25 @@ export async function POST(req: Request) {
   const categories: Category[] = JSON.parse(String(form.get('categories') ?? '[]'))
   const history: Past[] = JSON.parse(String(form.get('history') ?? '[]'))
 
-  const { elementStream } = streamObject({
-    model: google('gemini-3.8-flash'),
-    output: 'array',
-    schema: expenseSchema,
+  // streamText swallows model errors (empty stream), so capture and forward them as a final line
+  let failure: unknown
+  const { elementStream } = streamText({
+    model: google('gemini-3.5-flash-lite'),
+    output: Output.array({ element: expenseSchema }),
     prompt: prompt(transactions, categories, history),
-    maxRetries: 2
+    maxRetries: 2,
+    onError: ({ error }) => {
+      failure = error
+    }
   })
 
   const body = elementStream
     .pipeThrough(
       new TransformStream<z.infer<typeof expenseSchema>, string>({
-        transform: (expense, out) => out.enqueue(JSON.stringify(expense) + '\n')
+        transform: (expense, out) => out.enqueue(JSON.stringify(expense) + '\n'),
+        flush: (out) => {
+          if (failure) out.enqueue(JSON.stringify({ error: String((failure as Error).message ?? failure) }) + '\n')
+        }
       })
     )
     .pipeThrough(new TextEncoderStream())
