@@ -2,176 +2,129 @@ import { createTheme } from '@mantine/core'
 
 // Colors are CSS variables defined in styles/base.css, so plain CSS and Mantine share one source
 const inputStyles = {
-  label: { fontWeight: 500, fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px' }
+  label: { fontWeight: 500, fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '6px' }
 }
 
 export const theme = createTheme({
-  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-  fontFamilyMonospace: "'JetBrains Mono', ui-monospace, monospace",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', system-ui, sans-serif",
+  fontFamilyMonospace: "ui-monospace, 'SF Mono', Menlo, monospace",
   headings: {
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', system-ui, sans-serif",
     fontWeight: '600'
   },
 
+  // systemBlue, shade 6 is the tint
   colors: {
-    forest: [
-      '#E9F5EF', // 0
-      '#D3EBE0', // 1
-      '#A8D7C1', // 2
-      '#74C69D', // 3
-      '#52B788', // 4 - accent
-      '#40916C', // 5
-      '#2D6A4F', // 6 - primary light
-      '#1B4332', // 7 - primary
-      '#143728', // 8
-      '#0D2818' // 9
-    ]
+    tint: ['#e5f1ff', '#cce4ff', '#99c9ff', '#66adff', '#3392ff', '#1a85ff', '#007aff', '#0062cc', '#004999', '#003166']
   },
-  primaryColor: 'forest',
-  primaryShade: 7,
+  primaryColor: 'tint',
+  primaryShade: { light: 6, dark: 5 },
 
-  // Subtle shadows
   shadows: {
-    xs: '0 1px 2px rgba(0, 0, 0, 0.04)',
-    sm: '0 1px 3px rgba(0, 0, 0, 0.06)',
-    md: '0 4px 6px rgba(0, 0, 0, 0.06)',
-    lg: '0 10px 15px rgba(0, 0, 0, 0.06)',
-    xl: '0 20px 25px rgba(0, 0, 0, 0.08)'
+    xs: 'var(--shadow-card)',
+    sm: 'var(--shadow-card)',
+    md: 'var(--shadow-popover)',
+    lg: 'var(--shadow-popover)',
+    xl: 'var(--shadow-popover)'
   },
 
-  // Spacing
   spacing: {
     xs: '4px',
     sm: '8px',
-    md: '12px',
-    lg: '16px',
-    xl: '24px'
+    md: '16px',
+    lg: '20px',
+    xl: '28px'
   },
 
-  // Rounded corners
+  // Capsules for controls, large continuous corners for containers (iOS 27)
   radius: {
-    xs: '4px',
-    sm: '6px',
-    md: '8px',
-    lg: '12px',
-    xl: '16px'
+    xs: '8px',
+    sm: '12px',
+    md: '14px',
+    lg: '26px',
+    xl: '999px'
   },
   defaultRadius: 'md',
 
-  // Component defaults
   components: {
+    // Inset-grouped cards: no border, soft elevation, 12px corners
     Card: {
-      defaultProps: { padding: 'sm', withBorder: true },
-      styles: {
-        root: {
-          borderColor: 'var(--color-border)',
-          backgroundColor: 'var(--color-surface)'
-        }
-      }
+      defaultProps: { padding: 18, withBorder: false, radius: 'lg', shadow: 'sm' },
+      styles: { root: { backgroundColor: 'var(--color-surface)' } }
     },
     Table: {
       defaultProps: {
         highlightOnHover: true,
-        verticalSpacing: '6px',
-        horizontalSpacing: 'xs',
-        fz: 'sm'
+        verticalSpacing: '7px',
+        horizontalSpacing: 'sm',
+        fz: 'sm',
+        withRowBorders: true
       },
       styles: {
         th: {
-          fontWeight: 600,
-          fontSize: '11px',
-          textTransform: 'uppercase' as const,
-          letterSpacing: '0.03em',
+          fontWeight: 500,
+          fontSize: '12px',
           color: 'var(--color-text-secondary)',
           paddingTop: '8px',
           paddingBottom: '8px',
-          backgroundColor: 'var(--color-page-background)',
-          borderBottom: '1px solid var(--color-border)'
+          backgroundColor: 'var(--color-surface)',
+          borderBottom: '0.5px solid var(--color-border)'
         },
         td: {
-          paddingTop: '6px',
-          paddingBottom: '6px',
-          borderBottom: '1px solid var(--color-border-light)'
+          borderBottom: '0.5px solid var(--color-border-light)'
         }
       }
     },
-    Button: { styles: { root: { fontWeight: 500 } } },
+    Button: {
+      defaultProps: { radius: 'xl' },
+      styles: { root: { fontWeight: 600, letterSpacing: '-0.01em' } }
+    },
     TextInput: { styles: inputStyles },
     Select: { styles: inputStyles },
-    NumberInput: { styles: inputStyles },
     Textarea: { styles: inputStyles },
     Badge: {
-      defaultProps: { radius: 'sm', size: 'sm', variant: 'light' },
-      styles: {
-        root: {
-          textTransform: 'uppercase' as const,
-          letterSpacing: '0.02em',
-          fontWeight: 600,
-          fontSize: '10px'
-        }
-      }
+      defaultProps: { radius: 'xl', size: 'sm', variant: 'light' },
+      styles: { root: { textTransform: 'none' as const, fontWeight: 600, fontSize: '11px' } }
+    },
+    SegmentedControl: {
+      defaultProps: { radius: 'xl', size: 'sm' }
     },
     Accordion: {
+      defaultProps: { chevronPosition: 'right' },
       styles: {
-        control: {
-          paddingTop: '10px',
-          paddingBottom: '10px',
-          fontWeight: 500,
-          backgroundColor: 'var(--color-page-background)'
-        },
-        content: {
-          padding: '12px',
-          backgroundColor: 'var(--color-surface)'
-        },
-        item: {
-          borderBottom: '1px solid var(--color-border)'
-        }
+        control: { fontWeight: 700, paddingInline: 18 },
+        label: { fontSize: '17px', letterSpacing: '-0.02em' },
+        item: { borderBottom: 'none' }
       }
     },
     Modal: {
+      defaultProps: { radius: 34, centered: true },
       styles: {
-        content: {
-          backgroundColor: 'var(--color-surface)'
-        },
-        header: {
-          backgroundColor: 'var(--color-surface)'
-        },
-        title: {
-          fontWeight: 600,
-          fontSize: '18px'
-        }
+        content: { backgroundColor: 'var(--color-surface)' },
+        header: { backgroundColor: 'var(--color-surface)' },
+        title: { fontWeight: 700, fontSize: '20px', letterSpacing: '-0.02em' }
       }
     },
-    Stack: {
-      defaultProps: {
-        gap: 'sm'
-      }
-    },
-    Title: {
-      styles: {
-        root: {
-          fontWeight: 600,
-          color: 'var(--color-text)'
-        }
-      }
-    },
-    Text: {
-      styles: {
-        root: {
-          color: 'var(--color-text)'
-        }
-      }
-    },
+    Stack: { defaultProps: { gap: 'sm' } },
+    Title: { styles: { root: { fontWeight: 600, color: 'var(--color-text)' } } },
+    Text: { styles: { root: { color: 'var(--color-text)' } } },
     ActionIcon: {
-      defaultProps: {
-        variant: 'subtle'
-      },
-      styles: { root: { color: 'var(--color-text-secondary)' } }
+      defaultProps: { variant: 'subtle', radius: 'xl' },
+      styles: { root: { color: 'var(--color-tint)' } }
     },
+    Menu: { defaultProps: { radius: 20, shadow: 'md' } },
+    Input: { defaultProps: { radius: 'md' } },
+    NumberInput: { defaultProps: { radius: 'md', hideControls: true }, styles: inputStyles },
+    DatePickerInput: { styles: inputStyles },
+    MonthPickerInput: { styles: inputStyles },
     Tooltip: {
+      defaultProps: { openDelay: 400 },
       styles: {
         tooltip: {
-          backgroundColor: 'var(--color-primary)',
+          backgroundColor: 'var(--material-bar)',
+          backdropFilter: 'var(--material-blur)',
+          color: 'var(--color-text)',
+          boxShadow: 'var(--shadow-popover)',
           fontSize: '12px',
           fontWeight: 500
         }

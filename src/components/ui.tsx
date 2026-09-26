@@ -8,9 +8,9 @@ type Metric = { label: string; value: string; color?: string }
 // "Label ........ value" rows, used by the summary cards
 export function MetricList({ metrics }: { metrics: Metric[] }) {
   return (
-    <Stack gap={4}>
+    <Stack gap={0} className="metric-list">
       {metrics.map((m) => (
-        <Group key={m.label} justify="space-between" gap="xs">
+        <Group key={m.label} justify="space-between" gap="xs" className="metric-list-row" wrap="nowrap">
           <Text size="sm" c="dimmed">
             {m.label}
           </Text>
@@ -26,9 +26,11 @@ export function MetricList({ metrics }: { metrics: Metric[] }) {
 // Small icon + heading at the top of a card
 export function CardTitle({ icon, title }: { icon: ReactNode; title: string }) {
   return (
-    <Group gap="xs" mb="xs" c="gray.6">
+    <Group gap={8} mb="sm" c="var(--color-tint)">
       {icon}
-      <Title order={5}>{title}</Title>
+      <Title order={5} fz={15}>
+        {title}
+      </Title>
     </Group>
   )
 }
@@ -54,5 +56,5 @@ export function Money({ value }: { value: number | null | undefined }) {
 
 // Green for gains and zero, red for losses
 export function colorBySign(amount: number) {
-  return amount >= 0 ? 'green.6' : 'red.6'
+  return amount >= 0 ? 'var(--color-positive)' : 'var(--color-negative)'
 }
