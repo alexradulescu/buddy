@@ -1,6 +1,5 @@
 import { google } from '@ai-sdk/google'
 import { streamObject } from 'ai'
-import { PDFParse } from 'pdf-parse'
 import { z } from 'zod'
 
 export const maxDuration = 300
@@ -53,6 +52,8 @@ ${transactions}
 
 async function extractText(file: File) {
   if (file.name.toLowerCase().endsWith('.pdf')) {
+    // lazy: pdf-parse pulls in pdfjs + native canvas, which crashes the function at load on Vercel
+    const { PDFParse } = await import('pdf-parse')
     const parser = new PDFParse({ data: Buffer.from(await file.arrayBuffer()) })
     return (await parser.getText()).text
   }
