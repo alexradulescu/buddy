@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { Button, Card, Center, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { useQuery } from 'convex/react'
 import { ArrowLeft, BarChart3, DollarSign, Edit, PiggyBank, Trash2 } from 'lucide-react'
 
+import { api } from '@convex/_generated/api'
 import { ConfirmDelete } from '@/components/confirm-delete'
 import { EntriesCard, InvestmentModal, PerformanceChart } from '@/components/investment'
 import { CardTitle, colorBySign, MetricList } from '@/components/ui'
-import { db, remove, save } from '@/db'
+import { remove, save, toRow } from '@/db'
 import { investmentStats } from '@/lib/finance'
 import { formatMoney, formatPercent } from '@/lib/format'
 
@@ -15,20 +17,16 @@ export const Route = createFileRoute('/investments/$id')({ component: Investment
 function InvestmentDetailPage() {
   const { id } = Route.useParams()
   const navigate = useNavigate()
-  const { data } = db.useQuery({
-    investments: { $: { where: { id } } },
-    investmentContributions: { $: { where: { investmentId: id } } },
-    investmentValues: { $: { where: { investmentId: id } } }
-  })
+  const data = useQuery(api.rows.investment, { id })
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
   if (!data) return null
-  const investment = data.investments[0]
-  if (!investment) return <NotFound />
+  if (!data.investment) return <NotFound />
 
-  const contributions = data.investmentContributions
-  const values = data.investmentValues
+  const investment = toRow<'investments'>(data.investment)
+  const contributions = data.contributions.map((c) => toRow<'investmentContributions'>(c))
+  const values = data.values.map((v) => toRow<'investmentValues'>(v))
   const { invested, value, profit, returnRate } = investmentStats(investment, contributions, values)
   const profitColor = colorBySign(profit)
 

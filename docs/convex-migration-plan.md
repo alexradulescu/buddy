@@ -29,6 +29,15 @@ there is no server code left on Vercel); Vercel stays as static hosting.
 
 ## Phase 1 — Works fresh on Convex
 
+**Status: implemented on this branch** (see README for setup). Deviations from the steps below:
+- References stay plain strings (not `v.id`): uncategorized rows use `''`, and it keeps the Phase 2 import simple.
+- Components keep an `id` field. `src/db.ts` maps Convex's `_id` to `id`, so routes barely changed.
+- The AI import job keeps its rows in one `importJobs` doc instead of a drafts table.
+- Auth: Convex Auth with Password, restricted to `OWNER_EMAIL`, 180-day sessions. Sign out is in Settings.
+- Deleting a category that is still in use is blocked with a message.
+- `convex/_generated` was written by hand because this environment can't reach Convex;
+  the first `npx convex dev` regenerates it.
+
 The rewrite made this small: swap `src/db.ts` and the 8 `useQuery` calls.
 
 1. `npm i convex` → `npx convex dev` (you log in once; it creates the project and writes `VITE_CONVEX_URL`).

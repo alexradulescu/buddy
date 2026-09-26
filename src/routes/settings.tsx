@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { Button, Card, Group, Stack, Text } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { createFileRoute } from '@tanstack/react-router'
-import { Plus, Save } from 'lucide-react'
+import { useAuthActions } from '@convex-dev/auth/react'
+import { LogOut, Plus, Save } from 'lucide-react'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
 import { Sheet, type SheetColumn } from '@/components/sheet'
-import { db, remove, save, type ExpenseCategory, type IncomeCategory } from '@/db'
+import { remove, saveMany, useTables, type ExpenseCategory, type IncomeCategory } from '@/db'
 
 export const Route = createFileRoute('/settings')({ component: SettingsPage })
 
@@ -24,7 +25,8 @@ const incomeColumns: SheetColumn<IncomeCategory>[] = [
 ]
 
 function SettingsPage() {
-  const { data } = db.useQuery({ expenseCategories: {}, incomeCategories: {} })
+  const { data } = useTables('expenseCategories', 'incomeCategories')
+  const { signOut } = useAuthActions()
 
   return (
     <Stack gap="md">
@@ -44,6 +46,11 @@ function SettingsPage() {
         nameKey="title"
         blank={{ title: '', targetAmount: 0, isArchived: false }}
       />
+      <Group justify="flex-end">
+        <Button variant="default" leftSection={<LogOut size={14} />} onClick={() => void signOut()}>
+          Sign out
+        </Button>
+      </Group>
     </Stack>
   )
 }
@@ -64,12 +71,12 @@ function CategoryEditor<T extends { id: string }>({ title, entity, saved, column
   const rows = edits ?? saved
   const isNew = (row: T) => row.id.startsWith('new-')
 
-  function saveAll() {
+  async function saveAll() {
     if (rows.some((r) => !String(r[nameKey] ?? '').trim())) {
       notifications.show({ title: 'Validation Error', message: 'Category name is required', color: 'red' })
       return
     }
-    rows.forEach((row) => save(entity, (isNew(row) ? { ...row, id: undefined } : row) as never))
+    if (!(await saveMany(entity, rows.map((row) => (isNew(row) ? { ...row, id: undefined } : row)) as never))) return
     setEdits(null)
     notifications.show({ title: 'Success', message: 'All changes saved successfully', color: 'green' })
   }
@@ -110,9 +117,8 @@ function CategoryEditor<T extends { id: string }>({ title, entity, saved, column
         title="Delete Category"
         opened={!!deleting}
         onClose={() => setDeleting(null)}
-        onConfirm={() => {
-          if (!deleting) return
-          remove(entity, deleting.id)
+        onConfirm={async () => {
+          if (!deleting || !(await remove(entity, deleting.id))) return
           if (edits) setEdits(edits.filter((r) => r.id !== deleting.id))
           notifications.show({ title: 'Success', message: 'Category deleted successfully', color: 'green' })
         }}

@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react'
 import { InvestmentModal } from '@/components/investment'
 import { PageHeader } from '@/components/shell'
 import { colorBySign, Stat } from '@/components/ui'
-import { db } from '@/db'
+import { useTables } from '@/db'
 import { investmentStats } from '@/lib/finance'
 import { formatMoney, formatPercent } from '@/lib/format'
 
@@ -15,7 +15,7 @@ export const Route = createFileRoute('/investments/')({ component: InvestmentsPa
 const blank = { name: '', description: '', isActive: true }
 
 function InvestmentsPage() {
-  const { data } = db.useQuery({ investments: {}, investmentContributions: {}, investmentValues: {} })
+  const { data } = useTables('investments', 'investmentContributions', 'investmentValues')
   const [adding, setAdding] = useState(false)
 
   const investments = data?.investments ?? []

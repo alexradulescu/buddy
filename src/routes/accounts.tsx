@@ -6,7 +6,7 @@ import { Calculator, Edit2, Trash2, Wallet } from 'lucide-react'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
 import { CardTitle, colorBySign, MetricList } from '@/components/ui'
-import { db, remove, save, type AccountBalance } from '@/db'
+import { remove, save, useTables, type AccountBalance } from '@/db'
 import { useMonth } from '@/hooks/use-month'
 import { monthTotal, prevMonth, sum } from '@/lib/finance'
 import { formatMoney } from '@/lib/format'
@@ -17,7 +17,7 @@ type Draft = Pick<AccountBalance, 'title' | 'amount'> & { id?: string }
 
 function AccountsPage() {
   const { year, month } = useMonth()
-  const { data } = db.useQuery({ accountBalances: {}, expenses: {}, incomes: {} })
+  const { data } = useTables('accountBalances', 'expenses', 'incomes')
   const [editing, setEditing] = useState<Draft | null>(null)
   const [deleting, setDeleting] = useState<AccountBalance | null>(null)
 
@@ -93,8 +93,8 @@ function AccountsPage() {
         {editing && (
           <AccountForm
             draft={editing}
-            onSave={(draft) => {
-              save('accountBalances', { ...draft, year, month })
+            onSave={async (draft) => {
+              if (!(await save('accountBalances', { ...draft, year, month }))) return
               notifications.show({ title: 'Account balance saved', message: draft.title, color: 'green' })
               setEditing(null)
             }}

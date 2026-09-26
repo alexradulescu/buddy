@@ -3,7 +3,7 @@ import { Card, SimpleGrid } from '@mantine/core'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { DraftEntry, newDraft, TransactionList, type Draft } from '@/components/transactions'
-import { db } from '@/db'
+import { useTables } from '@/db'
 import { useMonth } from '@/hooks/use-month'
 import { useUnsavedChangesWarning } from '@/hooks/use-unsaved-changes-warning'
 import { inMonth } from '@/lib/finance'
@@ -12,7 +12,7 @@ export const Route = createFileRoute('/incomes')({ component: IncomesPage })
 
 function IncomesPage() {
   const { year, month } = useMonth()
-  const { data } = db.useQuery({ incomes: {}, incomeCategories: {} })
+  const { data } = useTables('incomes', 'incomeCategories')
   const [drafts, setDrafts] = useState<Draft[]>(() => [newDraft(year, month)])
   useUnsavedChangesWarning(drafts.some((d) => d.amount || d.description))
 

@@ -1,17 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/((?!api/).*)",
-      "destination": "/index.html"
-    }
-  ],
-  "functions": {
-    "api/categorize.ts": {
-      "maxDuration": 300
-    }
-  }
+  "buildCommand": "npx convex deploy --cmd 'npm run build'",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

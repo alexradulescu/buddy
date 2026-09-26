@@ -20,7 +20,7 @@ import { Calendar, ChevronDown, Download } from 'lucide-react'
 
 import { PageHeader } from '@/components/shell'
 import { CardTitle, colorBySign, MetricList, Money, Stat } from '@/components/ui'
-import { db } from '@/db'
+import { useTables } from '@/db'
 import { useMonth } from '@/hooks/use-month'
 import { downloadCSV, fullCSV, overviewCSV, type ExportData } from '@/lib/csv'
 import { expenseCategoryRows, incomeCategoryRows, monthTotal, portfolio, ytdSummary } from '@/lib/finance'
@@ -33,15 +33,15 @@ const negative = '#D64550'
 
 function HomePage() {
   const { year, month } = useMonth()
-  const { data } = db.useQuery({
-    expenses: {},
-    incomes: {},
-    expenseCategories: {},
-    incomeCategories: {},
-    investments: {},
-    investmentContributions: {},
-    investmentValues: {}
-  })
+  const { data } = useTables(
+    'expenses',
+    'incomes',
+    'expenseCategories',
+    'incomeCategories',
+    'investments',
+    'investmentContributions',
+    'investmentValues'
+  )
 
   const d: ExportData = {
     expenses: data?.expenses ?? [],

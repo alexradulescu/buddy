@@ -20,7 +20,7 @@ import { ConfirmDelete } from '@/components/confirm-delete'
 import { EntryModal, type Entry, type Option } from '@/components/entry-modal'
 import { Sheet, type SheetColumn } from '@/components/sheet'
 import { Money } from '@/components/ui'
-import { remove, save } from '@/db'
+import { remove, save, saveMany } from '@/db'
 import { inMonth } from '@/lib/finance'
 import { formatMoney } from '@/lib/format'
 
@@ -43,7 +43,7 @@ export function newDraft(year: number, month: number): Draft {
 }
 
 // Saves all drafts, or none if any is invalid. Returns true when saved.
-export function saveDrafts(entity: Entity, drafts: Draft[], year: number, month: number) {
+export async function saveDrafts(entity: Entity, drafts: Draft[], year: number, month: number) {
   const errors = drafts.flatMap((d, i) => {
     if (!Number(d.amount)) return [`Row ${i + 1}: invalid amount`]
     if (!inMonth(d, year, month)) return [`Row ${i + 1}: not in the selected month`]
@@ -53,7 +53,13 @@ export function saveDrafts(entity: Entity, drafts: Draft[], year: number, month:
     notifications.show({ title: 'Nothing saved, please fix these rows', message: errors.join('\n'), color: 'red' })
     return false
   }
-  drafts.forEach(({ id: _id, ...row }) => save(entity, row))
+  if (
+    !(await saveMany(
+      entity,
+      drafts.map(({ id: _id, ...row }) => row)
+    ))
+  )
+    return false
   notifications.show({ title: 'Saved', message: `Added ${drafts.length} ${entity}`, color: 'green' })
   return true
 }
@@ -93,7 +99,7 @@ export function DraftEntry({
           Add Rows
         </Button>
       </Group>
-      <Button fullWidth onClick={() => saveDrafts(entity, drafts, year, month) && setDrafts([])}>
+      <Button fullWidth onClick={async () => (await saveDrafts(entity, drafts, year, month)) && setDrafts([])}>
         Save {entity === 'expenses' ? 'Expenses' : 'Incomes'}
       </Button>
     </Stack>
@@ -208,8 +214,8 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
         entry={editing}
         categories={categories}
         onClose={() => setEditing(null)}
-        onSave={(entry) => {
-          save(entity, entry)
+        onSave={async (entry) => {
+          if (!(await save(entity, entry))) return
           setEditing(null)
           notifications.show({ title: `${noun} updated`, message: entry.description, color: 'green' })
         }}

@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, FileInput, Stack, Text, Textarea, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
+import { useMutation, useQuery } from 'convex/react'
 import { Upload } from 'lucide-react'
 
+import { api } from '@convex/_generated/api'
 import type { Option } from '@/components/entry-modal'
 import { Sheet } from '@/components/sheet'
 import { draftColumns, saveDrafts, type Draft } from '@/components/transactions'
@@ -11,73 +13,79 @@ import { useUnsavedChangesWarning } from '@/hooks/use-unsaved-changes-warning'
 
 type Props = {
   categories: Option[] // active expense categories
-  history: Expense[] // recent expenses, to learn categorization from
   monthExpenses: Expense[] // already saved, to flag duplicates
   year: number
   month: number
 }
 
-// Paste bank text or pick a PDF/CSV statement -> AI streams categorized rows -> review -> save
-export function ImportPanel({ categories, history, monthExpenses, year, month }: Props) {
+// Paste bank text or pick a PDF/CSV statement -> AI (a Convex action) streams categorized rows -> review -> save.
+// The rows live in an import job on the server, so a reload doesn't lose them.
+export function ImportPanel({ categories, monthExpenses, year, month }: Props) {
+  const job = useQuery(api.imports.current)
+  const generateUploadUrl = useMutation(api.imports.generateUploadUrl)
+  const start = useMutation(api.imports.start)
+  const clear = useMutation(api.imports.clear)
   const [text, setText] = useState('')
   const [file, setFile] = useState<File | null>(null)
-  const [rows, setRows] = useState<Draft[]>([])
-  const [loading, setLoading] = useState(false)
+  const [rows, setRows] = useState<Draft[]>([]) // local, editable copy of the job's rows
+  const [starting, setStarting] = useState(false)
+  const seen = useRef(0) // job rows already copied into `rows`
+  const loading = starting || job?.status === 'running'
   useUnsavedChangesWarning(rows.length > 0)
+
+  useEffect(() => {
+    if (!job) return
+    const fresh = job.rows.slice(seen.current)
+    if (fresh.length) {
+      seen.current = job.rows.length
+      setRows((prev) => [...prev, ...fresh.map((r) => ({ ...r, id: crypto.randomUUID() }))])
+    }
+    const failed = job.status === 'error' || (job.status === 'done' && !job.rows.length)
+    if (!failed) return
+    notifications.show(
+      job.status === 'error'
+        ? { title: 'Error', message: job.error ?? 'Import failed', color: 'red' }
+        : { title: 'No expenses found', message: 'The AI did not find any expenses', color: 'yellow' }
+    )
+    seen.current = 0
+    setRows([])
+    void clear()
+  }, [job, clear])
 
   const isDuplicate = (row: Draft) => monthExpenses.some((e) => e.date === row.date && e.amount === row.amount)
 
   async function run() {
-    const form = new FormData()
-    if (file) form.append('file', file)
-    else form.append('text', text)
-    form.append('categories', JSON.stringify(categories.map((c) => ({ id: c.value, name: c.label }))))
-    form.append(
-      'history',
-      JSON.stringify(
-        history
-          .toSorted((a, b) => b.date.localeCompare(a.date))
-          .slice(0, 200)
-          .map(({ description, categoryId, amount }) => ({ description, categoryId, amount }))
-      )
-    )
-
-    setLoading(true)
+    setStarting(true)
+    seen.current = 0
     setRows([])
     try {
-      const res = await fetch('/api/categorize', { method: 'POST', body: form })
-      if (!res.ok || !res.body)
-        throw new Error((await res.json().catch(() => null))?.error ?? `Server error ${res.status}`)
-
-      // One JSON expense per line, appended as they arrive
-      const reader = res.body.pipeThrough(new TextDecoderStream()).getReader()
-      let buffer = ''
-      let found = 0
-      for (let chunk = await reader.read(); !chunk.done; chunk = await reader.read()) {
-        buffer += chunk.value
-        const lines = buffer.split('\n')
-        buffer = lines.pop()!
-        const items = lines.filter(Boolean).map((l) => JSON.parse(l))
-        const failed = items.find((i) => i.error)
-        if (failed) throw new Error(failed.error)
-        const parsed = items.map((i) => ({ ...i, id: crypto.randomUUID() }) as Draft)
-        found += parsed.length
-        setRows((prev) => [...prev, ...parsed])
+      if (file) {
+        const res = await fetch(await generateUploadUrl(), {
+          method: 'POST',
+          headers: { 'Content-Type': file.type || 'application/octet-stream' },
+          body: file
+        })
+        if (!res.ok) throw new Error(`Upload failed (${res.status})`)
+        const { storageId } = await res.json()
+        await start({ fileId: storageId, fileName: file.name })
+      } else {
+        await start({ text })
       }
-      notifications.show(
-        found
-          ? { title: 'Expenses processed', message: `${found} expenses ready for review`, color: 'green' }
-          : { title: 'No expenses found', message: 'The AI did not find any expenses', color: 'yellow' }
-      )
     } catch (e) {
       notifications.show({ title: 'Error', message: e instanceof Error ? e.message : 'Import failed', color: 'red' })
     } finally {
-      setLoading(false)
+      setStarting(false)
     }
   }
 
   function reset() {
+    seen.current = 0
     setRows([])
+    void clear()
+  }
+
+  function discard() {
+    reset()
     setText('')
     setFile(null)
   }
@@ -98,10 +106,10 @@ export function ImportPanel({ categories, history, monthExpenses, year, month }:
           onChange={(row) => setRows(rows.map((r) => (r.id === row.id ? row : r)))}
           onDelete={(row) => setRows(rows.filter((r) => r.id !== row.id))}
         />
-        <Button disabled={loading} onClick={() => saveDrafts('expenses', rows, year, month) && reset()}>
+        <Button disabled={loading} onClick={async () => (await saveDrafts('expenses', rows, year, month)) && discard()}>
           Save Expenses
         </Button>
-        <Button color="red" onClick={reset}>
+        <Button color="red" onClick={discard}>
           Discard
         </Button>
       </Stack>
