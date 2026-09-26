@@ -76,7 +76,7 @@ export async function POST(req: Request) {
   // streamText swallows model errors (empty stream), so capture and forward them as a final line
   let failure: unknown
   const { elementStream } = streamText({
-    model: google('gemini-3.8-flash'),
+    model: google('gemini-3.5-flash-lite'),
     output: Output.array({ element: expenseSchema }),
     prompt: prompt(transactions, categories, history),
     maxRetries: 2,
