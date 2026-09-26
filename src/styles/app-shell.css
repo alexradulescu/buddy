@@ -1,0 +1,142 @@
+/* App frame: header, desktop sidebar, mobile bottom navigation, scrolling content, month picker */
+
+.mantine-AppShell-header {
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.desktop-sidebar {
+  border-right: 1px solid var(--color-border);
+}
+
+.navigation-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  color: var(--color-text-secondary);
+  background-color: transparent;
+}
+
+.navigation-link[data-active] {
+  color: var(--color-primary);
+  background-color: var(--color-accent-background-strong);
+}
+
+.desktop-sidebar-link {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.mobile-bottom-navigation-bar {
+  background-color: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+}
+
+.mobile-bottom-navigation {
+  display: flex;
+  width: 100%;
+  padding: 2px;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+}
+
+.mobile-bottom-navigation-link {
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 4px;
+  border-radius: 18px;
+}
+
+/* Page content scrolls inside this zone */
+.scrollable-page-content {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.scrollable-page-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-page-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollable-page-content::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 3px;
+}
+
+.scrollable-page-content::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-muted);
+}
+
+/* Mobile: frosted glass header, content scrolls up behind it like iOS nav bars */
+@media (max-width: 48em) {
+  .mantine-AppShell-header {
+    background-color: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(229, 233, 235, 0.6);
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Remove Mantine's padding so the scroll container starts at y=0, behind the header */
+  .mantine-AppShell-main {
+    padding-top: 0;
+  }
+
+  /* Push the initial content below the glass header */
+  .scrollable-page-content {
+    padding-top: calc(60px + env(safe-area-inset-top, 0px));
+  }
+}
+
+/* Header month picker: [<][Mar 25][>] joined into one bordered control */
+.header-month-picker .mantine-ActionIcon-root {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.header-month-picker .mantine-ActionIcon-root:first-child {
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+}
+
+.header-month-picker .mantine-ActionIcon-root:last-child {
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+}
+
+.header-month-picker .mantine-ActionIcon-root:hover {
+  background-color: var(--color-accent-background);
+  color: var(--color-primary);
+}
+
+.header-month-picker .mantine-InputWrapper-root {
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.header-month-picker .mantine-Input-input {
+  border: none;
+  border-radius: 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: transparent;
+  height: 34px;
+  min-height: 34px;
+  padding: 0 4px;
+}

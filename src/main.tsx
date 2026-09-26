@@ -9,7 +9,9 @@ import { router } from './router'
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
-import './globals.css'
+import './styles/base.css'
+import './styles/mantine-overrides.css'
+import './styles/app-shell.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -17,5 +19,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Notifications />
       <RouterProvider router={router} />
     </MantineProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 )
