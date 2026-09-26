@@ -30,6 +30,7 @@ export function ImportPanel({ categories, monthExpenses, year, month }: Props) {
   const [rows, setRows] = useState<Draft[]>([]) // local, editable copy of the job's rows
   const [starting, setStarting] = useState(false)
   const seen = useRef(0) // job rows already copied into `rows`
+  const handled = useRef<string | null>(null) // failed job already reported
   const loading = starting || job?.status === 'running'
   useUnsavedChangesWarning(rows.length > 0)
 
@@ -41,7 +42,8 @@ export function ImportPanel({ categories, monthExpenses, year, month }: Props) {
       setRows((prev) => [...prev, ...fresh.map((r) => ({ ...r, id: crypto.randomUUID() }))])
     }
     const failed = job.status === 'error' || (job.status === 'done' && !job.rows.length)
-    if (!failed) return
+    if (!failed || handled.current === job._id) return
+    handled.current = job._id
     notifications.show(
       job.status === 'error'
         ? { title: 'Error', message: job.error ?? 'Import failed', color: 'red' }
@@ -143,6 +145,11 @@ export function ImportPanel({ categories, monthExpenses, year, month }: Props) {
       <Button onClick={run} disabled={!file && !text.trim()} loading={loading} fullWidth>
         {file ? 'Process File' : 'Convert'}
       </Button>
+      {job?.status === 'running' && (
+        <Button variant="subtle" color="gray" onClick={() => void clear()}>
+          Cancel
+        </Button>
+      )}
     </Stack>
   )
 }

@@ -5,6 +5,7 @@ import { requireUser } from './auth'
 import { importedExpense } from './schema'
 
 const MAX_HISTORY = 200
+const TIMEOUT = 11 * 60 * 1000 // actions are stopped after 10 minutes
 
 // The current AI import (at most one), so its rows survive a reload
 export const current = query({
@@ -31,6 +32,8 @@ export const start = mutation({
     await clearJobs(ctx)
     const jobId = await ctx.db.insert('importJobs', { status: 'running', rows: [], fileId: args.fileId })
     await ctx.scheduler.runAfter(0, internal.categorize.run, { jobId, ...args })
+    // If the action dies without reporting (timeout, restart), don't leave the job running forever
+    await ctx.scheduler.runAfter(TIMEOUT, internal.imports.finish, { jobId, error: 'The import timed out' })
     return jobId
   }
 })
@@ -78,7 +81,7 @@ export const finish = internalMutation({
   args: { jobId: v.id('importJobs'), error: v.optional(v.string()) },
   handler: async (ctx, { jobId, error }) => {
     const job = await ctx.db.get(jobId)
-    if (!job) return
+    if (job?.status !== 'running') return
     if (job.fileId) await ctx.storage.delete(job.fileId).catch(() => {})
     await ctx.db.patch(jobId, { status: error ? 'error' : 'done', error, fileId: undefined })
   }
