@@ -57,7 +57,10 @@ export function ImportPanel({ categories, history, monthExpenses, year, month }:
         buffer += chunk.value
         const lines = buffer.split('\n')
         buffer = lines.pop()!
-        const parsed = lines.filter(Boolean).map((l) => ({ ...JSON.parse(l), id: crypto.randomUUID() }) as Draft)
+        const items = lines.filter(Boolean).map((l) => JSON.parse(l))
+        const failed = items.find((i) => i.error)
+        if (failed) throw new Error(failed.error)
+        const parsed = items.map((i) => ({ ...i, id: crypto.randomUUID() }) as Draft)
         found += parsed.length
         setRows((prev) => [...prev, ...parsed])
       }
