@@ -145,7 +145,7 @@ function HomePage() {
           ))}
         </GroupedList>
         <ScrollArea visibleFrom="sm">
-          <Table striped miw={800}>
+          <Table miw={800}>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th pl="md">Category</Table.Th>
@@ -200,7 +200,7 @@ function HomePage() {
           ))}
         </GroupedList>
         <ScrollArea visibleFrom="sm">
-          <Table striped miw={600}>
+          <Table miw={600}>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th pl="md">Category</Table.Th>

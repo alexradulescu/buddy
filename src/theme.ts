@@ -41,7 +41,7 @@ export const theme = createTheme({
     xs: '8px',
     sm: '12px',
     md: '14px',
-    lg: '26px',
+    lg: 'var(--radius-card)',
     xl: '999px'
   },
   defaultRadius: 'md',
@@ -49,7 +49,7 @@ export const theme = createTheme({
   components: {
     // Inset-grouped cards: no border, soft elevation, 12px corners
     Card: {
-      defaultProps: { padding: 18, withBorder: false, radius: 'lg', shadow: 'sm' },
+      defaultProps: { padding: 16, withBorder: false, radius: 'lg', shadow: 'sm' },
       styles: { root: { backgroundColor: 'var(--color-surface)' } }
     },
     Table: {

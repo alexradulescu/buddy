@@ -19,8 +19,16 @@
   --color-accent-background: var(--color-tint-fill);
   --color-accent-background-strong: var(--color-tint-fill-strong);
 
-  /* Grouped backgrounds: grey page, white cards */
-  --color-page-background: #f2f2f7;
+  /* Frame around the canvas (Shopify admin v2): black in light mode, dark grey in dark mode */
+  --color-frame: #0b0b0c;
+  --color-frame-text: rgba(255, 255, 255, 0.72);
+  --color-frame-text-strong: #ffffff;
+  --color-frame-text-muted: rgba(255, 255, 255, 0.45);
+  --color-frame-hover: rgba(255, 255, 255, 0.07);
+  --color-frame-active: rgba(255, 255, 255, 0.13);
+
+  /* Canvas is white; cards are white with a hairline border and a soft lift */
+  --color-page-background: #ffffff;
   --color-surface: #ffffff;
   --color-surface-secondary: #f9f9fb;
   --color-fill: rgba(118, 118, 128, 0.12);
@@ -48,11 +56,13 @@
   --material-sidebar-solid: #ffffff;
 
   /* Concentric radii: card, rows inside a card (card - padding), and capsules */
-  --radius-card: 26px;
+  --radius-card: 16px;
   --radius-inner: 12px;
   --radius-capsule: 999px;
 
-  --shadow-card: 0 0 0 0.5px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.075), 0 1px 2px rgba(0, 0, 0, 0.05), 0 4px 12px -4px rgba(0, 0, 0, 0.06);
+  --shadow-control: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-canvas: 0 0 0 1px rgba(255, 255, 255, 0.04);
   --shadow-popover: 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 10px 30px rgba(0, 0, 0, 0.12);
   --shadow-floating: 0 0 0 0.5px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04);
 
@@ -71,9 +81,15 @@
     --color-tint-fill: rgba(10, 132, 255, 0.18);
     --color-tint-fill-strong: rgba(10, 132, 255, 0.26);
 
+    --color-frame: #1c1c1e;
+    --color-frame-text: rgba(235, 235, 245, 0.68);
+    --color-frame-text-muted: rgba(235, 235, 245, 0.4);
+    --color-frame-hover: rgba(255, 255, 255, 0.06);
+    --color-frame-active: rgba(255, 255, 255, 0.11);
+
     --color-page-background: #000000;
-    --color-surface: #1c1c1e;
-    --color-surface-secondary: #242426;
+    --color-surface: #141415;
+    --color-surface-secondary: #1c1c1e;
     --color-fill: rgba(118, 118, 128, 0.24);
     --color-fill-secondary: rgba(118, 118, 128, 0.16);
     --color-border: rgba(84, 84, 88, 0.6);
@@ -94,8 +110,28 @@
     --material-sidebar-solid: #1c1c1e;
     --shadow-floating: 0 0 0 0.5px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.6);
 
-    --shadow-card: 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+    --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --shadow-control: 0 0 0 1px rgba(255, 255, 255, 0.12);
+    --shadow-canvas: 0 0 0 1px rgba(255, 255, 255, 0.07);
     --shadow-popover: 0 0 0 0.5px rgba(255, 255, 255, 0.1), 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Phones: iOS grouped look, grey page with borderless cards and larger continuous corners */
+@media (max-width: 47.99em) {
+  :root {
+    --color-page-background: #f2f2f7;
+    --shadow-card: 0 0 0 0.5px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.05);
+    --radius-card: 24px;
+  }
+}
+
+@media (max-width: 47.99em) and (prefers-color-scheme: dark) {
+  :root {
+    --color-page-background: #000000;
+    --color-surface: #1c1c1e;
+    --color-surface-secondary: #242426;
+    --shadow-card: none;
   }
 }
 
@@ -106,7 +142,13 @@
 }
 
 html {
-  background-color: var(--color-page-background);
+  background-color: var(--color-frame);
+}
+
+@media (max-width: 47.99em) {
+  html {
+    background-color: var(--color-page-background);
+  }
 }
 
 body {
@@ -329,7 +371,7 @@ button.grouped-list-row:active {
 /* Transaction rows sit inside a card on phones: flatten to the card's edges */
 .transaction-list {
   box-shadow: none;
-  margin: 0 -18px -18px;
+  margin: 0 -16px -16px;
   border-radius: 0 0 var(--radius-card) var(--radius-card);
   border-top: 0.5px solid var(--color-border);
 }

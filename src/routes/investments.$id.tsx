@@ -34,16 +34,15 @@ function InvestmentDetailPage() {
 
   return (
     <Stack gap="md">
-      <Group justify="space-between" wrap="nowrap">
-        <Button
-          variant="default"
-          component={Link}
-          to="/investments"
-          leftSection={<ChevronLeft size={18} strokeWidth={2.4} />}
-          className="back-button"
-        >
-          Investments
-        </Button>
+      <Group justify="space-between" align="flex-start" wrap="nowrap" className="large-title-row">
+        <Stack gap={2}>
+          <Title order={1} className="large-title">
+            {investment.name}
+          </Title>
+          <Text c="dimmed" size="sm">
+            {investment.description || 'No description provided'}
+          </Text>
+        </Stack>
         <Group gap="xs" wrap="nowrap">
           <Button variant="default" onClick={() => setEditing(true)} leftSection={<Edit size={14} />}>
             Edit
@@ -53,15 +52,6 @@ function InvestmentDetailPage() {
           </Button>
         </Group>
       </Group>
-
-      <Stack gap={2} px={4}>
-        <Title order={1} className="large-title">
-          {investment.name}
-        </Title>
-        <Text c="dimmed" size="sm">
-          {investment.description || 'No description provided'}
-        </Text>
-      </Stack>
 
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
         <Card>

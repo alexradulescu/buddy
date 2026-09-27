@@ -189,7 +189,7 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
             <Table miw={450} stickyHeader>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th w={80}>{header('date', 'Date')}</Table.Th>
+                  <Table.Th w={110}>{header('date', 'Date')}</Table.Th>
                   <Table.Th>{header('description', 'Description')}</Table.Th>
                   <Table.Th>{header('category', 'Category')}</Table.Th>
                   <Table.Th w={70}>{header('amount', 'Amount')}</Table.Th>
@@ -199,7 +199,7 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
               <Table.Tbody>
                 {visible.map((row) => (
                   <Table.Tr key={row.id}>
-                    <Table.Td>{dayjs(row.date).format('DD MMM YYYY')}</Table.Td>
+                    <Table.Td style={{ whiteSpace: 'nowrap' }}>{dayjs(row.date).format('DD MMM YYYY')}</Table.Td>
                     <Table.Td>{row.description}</Table.Td>
                     <Table.Td c="dimmed">{row.category}</Table.Td>
                     <Table.Td ta="right" c={row.amount < 0 ? 'var(--color-positive)' : undefined}>
