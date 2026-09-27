@@ -339,14 +339,129 @@ button.grouped-list-row:active {
   }
 }
 
-/* Transaction rows sit inside a card on phones: flatten to the card's edges */
-.transaction-list {
-  box-shadow: none;
-  margin: 0 -16px -16px;
-  border-radius: 0 0 var(--radius-card) var(--radius-card);
-  border-top: 0.5px solid var(--color-border);
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
-.transaction-list .grouped-list-row {
-  padding-right: 8px;
+/*
+ * Transaction list (expenses, incomes): Wallet-style day sections with sticky headers,
+ * two-line rows, amount on the right, edit/delete revealed on hover.
+ */
+.tx-list {
+  margin: 0 -16px -16px;
+  border-top: 0.5px solid var(--color-border);
+  max-height: calc(100dvh - 240px);
+  min-height: 320px;
+  overflow-y: auto;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+}
+
+.tx-day-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 16px;
+  background: var(--color-surface-secondary);
+  border-bottom: 0.5px solid var(--color-border);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--color-text-secondary);
+}
+
+.tx-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 7px 8px 7px 16px;
+  position: relative;
+  cursor: pointer;
+  background: var(--color-surface);
+}
+
+.tx-row + .tx-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 0;
+  height: 0.5px;
+  background: var(--color-border-light);
+}
+
+.tx-row:hover,
+.tx-row:active {
+  background: var(--color-fill);
+}
+
+.tx-row:focus-visible {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: -2px;
+}
+
+.tx-row-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.tx-row-title,
+.tx-row-subtitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tx-row-title {
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--color-text);
+}
+
+.tx-row-subtitle {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-secondary);
+}
+
+.tx-row-amount {
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--color-text);
+}
+
+.tx-row-amount[data-positive] {
+  color: var(--color-positive);
+}
+
+/* Touch: tapping the row edits, so only delete stays */
+@media (hover: none) {
+  .tx-row-edit {
+    display: none;
+  }
+}
+
+@media (hover: hover) {
+  .tx-row:hover .row-actions {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 48em) {
+  .tx-list {
+    max-height: none;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .tx-row-title,
+  .tx-row-amount {
+    font-size: 17px;
+    line-height: 22px;
+  }
 }

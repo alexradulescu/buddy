@@ -192,6 +192,9 @@
 }
 
 .spent-cell {
+  /* Fixed width so wide screens give the spare room to the category column */
+  width: 120px;
+  white-space: nowrap;
   font-weight: 600;
   color: var(--color-text);
 }
@@ -201,7 +204,7 @@
 }
 
 .budget-cell {
-  width: 170px;
+  width: 200px;
   min-width: 150px;
 }
 

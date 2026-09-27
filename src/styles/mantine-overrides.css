@@ -343,27 +343,6 @@
   vertical-align: middle;
 }
 
-.sort-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-}
-
-.sort-label[data-active] {
-  color: var(--color-text);
-}
-
-.sort-icon {
-  color: var(--color-text-muted);
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
-.sort-icon[data-active],
-.mantine-Table-th:hover .sort-icon {
-  opacity: 1;
-}
-
 @media (hover: hover) {
   .row-actions {
     opacity: 0;

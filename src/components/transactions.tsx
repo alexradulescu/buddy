@@ -1,27 +1,13 @@
 import { useState } from 'react'
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Group,
-  NumberInput,
-  ScrollArea,
-  Select,
-  Stack,
-  Table,
-  Text,
-  TextInput,
-  UnstyledButton
-} from '@mantine/core'
+import { ActionIcon, Button, Group, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import dayjs from 'dayjs'
-import { ArrowDown, ArrowUp, ArrowUpDown, Edit, Search, Trash } from 'lucide-react'
+import { Edit, Search, Trash } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
 import { EntryModal, type Entry, type Option } from '@/components/entry-modal'
 import { Sheet, type SheetColumn } from '@/components/sheet'
-import { Money } from '@/components/ui'
 import { remove, save } from '@/db'
 import { inMonth } from '@/lib/finance'
 import { formatMoney } from '@/lib/format'
@@ -92,69 +78,102 @@ export function DraftEntry({
       <Group gap="xs">
         <NumberInput value={count} onChange={(v) => setCount(Number(v) || 1)} min={1} w={60} />
         <Button onClick={() => setDrafts([...drafts, ...Array.from({ length: count }, () => newDraft(year, month))])}>
-          Add Rows
+          Add rows
         </Button>
       </Group>
       <Button fullWidth onClick={() => saveDrafts(entity, drafts, year, month) && setDrafts([])}>
-        Save {entity === 'expenses' ? 'Expenses' : 'Incomes'}
+        Save {entity}
       </Button>
     </Stack>
   )
 }
 
-type SortKey = 'date' | 'description' | 'category' | 'amount'
+type Sort = 'newest' | 'oldest' | 'highest' | 'lowest'
+
+const sortOptions: { value: Sort; label: string }[] = [
+  { value: 'newest', label: 'Newest first' },
+  { value: 'oldest', label: 'Oldest first' },
+  { value: 'highest', label: 'Highest amount' },
+  { value: 'lowest', label: 'Lowest amount' }
+]
+
+type Row = Entry & { category: string }
+
+// Wallet-style sections: one per day when sorted by date, a single unlabelled one when sorted by amount
+function groupRows(rows: Row[], byDay: boolean) {
+  if (!byDay) return [{ key: 'all', label: null, total: 0, rows }]
+  const groups: { key: string; label: string | null; total: number; rows: Row[] }[] = []
+  for (const row of rows) {
+    const last = groups.at(-1)
+    if (last?.key === row.date) {
+      last.rows.push(row)
+      last.total += row.amount
+    } else {
+      groups.push({ key: row.date, label: dayjs(row.date).format('ddd D MMM'), total: row.amount, rows: [row] })
+    }
+  }
+  return groups
+}
 
 // Saved entries of the month: search, category filter (in URL), sort, edit, delete
 export function TransactionList({ entity, rows, categories }: { entity: Entity; rows: Entry[]; categories: Option[] }) {
   const noun = entity === 'expenses' ? 'expense' : 'income'
+  const Noun = entity === 'expenses' ? 'Expense' : 'Income'
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useQueryState(noun === 'expense' ? 'categoryExpense' : 'categoryIncome')
-  const [sort, setSort] = useState<{ key: SortKey; asc: boolean }>({ key: 'date', asc: true })
+  const [sort, setSort] = useState<Sort>('newest')
   const [editing, setEditing] = useState<Entry | null>(null)
   const [deleting, setDeleting] = useState<Entry | null>(null)
 
   const categoryName = (id: string) => categories.find((c) => c.value === id)?.label ?? ''
   const term = search.toLowerCase()
-  const visible = rows
+  const visible: Row[] = rows
     .map((r) => ({ ...r, category: categoryName(r.categoryId) }))
     .filter((r) => !categoryFilter || r.categoryId === categoryFilter)
     .filter((r) => `${r.description} ${r.category} ${r.amount}`.toLowerCase().includes(term))
     .sort((a, b) => {
-      const cmp = sort.key === 'amount' ? a.amount - b.amount : String(a[sort.key]).localeCompare(String(b[sort.key]))
-      return sort.asc ? cmp : -cmp
+      if (sort === 'highest') return b.amount - a.amount
+      if (sort === 'lowest') return a.amount - b.amount
+      const cmp = a.date.localeCompare(b.date)
+      return sort === 'oldest' ? cmp : -cmp
     })
-
-  const header = (key: SortKey, label: string) => {
-    const Icon = sort.key !== key ? ArrowUpDown : sort.asc ? ArrowUp : ArrowDown
-    return (
-      <UnstyledButton w="100%" onClick={() => setSort({ key, asc: sort.key === key ? !sort.asc : true })}>
-        <Group gap={4} wrap="nowrap" justify={key === 'amount' ? 'flex-end' : 'flex-start'}>
-          <span className="sort-label" data-active={sort.key === key || undefined}>
-            {label}
-          </span>
-          <Icon size={12} strokeWidth={2.2} className="sort-icon" data-active={sort.key === key || undefined} />
-        </Group>
-      </UnstyledButton>
-    )
-  }
+  const total = visible.reduce((sum, r) => sum + r.amount, 0)
+  const byDay = sort === 'newest' || sort === 'oldest'
+  const groups = groupRows(visible, byDay)
 
   return (
     <Stack gap="sm">
-      <TextInput
-        placeholder={`Search ${entity}...`}
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        leftSection={<Search size={14} />}
-      />
-      <Group gap="xs">
-        <Text size="xs" c="dimmed">
-          Filter:
+      <Group justify="space-between" align="baseline" gap="xs">
+        <Text fw={600} size="lg">
+          {visible.length} {visible.length === 1 ? noun : entity}
         </Text>
+        <Text fw={600} size="lg" className="tabular">
+          {formatMoney(total)}
+        </Text>
+      </Group>
+      <Group gap="xs" wrap="wrap">
+        <TextInput
+          flex="2 1 180px"
+          placeholder={`Search ${entity}`}
+          aria-label={`Search ${entity}`}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          leftSection={<Search size={14} />}
+        />
         <Select
-          flex={1}
+          flex="1 1 150px"
+          aria-label="Category"
           value={categoryFilter ?? 'all'}
           onChange={(v) => setCategoryFilter(v === 'all' ? null : v)}
           data={[{ value: 'all', label: 'All categories' }, ...categories]}
+        />
+        <Select
+          flex="1 1 140px"
+          aria-label="Sort"
+          value={sort}
+          onChange={(v) => v && setSort(v as Sort)}
+          data={sortOptions}
+          allowDeselect={false}
         />
       </Group>
 
@@ -163,79 +182,57 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
           No {entity} found for this period.
         </Text>
       ) : (
-        <>
-          <Text size="xs" c="dimmed">
-            {visible.length} {visible.length === 1 ? 'item' : 'items'}
-          </Text>
-          <Box className="grouped-list transaction-list" hiddenFrom="sm">
-            {visible.map((row) => (
-              <Box key={row.id} className="grouped-list-row">
-                <UnstyledButton className="grouped-list-row-main" onClick={() => setEditing(row)}>
-                  <Text className="grouped-list-row-title">{row.description || 'Untitled'}</Text>
-                  <Text className="grouped-list-row-subtitle">
-                    {dayjs(row.date).format('D MMM')} · {row.category || 'Uncategorized'}
-                  </Text>
-                </UnstyledButton>
-                <Text className="grouped-list-row-value" c={row.amount < 0 ? 'var(--color-positive)' : undefined}>
-                  {formatMoney(row.amount)}
-                </Text>
-                <ActionIcon color="red" c="var(--color-negative)" aria-label="Delete" onClick={() => setDeleting(row)}>
-                  <Trash size={16} />
-                </ActionIcon>
-              </Box>
-            ))}
-          </Box>
-          <ScrollArea mah={560} visibleFrom="sm" className="table-frame">
-            <Table miw={450} stickyHeader className="data-table">
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th w={110}>{header('date', 'Date')}</Table.Th>
-                  <Table.Th>{header('description', 'Description')}</Table.Th>
-                  <Table.Th>{header('category', 'Category')}</Table.Th>
-                  <Table.Th w={110} ta="right">
-                    {header('amount', 'Amount')}
-                  </Table.Th>
-                  <Table.Th w={72}>
-                    <span className="visually-hidden">Actions</span>
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {visible.map((row) => (
-                  <Table.Tr key={row.id}>
-                    <Table.Td className="data-table-muted" style={{ whiteSpace: 'nowrap' }}>
-                      {dayjs(row.date).format('DD MMM YYYY')}
-                    </Table.Td>
-                    <Table.Td className="data-table-primary">{row.description}</Table.Td>
-                    <Table.Td>{row.category && <span className="chip">{row.category}</span>}</Table.Td>
-                    <Table.Td
-                      ta="right"
-                      className="data-table-amount"
-                      c={row.amount < 0 ? 'var(--color-positive)' : undefined}
+        <div className="tx-list">
+          {groups.map((group) => (
+            <section key={group.key} className="tx-day">
+              {group.label && (
+                <header className="tx-day-header">
+                  <span>{group.label}</span>
+                  <span className="tabular">{formatMoney(group.total)}</span>
+                </header>
+              )}
+              {group.rows.map((row) => (
+                <div
+                  key={row.id}
+                  className="tx-row"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setEditing(row)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setEditing(row)
+                    }
+                  }}
+                >
+                  <div className="tx-row-main">
+                    <div className="tx-row-title">{row.description || 'Untitled'}</div>
+                    <div className="tx-row-subtitle">
+                      {!byDay && `${dayjs(row.date).format('D MMM')} · `}
+                      {row.category || 'Uncategorized'}
+                    </div>
+                  </div>
+                  <div className="tx-row-amount" data-positive={row.amount < 0 || undefined}>
+                    {formatMoney(row.amount)}
+                  </div>
+                  <Group gap={2} wrap="nowrap" className="row-actions" onClick={(e) => e.stopPropagation()}>
+                    <ActionIcon size="sm" aria-label="Edit" className="tx-row-edit" onClick={() => setEditing(row)}>
+                      <Edit size={14} />
+                    </ActionIcon>
+                    <ActionIcon
+                      size="sm"
+                      c="var(--color-negative)"
+                      aria-label="Delete"
+                      onClick={() => setDeleting(row)}
                     >
-                      <Money value={row.amount} />
-                    </Table.Td>
-                    <Table.Td>
-                      <Group gap={2} wrap="nowrap" justify="flex-end" className="row-actions">
-                        <ActionIcon size="sm" aria-label="Edit" onClick={() => setEditing(row)}>
-                          <Edit size={14} />
-                        </ActionIcon>
-                        <ActionIcon
-                          size="sm"
-                          c="var(--color-negative)"
-                          aria-label="Delete"
-                          onClick={() => setDeleting(row)}
-                        >
-                          <Trash size={14} />
-                        </ActionIcon>
-                      </Group>
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-          </ScrollArea>
-        </>
+                      <Trash size={14} />
+                    </ActionIcon>
+                  </Group>
+                </div>
+              ))}
+            </section>
+          ))}
+        </div>
       )}
 
       <EntryModal
@@ -246,7 +243,7 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
         onSave={(entry) => {
           save(entity, entry)
           setEditing(null)
-          notifications.show({ title: `${noun} updated`, message: entry.description, color: 'green' })
+          notifications.show({ title: `${Noun} updated`, message: entry.description, color: 'green' })
         }}
       />
       <ConfirmDelete

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { Card, Group, SegmentedControl, SimpleGrid, Stack } from '@mantine/core'
+import { Card, Group, SegmentedControl, Grid, Stack } from '@mantine/core'
 import { createFileRoute } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import { SparklesIcon, TableIcon } from 'lucide-react'
@@ -29,43 +29,47 @@ function ExpensesPage() {
   const history = expenses.filter((e) => e.date >= threeMonthsAgo)
 
   return (
-    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
-      <Card>
-        <Stack gap="sm">
-          <SegmentedControl
-            fullWidth
-            value={tab}
-            onChange={setTab}
-            data={[
-              { value: 'import', label: <Label icon={<SparklesIcon size={14} />} text="AI Import" /> },
-              { value: 'manual', label: <Label icon={<TableIcon size={14} />} text="Manual" /> }
-            ]}
-          />
-          {tab === 'import' ? (
-            <ImportPanel
-              categories={activeOptions}
-              history={history}
-              monthExpenses={monthExpenses}
-              year={year}
-              month={month}
+    <Grid gap="sm">
+      <Grid.Col span={{ base: 12, lg: 5 }}>
+        <Card>
+          <Stack gap="sm">
+            <SegmentedControl
+              fullWidth
+              value={tab}
+              onChange={setTab}
+              data={[
+                { value: 'import', label: <Label icon={<SparklesIcon size={14} />} text="AI import" /> },
+                { value: 'manual', label: <Label icon={<TableIcon size={14} />} text="Manual" /> }
+              ]}
             />
-          ) : (
-            <DraftEntry
-              entity="expenses"
-              categories={activeOptions}
-              drafts={drafts}
-              setDrafts={setDrafts}
-              year={year}
-              month={month}
-            />
-          )}
-        </Stack>
-      </Card>
+            {tab === 'import' ? (
+              <ImportPanel
+                categories={activeOptions}
+                history={history}
+                monthExpenses={monthExpenses}
+                year={year}
+                month={month}
+              />
+            ) : (
+              <DraftEntry
+                entity="expenses"
+                categories={activeOptions}
+                drafts={drafts}
+                setDrafts={setDrafts}
+                year={year}
+                month={month}
+              />
+            )}
+          </Stack>
+        </Card>
+      </Grid.Col>
 
-      <Card>
-        <TransactionList entity="expenses" rows={monthExpenses} categories={allOptions} />
-      </Card>
-    </SimpleGrid>
+      <Grid.Col span={{ base: 12, lg: 7 }}>
+        <Card>
+          <TransactionList entity="expenses" rows={monthExpenses} categories={allOptions} />
+        </Card>
+      </Grid.Col>
+    </Grid>
   )
 }
 

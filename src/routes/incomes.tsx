@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, SimpleGrid } from '@mantine/core'
+import { Card, Grid } from '@mantine/core'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { DraftEntry, newDraft, TransactionList, type Draft } from '@/components/transactions'
@@ -22,20 +22,24 @@ function IncomesPage() {
   const monthIncomes = (data?.incomes ?? []).filter((i) => inMonth(i, year, month))
 
   return (
-    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
-      <Card>
-        <DraftEntry
-          entity="incomes"
-          categories={activeOptions}
-          drafts={drafts}
-          setDrafts={setDrafts}
-          year={year}
-          month={month}
-        />
-      </Card>
-      <Card>
-        <TransactionList entity="incomes" rows={monthIncomes} categories={allOptions} />
-      </Card>
-    </SimpleGrid>
+    <Grid gap="sm">
+      <Grid.Col span={{ base: 12, lg: 5 }}>
+        <Card>
+          <DraftEntry
+            entity="incomes"
+            categories={activeOptions}
+            drafts={drafts}
+            setDrafts={setDrafts}
+            year={year}
+            month={month}
+          />
+        </Card>
+      </Grid.Col>
+      <Grid.Col span={{ base: 12, lg: 7 }}>
+        <Card>
+          <TransactionList entity="incomes" rows={monthIncomes} categories={allOptions} />
+        </Card>
+      </Grid.Col>
+    </Grid>
   )
 }

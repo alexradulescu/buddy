@@ -86,7 +86,7 @@ export function ImportPanel({ categories, history, monthExpenses, year, month }:
     return (
       <Stack gap="md">
         <Title order={3} size="h5">
-          {loading ? 'Processing…' : 'Processed Expenses'}
+          {loading ? 'Processing…' : 'Processed expenses'}
         </Title>
         <Text size="sm" c="dimmed">
           {rows.length} {rows.length === 1 ? 'item' : 'items'}
@@ -99,7 +99,7 @@ export function ImportPanel({ categories, history, monthExpenses, year, month }:
           onDelete={(row) => setRows(rows.filter((r) => r.id !== row.id))}
         />
         <Button disabled={loading} onClick={() => saveDrafts('expenses', rows, year, month) && reset()}>
-          Save Expenses
+          Save expenses
         </Button>
         <Button color="red" onClick={reset}>
           Discard
@@ -111,7 +111,7 @@ export function ImportPanel({ categories, history, monthExpenses, year, month }:
   return (
     <Stack gap="md">
       <FileInput
-        label="Bank Statement"
+        label="Bank statement"
         description="PDF or CSV file (max 5MB)"
         placeholder="Select file..."
         accept=".pdf,.csv"
@@ -133,7 +133,7 @@ export function ImportPanel({ categories, history, monthExpenses, year, month }:
         />
       )}
       <Button onClick={run} disabled={!file && !text.trim()} loading={loading} fullWidth>
-        {file ? 'Process File' : 'Convert'}
+        {file ? 'Process file' : 'Convert'}
       </Button>
     </Stack>
   )
