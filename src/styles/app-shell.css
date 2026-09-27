@@ -257,11 +257,6 @@
   white-space: nowrap;
 }
 
-/* Root breadcrumb lines up with the large title below it */
-.breadcrumb:not(.breadcrumb-link) {
-  padding-left: 2px;
-}
-
 .breadcrumb-link {
   padding-left: 6px;
   color: var(--color-text);
@@ -386,11 +381,6 @@
     right: 0;
     height: calc(52px + env(safe-area-inset-top, 0px));
     padding: env(safe-area-inset-top, 0px) 16px 0;
-  }
-
-  /* Tab roots hide the breadcrumb (the large title says it); pushed pages keep the back capsule */
-  .canvas-toolbar-leading .breadcrumb:not(.breadcrumb-link) {
-    display: none;
   }
 
   .toolbar-title {

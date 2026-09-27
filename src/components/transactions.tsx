@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { ActionIcon, Button, Group, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core'
+import { useElementSize } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import dayjs from 'dayjs'
 import { Edit, Search, Trash } from 'lucide-react'
@@ -53,7 +54,8 @@ export function DraftEntry({
   drafts,
   setDrafts,
   year,
-  month
+  month,
+  onSaved
 }: {
   entity: Entity
   categories: Option[]
@@ -61,6 +63,7 @@ export function DraftEntry({
   setDrafts: (drafts: Draft[]) => void
   year: number
   month: number
+  onSaved?: () => void
 }) {
   const [count, setCount] = useState(1)
 
@@ -81,7 +84,14 @@ export function DraftEntry({
           Add rows
         </Button>
       </Group>
-      <Button fullWidth onClick={() => saveDrafts(entity, drafts, year, month) && setDrafts([])}>
+      <Button
+        fullWidth
+        onClick={() => {
+          if (!saveDrafts(entity, drafts, year, month)) return
+          setDrafts([])
+          onSaved?.()
+        }}
+      >
         Save {entity}
       </Button>
     </Stack>
@@ -140,45 +150,49 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
   const total = visible.reduce((sum, r) => sum + r.amount, 0)
   const byDay = sort === 'newest' || sort === 'oldest'
   const groups = groupRows(visible, byDay)
+  // Day headers stick just below the sticky filter bar, whose height changes as it wraps
+  const { ref: toolbarRef, height: toolbarHeight } = useElementSize()
 
   return (
-    <Stack gap="sm">
-      <Group justify="space-between" align="baseline" gap="xs">
-        <Text fw={600} size="lg">
-          {visible.length} {visible.length === 1 ? noun : entity}
-        </Text>
-        <Text fw={600} size="lg" className="tabular">
-          {formatMoney(total)}
-        </Text>
-      </Group>
-      <Group gap="xs" wrap="wrap">
-        <TextInput
-          flex="2 1 180px"
-          placeholder={`Search ${entity}`}
-          aria-label={`Search ${entity}`}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          leftSection={<Search size={14} />}
-        />
-        <Select
-          flex="1 1 150px"
-          aria-label="Category"
-          value={categoryFilter ?? 'all'}
-          onChange={(v) => setCategoryFilter(v === 'all' ? null : v)}
-          data={[{ value: 'all', label: 'All categories' }, ...categories]}
-        />
-        <Select
-          flex="1 1 140px"
-          aria-label="Sort"
-          value={sort}
-          onChange={(v) => v && setSort(v as Sort)}
-          data={sortOptions}
-          allowDeselect={false}
-        />
-      </Group>
+    <Stack gap={0} style={{ '--tx-toolbar-height': `${toolbarHeight}px` } as CSSProperties}>
+      <Stack gap="sm" className="tx-toolbar" ref={toolbarRef}>
+        <Group justify="space-between" align="baseline" gap="xs">
+          <Text fw={600} size="lg">
+            {visible.length} {visible.length === 1 ? noun : entity}
+          </Text>
+          <Text fw={600} size="lg" className="tabular">
+            {formatMoney(total)}
+          </Text>
+        </Group>
+        <Group gap="xs" wrap="wrap">
+          <TextInput
+            flex="2 1 180px"
+            placeholder={`Search ${entity}`}
+            aria-label={`Search ${entity}`}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            leftSection={<Search size={14} />}
+          />
+          <Select
+            flex="1 1 150px"
+            aria-label="Category"
+            value={categoryFilter ?? 'all'}
+            onChange={(v) => setCategoryFilter(v === 'all' ? null : v)}
+            data={[{ value: 'all', label: 'All categories' }, ...categories]}
+          />
+          <Select
+            flex="1 1 140px"
+            aria-label="Sort"
+            value={sort}
+            onChange={(v) => v && setSort(v as Sort)}
+            data={sortOptions}
+            allowDeselect={false}
+          />
+        </Group>
+      </Stack>
 
       {visible.length === 0 ? (
-        <Text ta="center" c="dimmed" py="md" size="sm">
+        <Text ta="center" c="dimmed" pt="lg" pb="xs" size="sm">
           No {entity} found for this period.
         </Text>
       ) : (
@@ -222,6 +236,7 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
                     <ActionIcon
                       size="sm"
                       c="var(--color-negative)"
+                      className="tx-row-delete"
                       aria-label="Delete"
                       onClick={() => setDeleting(row)}
                     >
@@ -240,6 +255,10 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
         entry={editing}
         categories={categories}
         onClose={() => setEditing(null)}
+        onDelete={(entry) => {
+          setEditing(null)
+          setDeleting(entry)
+        }}
         onSave={(entry) => {
           save(entity, entry)
           setEditing(null)

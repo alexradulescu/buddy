@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from 'react'
-import { Card, Group, SegmentedControl, Grid, Stack } from '@mantine/core'
+import { Card, Group, SegmentedControl, Stack } from '@mantine/core'
 import { createFileRoute } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import { SparklesIcon, TableIcon } from 'lucide-react'
 
+import { AddEntry } from '@/components/add-entry'
 import { ImportPanel } from '@/components/import-panel'
 import { DraftEntry, TransactionList, type Draft } from '@/components/transactions'
 import { db } from '@/db'
@@ -17,6 +18,7 @@ function ExpensesPage() {
   const { year, month } = useMonth()
   const { data } = db.useQuery({ expenses: {}, expenseCategories: {} })
   const [tab, setTab] = useState('import')
+  const [adding, setAdding] = useState(false)
   const [drafts, setDrafts] = useState<Draft[]>([])
   useUnsavedChangesWarning(drafts.length > 0)
 
@@ -29,47 +31,44 @@ function ExpensesPage() {
   const history = expenses.filter((e) => e.date >= threeMonthsAgo)
 
   return (
-    <Grid gap="sm">
-      <Grid.Col span={{ base: 12, lg: 5 }}>
-        <Card>
-          <Stack gap="sm">
-            <SegmentedControl
-              fullWidth
-              value={tab}
-              onChange={setTab}
-              data={[
-                { value: 'import', label: <Label icon={<SparklesIcon size={14} />} text="AI import" /> },
-                { value: 'manual', label: <Label icon={<TableIcon size={14} />} text="Manual" /> }
-              ]}
+    <>
+      <AddEntry label="Add expense" opened={adding} setOpened={setAdding}>
+        <Stack gap="sm">
+          <SegmentedControl
+            fullWidth
+            value={tab}
+            onChange={setTab}
+            data={[
+              { value: 'import', label: <Label icon={<SparklesIcon size={14} />} text="AI import" /> },
+              { value: 'manual', label: <Label icon={<TableIcon size={14} />} text="Manual" /> }
+            ]}
+          />
+          {tab === 'import' ? (
+            <ImportPanel
+              categories={activeOptions}
+              history={history}
+              monthExpenses={monthExpenses}
+              year={year}
+              month={month}
+              onSaved={() => setAdding(false)}
             />
-            {tab === 'import' ? (
-              <ImportPanel
-                categories={activeOptions}
-                history={history}
-                monthExpenses={monthExpenses}
-                year={year}
-                month={month}
-              />
-            ) : (
-              <DraftEntry
-                entity="expenses"
-                categories={activeOptions}
-                drafts={drafts}
-                setDrafts={setDrafts}
-                year={year}
-                month={month}
-              />
-            )}
-          </Stack>
-        </Card>
-      </Grid.Col>
-
-      <Grid.Col span={{ base: 12, lg: 7 }}>
-        <Card>
-          <TransactionList entity="expenses" rows={monthExpenses} categories={allOptions} />
-        </Card>
-      </Grid.Col>
-    </Grid>
+          ) : (
+            <DraftEntry
+              entity="expenses"
+              categories={activeOptions}
+              drafts={drafts}
+              setDrafts={setDrafts}
+              year={year}
+              month={month}
+              onSaved={() => setAdding(false)}
+            />
+          )}
+        </Stack>
+      </AddEntry>
+      <Card className="tx-card">
+        <TransactionList entity="expenses" rows={monthExpenses} categories={allOptions} />
+      </Card>
+    </>
   )
 }
 

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ActionIcon, Box, Button, Card, Menu, ScrollArea, Stack, Table, Text } from '@mantine/core'
+import { Box, Button, Card, Menu, ScrollArea, Stack, Table, Text } from '@mantine/core'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import { ChevronDown, ChevronRight, Download } from 'lucide-react'
@@ -14,7 +14,8 @@ import { formatMoney, formatPercent } from '@/lib/format'
 
 export const Route = createFileRoute('/')({ component: HomePage })
 
-const positive = 'var(--color-positive)'
+// Figures that are only noteworthy when they go wrong
+const negativeOnly = (amount: number) => (amount < 0 ? 'var(--color-negative)' : undefined)
 
 function HomePage() {
   const { year, month } = useMonth()
@@ -65,6 +66,9 @@ function HomePage() {
 
   const monthName = dayjs(new Date(year, month)).format('MMMM')
   const monthShort = dayjs(new Date(year, month)).format('MMM')
+  const monthLeft = totals.budgetMonth - monthSpent
+  const today = dayjs()
+  const daysLeft = today.year() === year && today.month() === month ? today.daysInMonth() - today.date() : null
 
   const exportCSV = (kind: 'Overview' | 'Full') => {
     const csv = kind === 'Overview' ? overviewCSV(d, year, month) : fullCSV(d, year, month)
@@ -77,19 +81,9 @@ function HomePage() {
         actions={
           <Menu shadow="md" width={200} position="bottom-end">
             <Menu.Target>
-              <Box>
-                <Button
-                  visibleFrom="sm"
-                  variant="default"
-                  leftSection={<Download size={16} />}
-                  rightSection={<ChevronDown size={14} />}
-                >
-                  Export
-                </Button>
-                <ActionIcon hiddenFrom="sm" variant="light" size="lg" aria-label="Export">
-                  <Download size={18} />
-                </ActionIcon>
-              </Box>
+              <Button variant="default" leftSection={<Download size={16} />} rightSection={<ChevronDown size={14} />}>
+                Export
+              </Button>
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Label>Export as CSV</Menu.Label>
@@ -100,23 +94,24 @@ function HomePage() {
         }
       />
 
+      <Card className="hero-card">
+        <Text className="hero-label">{`${monthName} ${year}`}</Text>
+        <Text className="hero-value tabular-number" c={monthLeft < 0 ? 'var(--color-negative)' : undefined}>
+          {formatMoney(Math.abs(monthLeft))} {monthLeft < 0 ? 'over budget' : 'left this month'}
+        </Text>
+        <Meter used={monthSpent} limit={totals.budgetMonth} />
+        <Text className="hero-footnote tabular-number">
+          Spent {formatMoney(monthSpent)} of {formatMoney(totals.budgetMonth)}
+          {daysLeft !== null && ` · ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'} left`}
+        </Text>
+      </Card>
+
       <div className="summary-grid">
         <Card className="summary-card">
-          <CardTitle title="This month" trailing={<Text className="card-title-note">{`${monthName} ${year}`}</Text>} />
-          <div className="stat-tile-grid">
-            <StatTile label="Income" value={formatMoney(income)} color={income > 0 ? positive : undefined} />
-            <StatTile
-              label="Spent"
-              value={formatMoney(monthSpent)}
-              meter={{ used: monthSpent, limit: totals.budgetMonth }}
-              footnote={
-                <>
-                  <BudgetRemaining spent={monthSpent} budget={totals.budgetMonth} /> of{' '}
-                  {formatMoney(totals.budgetMonth)}
-                </>
-              }
-            />
-            <StatTile label="Net income" value={formatMoney(net)} color={colorBySign(net)} />
+          <CardTitle title="This month" trailing={<Text className="card-title-note">{monthShort}</Text>} />
+          <div className="stat-tile-grid" data-compact>
+            <StatTile label="Income" value={formatMoney(income)} />
+            <StatTile label="Net income" value={formatMoney(net)} color={negativeOnly(net)} />
             <StatTile label="Saving rate" value={income > 0 ? formatPercent(net / income) : 'N/A'} />
           </div>
         </Card>
@@ -125,8 +120,8 @@ function HomePage() {
             title={`${year} so far`}
             trailing={<Text className="card-title-note">{month === 0 ? 'Jan' : `Jan – ${monthShort}`}</Text>}
           />
-          <div className="stat-tile-grid">
-            <StatTile label="Income" value={formatMoney(ytd.income)} color={ytd.income > 0 ? positive : undefined} />
+          <div className="stat-tile-grid" data-compact>
+            <StatTile label="Income" value={formatMoney(ytd.income)} />
             <StatTile
               label="Spent"
               value={formatMoney(ytd.spent)}
@@ -137,7 +132,7 @@ function HomePage() {
                 </>
               }
             />
-            <StatTile label="Savings" value={formatMoney(ytd.savings)} color={colorBySign(ytd.savings)} />
+            <StatTile label="Savings" value={formatMoney(ytd.savings)} color={negativeOnly(ytd.savings)} />
             <StatTile
               label="Savings rate"
               value={formatPercent(ytd.savingsRate)}
@@ -231,7 +226,6 @@ function HomePage() {
               title={row.category.title}
               subtitle={`YTD ${formatMoney(row.ytd)} · Year ${formatMoney(row.annual)}`}
               value={formatMoney(row.month)}
-              valueColor={row.month > 0 ? positive : undefined}
             />
           ))}
         </div>
@@ -258,7 +252,7 @@ function HomePage() {
                     </Link>
                   </Table.Td>
                   {[row.month, row.ytd, row.annual].map((amount, i) => (
-                    <Table.Td key={i} ta="right" c={amount > 0 ? positive : 'var(--color-text-muted)'}>
+                    <Table.Td key={i} ta="right" c={amount > 0 ? undefined : 'var(--color-text-muted)'}>
                       <Money value={amount} />
                     </Table.Td>
                   ))}

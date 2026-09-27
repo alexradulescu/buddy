@@ -67,7 +67,38 @@
   color: var(--color-text);
 }
 
-/* Summary: two cards side by side, four tiles each */
+/* Hero: the one headline number, what's left of this month's budget */
+.hero-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hero-label {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.hero-value {
+  font-size: 40px;
+  line-height: 46px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.hero-card .meter {
+  height: 6px;
+}
+
+.hero-footnote {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-secondary);
+}
+
+/* Secondary figures: two compact cards side by side */
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -108,6 +139,18 @@
   line-height: 16px;
   color: var(--color-text-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+.stat-tile-grid[data-compact] {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 14px 20px;
+}
+
+.stat-tile-grid[data-compact] .stat-tile-value {
+  font-size: 19px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
 }
 
 .stat-tile .meter {
@@ -275,6 +318,16 @@
 
   .stat-tile-grid {
     gap: 16px;
+  }
+
+  .stat-tile-grid[data-compact] .stat-tile-value {
+    font-size: 17px;
+    line-height: 22px;
+  }
+
+  .hero-value {
+    font-size: 30px;
+    line-height: 36px;
   }
 
   /* Section card dissolves into an iOS grouped list with its title as the header */

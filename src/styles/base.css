@@ -63,10 +63,8 @@
 
   /* Light paper: a hairline and the faintest contact shadow; dark mode carries the deeper lift */
   --shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.055), 0 1px 2px rgba(0, 0, 0, 0.035);
-  /* Faint tint wash from the top plus a barely-there dot grid behind content */
-  --page-texture:
-    radial-gradient(120% 55% at 50% -12%, rgba(0, 122, 255, 0.05), transparent 65%),
-    radial-gradient(circle, rgba(0, 0, 0, 0.05) 0.7px, transparent 1px) 0 0 / 16px 16px;
+  /* Faint tint wash from the top */
+  --page-texture: radial-gradient(120% 55% at 50% -12%, rgba(0, 122, 255, 0.05), transparent 65%);
   --shadow-control: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 1px 1px rgba(0, 0, 0, 0.04);
   --shadow-canvas: 0 0 0 1px rgba(255, 255, 255, 0.04);
   --shadow-popover: 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 10px 30px rgba(0, 0, 0, 0.12);
@@ -120,9 +118,7 @@
     --shadow-card:
       inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 0 0 1px rgba(255, 255, 255, 0.08), 0 -1px 4px rgba(0, 0, 0, 0.35),
       0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 40px -14px rgba(0, 0, 0, 0.75);
-    --page-texture:
-      radial-gradient(120% 55% at 50% -12%, rgba(10, 132, 255, 0.09), transparent 65%),
-      radial-gradient(circle, rgba(255, 255, 255, 0.045) 0.7px, transparent 1px) 0 0 / 16px 16px;
+    --page-texture: radial-gradient(120% 55% at 50% -12%, rgba(10, 132, 255, 0.09), transparent 65%);
     --shadow-control:
       inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.12), 0 2px 6px rgba(0, 0, 0, 0.4);
     --shadow-canvas: 0 0 0 1px rgba(255, 255, 255, 0.07);
@@ -358,18 +354,31 @@ button.grouped-list-row:active {
  * Transaction list (expenses, incomes): Wallet-style day sections with sticky headers,
  * two-line rows, amount on the right, edit/delete revealed on hover.
  */
+.tx-card.tx-card {
+  overflow: visible;
+  padding-top: 0;
+}
+
+/* Count/total and filters stay pinned below the canvas toolbar while the list scrolls with the page */
+.tx-toolbar {
+  position: sticky;
+  top: var(--tx-sticky-top, 52px);
+  z-index: 2;
+  margin: 0 -16px;
+  padding: 16px 16px 12px;
+  background: var(--color-surface);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
 .tx-list {
   margin: 0 -16px -16px;
   border-top: 0.5px solid var(--color-border);
-  max-height: calc(100dvh - 240px);
-  min-height: 320px;
-  overflow-y: auto;
   border-radius: 0 0 var(--radius-card) var(--radius-card);
 }
 
 .tx-day-header {
   position: sticky;
-  top: 0;
+  top: calc(var(--tx-sticky-top, 52px) + var(--tx-toolbar-height, 0px));
   z-index: 1;
   display: flex;
   justify-content: space-between;
@@ -450,9 +459,9 @@ button.grouped-list-row:active {
   color: var(--color-positive);
 }
 
-/* Touch: tapping the row edits, so only delete stays */
+/* Touch: tapping the row edits and delete lives in the edit modal, so no row actions */
 @media (hover: none) {
-  .tx-row-edit {
+  .tx-row .row-actions {
     display: none;
   }
 }
@@ -463,21 +472,35 @@ button.grouped-list-row:active {
   }
 }
 
-@media (max-width: 48em) {
-  .tx-list {
-    max-height: none;
-    min-height: 0;
-    overflow: visible;
+@media (max-width: 47.99em) {
+  /* The document scrolls on phones; stick below the fixed toolbar (see app-shell.css) */
+  .tx-card {
+    --tx-sticky-top: calc(52px + env(safe-area-inset-top, 0px));
   }
 
-  /* The document scrolls on phones; stick below the fixed toolbar (see app-shell.css) */
-  .tx-day-header {
-    top: calc(52px + env(safe-area-inset-top, 0px));
+  .tx-row .row-actions {
+    display: none;
   }
 
   .tx-row-title,
   .tx-row-amount {
     font-size: 17px;
     line-height: 22px;
+  }
+}
+
+/* Floating add button on phones, above the tab bar */
+.fab {
+  display: none;
+}
+
+@media (max-width: 47.99em) {
+  .fab {
+    display: flex;
+    position: fixed;
+    z-index: 110;
+    right: 16px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 10px + 64px + 14px);
+    box-shadow: var(--shadow-floating);
   }
 }

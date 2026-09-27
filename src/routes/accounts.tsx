@@ -18,7 +18,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Calculator, Edit2, Plus, Trash2, Wallet } from 'lucide-react'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
-import { CardTitle, colorBySign, MetricList, Money } from '@/components/ui'
+import { CardTitle, MetricList, Money } from '@/components/ui'
 import { db, remove, save, type AccountBalance } from '@/db'
 import { useMonth } from '@/hooks/use-month'
 import { monthTotal, prevMonth, sum } from '@/lib/finance'
@@ -61,7 +61,7 @@ function AccountsPage() {
             {
               label: 'Difference',
               value: formatMoney(difference),
-              color: colorBySign(difference),
+              color: difference < 0 ? 'var(--color-negative)' : undefined,
               total: true
             }
           ]}

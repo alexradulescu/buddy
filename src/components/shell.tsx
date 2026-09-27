@@ -98,18 +98,12 @@ export function Shell({ children }: { children: ReactNode }) {
       <main className="canvas">
         <header className="canvas-toolbar">
           <div className="canvas-toolbar-leading">
-            {current &&
-              (isRoot ? (
-                <span className="breadcrumb">
-                  <current.icon size={15} strokeWidth={1.9} />
-                  {current.label}
-                </span>
-              ) : (
-                <Link to={current.href} search={{ year, month } as never} className="breadcrumb breadcrumb-link">
-                  <ChevronLeft size={16} strokeWidth={2.2} />
-                  {current.label}
-                </Link>
-              ))}
+            {current && !isRoot && (
+              <Link to={current.href} search={{ year, month } as never} className="breadcrumb breadcrumb-link">
+                <ChevronLeft size={16} strokeWidth={2.2} />
+                {current.label}
+              </Link>
+            )}
           </div>
           <Title order={1} className="toolbar-title">
             {current?.title ?? 'Buddy'}

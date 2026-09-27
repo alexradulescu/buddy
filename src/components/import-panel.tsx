@@ -15,10 +15,11 @@ type Props = {
   monthExpenses: Expense[] // already saved, to flag duplicates
   year: number
   month: number
+  onSaved?: () => void
 }
 
 // Paste bank text or pick a PDF/CSV statement -> AI streams categorized rows -> review -> save
-export function ImportPanel({ categories, history, monthExpenses, year, month }: Props) {
+export function ImportPanel({ categories, history, monthExpenses, year, month, onSaved }: Props) {
   const [text, setText] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [rows, setRows] = useState<Draft[]>([])
@@ -98,7 +99,14 @@ export function ImportPanel({ categories, history, monthExpenses, year, month }:
           onChange={(row) => setRows(rows.map((r) => (r.id === row.id ? row : r)))}
           onDelete={(row) => setRows(rows.filter((r) => r.id !== row.id))}
         />
-        <Button disabled={loading} onClick={() => saveDrafts('expenses', rows, year, month) && reset()}>
+        <Button
+          disabled={loading}
+          onClick={() => {
+            if (!saveDrafts('expenses', rows, year, month)) return
+            reset()
+            onSaved?.()
+          }}
+        >
           Save expenses
         </Button>
         <Button color="red" onClick={reset}>
