@@ -31,7 +31,14 @@ export function AddEntry({
         }
       />
       {createPortal(
-        <ActionIcon className="fab" size={56} radius="xl" aria-label={label} onClick={() => setOpened(true)}>
+        <ActionIcon
+          className="fab"
+          variant="filled"
+          size={56}
+          radius="xl"
+          aria-label={label}
+          onClick={() => setOpened(true)}
+        >
           <Plus size={26} strokeWidth={2.2} />
         </ActionIcon>,
         document.body
