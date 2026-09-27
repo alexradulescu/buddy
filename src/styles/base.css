@@ -370,6 +370,10 @@ button.grouped-list-row:active {
   border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 
+.tx-list > .tx-day:last-child .tx-row:last-child {
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+}
+
 .tx-list {
   margin: 0 -16px -16px;
   border-top: 0.5px solid var(--color-border);
