@@ -144,25 +144,10 @@
   text-overflow: ellipsis;
 }
 
-.sidebar-badge {
-  min-width: 22px;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: 9px;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 18px;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-frame-text-strong);
-  background-color: var(--color-frame-active);
-}
-
 /* Icon rail: collapsed by choice (desktop) or forced (tablet) */
 @media (min-width: 48em) {
   .app-frame[data-collapsed] .sidebar-brand-name,
-  .app-frame[data-collapsed] .sidebar-link-label,
-  .app-frame[data-collapsed] .sidebar-badge {
+  .app-frame[data-collapsed] .sidebar-link-label {
     display: none;
   }
 
@@ -181,24 +166,11 @@
     padding: 0;
     margin: 0 auto;
   }
-
-  /* The count badge becomes a dot in the rail */
-  .app-frame[data-collapsed] .sidebar-link:has(.sidebar-badge)::after {
-    content: '';
-    position: absolute;
-    top: 7px;
-    right: 8px;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: var(--color-tint);
-  }
 }
 
 @media (min-width: 48em) and (max-width: 68em) {
   .sidebar-brand-name,
   .sidebar-link-label,
-  .sidebar-badge,
   .sidebar-toggle {
     display: none;
   }
@@ -503,24 +475,6 @@
     position: relative;
     display: grid;
     place-items: center;
-  }
-
-  .tab-bar-badge {
-    position: absolute;
-    top: -5px;
-    left: 13px;
-    min-width: 17px;
-    height: 17px;
-    padding: 0 4px;
-    border-radius: 9px;
-    font-size: 10px;
-    font-weight: 700;
-    line-height: 17px;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-    color: #fff;
-    background-color: var(--color-tint);
-    box-shadow: 0 0 0 2px var(--material-bar-solid);
   }
 
   .tab-bar-label {

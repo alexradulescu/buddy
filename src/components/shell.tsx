@@ -17,9 +17,7 @@ import {
   Wallet
 } from 'lucide-react'
 
-import { db } from '@/db'
 import { useMonth } from '@/hooks/use-month'
-import { inMonth } from '@/lib/finance'
 
 type NavItem = { href: string; label: string; title: string; icon: typeof Home }
 
@@ -44,11 +42,6 @@ export function Shell({ children }: { children: ReactNode }) {
   const { year, month } = useMonth()
   const [actionsSlot, setActionsSlot] = useState<HTMLElement | null>(null)
   const [collapsed, setCollapsed] = useLocalStorage({ key: 'buddy.sidebar-collapsed', defaultValue: false })
-
-  // This month's expense count, shown as a badge like Shopify's order count
-  const { data } = db.useQuery({ expenses: {} })
-  const expenseCount = (data?.expenses ?? []).filter((e) => inMonth(e, year, month)).length
-  const badges: Record<string, number> = { '/expenses': expenseCount }
 
   const isActive = (href: string) => pathname === href || (href !== '/' && pathname.startsWith(href))
   const current = nav.find((n) => isActive(n.href))
@@ -91,13 +84,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
         <nav className="sidebar-section">
           {main.map((item) => (
-            <SidebarLink
-              key={item.href}
-              item={item}
-              active={isActive(item.href)}
-              badge={badges[item.href]}
-              rail={collapsed}
-            />
+            <SidebarLink key={item.href} item={item} active={isActive(item.href)} rail={collapsed} />
           ))}
         </nav>
 
@@ -143,12 +130,12 @@ export function Shell({ children }: { children: ReactNode }) {
         </div>
       </main>
 
-      <TabBar isActive={isActive} badges={badges} />
+      <TabBar isActive={isActive} />
     </div>
   )
 }
 
-function SidebarLink({ item, active, badge, rail }: { item: NavItem; active: boolean; badge?: number; rail: boolean }) {
+function SidebarLink({ item, active, rail }: { item: NavItem; active: boolean; rail: boolean }) {
   const { year, month } = useMonth()
   return (
     <Tooltip label={item.label} position="right" disabled={!rail}>
@@ -161,14 +148,13 @@ function SidebarLink({ item, active, badge, rail }: { item: NavItem; active: boo
       >
         <item.icon size={16} strokeWidth={active ? 2.2 : 1.8} className="sidebar-link-icon" />
         <span className="sidebar-link-label">{item.label}</span>
-        {!!badge && <span className="sidebar-badge">{badge}</span>}
       </Link>
     </Tooltip>
   )
 }
 
 // iOS 27 floating tab bar, always expanded. Every item is at least 64px wide, so extra tabs scroll sideways.
-function TabBar({ isActive, badges }: { isActive: (href: string) => boolean; badges: Record<string, number> }) {
+function TabBar({ isActive }: { isActive: (href: string) => boolean }) {
   const { year, month } = useMonth()
   const scroller = useRef<HTMLDivElement>(null)
 
@@ -195,7 +181,6 @@ function TabBar({ isActive, badges }: { isActive: (href: string) => boolean; bad
             >
               <span className="tab-bar-icon">
                 <item.icon size={22} strokeWidth={active ? 2.3 : 1.9} />
-                {!!badges[item.href] && <span className="tab-bar-badge">{badges[item.href]}</span>}
               </span>
               <Text component="span" className="tab-bar-label">
                 {item.label}
