@@ -195,7 +195,7 @@
   position: relative;
   margin: var(--canvas-inset) var(--canvas-inset) var(--canvas-inset) 0;
   border-radius: 18px;
-  background-color: var(--color-page-background);
+  background: var(--page-texture), var(--color-page-background);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
@@ -357,7 +357,7 @@
     display: block;
     height: auto;
     min-height: 100dvh;
-    background-color: var(--color-page-background);
+    background: var(--page-texture), var(--color-page-background);
   }
 
   .sidebar {
