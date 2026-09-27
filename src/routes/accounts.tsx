@@ -27,31 +27,40 @@ function AccountsPage() {
   const previous = balances.filter((b) => b.year === prev.year && b.month === prev.month)
 
   // Last month's balances plus this month's cash flow should equal this month's balances
-  const real = sum(current)
+  const opening = sum(previous)
+  const actual = sum(current)
   const expenses = monthTotal(data?.expenses ?? [], year, month)
   const income = monthTotal(data?.incomes ?? [], year, month)
-  const expected = sum(previous) + income - expenses
-  const discrepancy = real - expected
+  const expected = opening + income - expenses
+  const difference = actual - expected
 
   return (
     <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
       <Card shadow="sm" padding="md">
-        <CardTitle icon={<Calculator size={16} />} title="Summary" />
+        <CardTitle icon={<Calculator size={16} />} title="Reconciliation" />
         <MetricList
           metrics={[
-            { label: 'Total Account Balances', value: formatMoney(real) },
-            { label: 'Total Expenses', value: formatMoney(expenses) },
-            { label: 'Total Income', value: formatMoney(income) },
-            { label: 'Expected Accounts Total', value: formatMoney(expected) },
-            { label: 'Real Accounts Total', value: formatMoney(real) },
-            { label: 'Discrepancy', value: formatMoney(discrepancy), color: colorBySign(discrepancy) }
+            { label: 'Opening balance', value: formatMoney(opening) },
+            { sign: '+', label: 'Income', value: formatMoney(income) },
+            { sign: '−', label: 'Expenses', value: formatMoney(expenses) },
+            { sign: '=', label: 'Expected balance', value: formatMoney(expected), total: true },
+            { label: 'Actual balance', value: formatMoney(actual) },
+            {
+              label: 'Difference',
+              value: formatMoney(difference),
+              color: colorBySign(difference),
+              total: true
+            }
           ]}
         />
+        <Text size="xs" c="dimmed" mt="xs">
+          Opening balance is last month&apos;s account total. A non-zero difference means untracked income or spending.
+        </Text>
       </Card>
 
       <Card shadow="sm" padding="md">
         <Group justify="space-between">
-          <CardTitle icon={<Wallet size={16} />} title="Account Balances" />
+          <CardTitle icon={<Wallet size={16} />} title="Account balances" />
           <Button size="xs" onClick={() => setEditing({ title: '', amount: 0 })}>
             Add
           </Button>
@@ -87,7 +96,7 @@ function AccountsPage() {
       <Modal
         opened={!!editing}
         onClose={() => setEditing(null)}
-        title={editing?.id ? 'Edit Account Balance' : 'Add New Account Balance'}
+        title={editing?.id ? 'Edit account balance' : 'Add account balance'}
         centered
       >
         {editing && (
@@ -103,7 +112,7 @@ function AccountsPage() {
       </Modal>
 
       <ConfirmDelete
-        title="Delete Account Balance"
+        title="Delete account balance"
         opened={!!deleting}
         details={deleting ? { Account: deleting.title, Amount: formatMoney(deleting.amount) } : undefined}
         onClose={() => setDeleting(null)}
@@ -125,18 +134,20 @@ function AccountForm({ draft, onSave }: { draft: Draft; onSave: (draft: Draft) =
     >
       <Stack gap="md">
         <TextInput
-          placeholder="Account Title"
+          label="Account"
+          placeholder="e.g. Checking"
           required
           value={values.title}
           onChange={(e) => setValues({ ...values, title: e.target.value })}
         />
         <NumberInput
-          placeholder="Balance Amount"
+          label="Balance"
+          placeholder="0.00"
           decimalScale={2}
           value={values.amount}
           onChange={(v) => setValues({ ...values, amount: Number(v) || 0 })}
         />
-        <Button type="submit">{draft.id ? 'Update Balance' : 'Add Balance'}</Button>
+        <Button type="submit">{draft.id ? 'Update balance' : 'Add balance'}</Button>
       </Stack>
     </form>
   )

@@ -76,7 +76,8 @@ function toHotColumn<T>(col: SheetColumn<T>): Handsontable.ColumnSettings {
         type: 'intl-date',
         locale: 'sv-SE',
         dateFormat: { year: 'numeric', month: '2-digit', day: '2-digit' },
-        width: col.width ?? 72
+        className: 'htMiddle htLeft ht-nowrap',
+        width: col.width ?? 96
       }
     case 'money':
       return {

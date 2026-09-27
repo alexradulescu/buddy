@@ -122,3 +122,8 @@
   color: var(--color-negative);
   background: var(--color-negative-background) !important;
 }
+
+/* Dates never wrap, even in narrow sheets */
+[class*='ht-theme-main'] td.ht-nowrap {
+  white-space: nowrap;
+}

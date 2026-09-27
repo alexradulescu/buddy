@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Button, Card, Center, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { ChevronLeft, BarChart3, DollarSign, Edit, PiggyBank, Trash2 } from 'lucide-react'
+import { ChevronLeft, BarChart3, Edit, PiggyBank, Trash2 } from 'lucide-react'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
 import { EntriesCard, InvestmentModal, PerformanceChart } from '@/components/investment'
-import { CardTitle, colorBySign, MetricList } from '@/components/ui'
+import { colorBySign, StatTile } from '@/components/ui'
 import { db, remove, save } from '@/db'
 import { investmentStats } from '@/lib/finance'
 import { formatMoney, formatPercent } from '@/lib/format'
@@ -47,24 +47,27 @@ function InvestmentDetailPage() {
           <Button variant="default" onClick={() => setEditing(true)} leftSection={<Edit size={14} />}>
             Edit
           </Button>
-          <Button variant="light" color="red" onClick={() => setDeleting(true)} leftSection={<Trash2 size={14} />}>
+          <Button
+            variant="default"
+            c="var(--color-negative)"
+            onClick={() => setDeleting(true)}
+            leftSection={<Trash2 size={14} />}
+          >
             Delete
           </Button>
         </Group>
       </Group>
 
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
-        <Card>
-          <CardTitle icon={<DollarSign size={16} />} title="Overview" />
-          <MetricList
-            metrics={[
-              { label: 'Total Contributions', value: formatMoney(invested) },
-              { label: 'Current Value', value: formatMoney(value) },
-              { label: 'Profit/Loss', value: formatMoney(profit), color: profitColor },
-              { label: 'Return', value: value === null ? 'N/A' : formatPercent(returnRate, 2), color: profitColor }
-            ]}
-          />
-        </Card>
+      <Card>
+        <div className="stat-tile-grid stat-tile-strip">
+          <StatTile label="Current value" value={value === null ? 'N/A' : formatMoney(value)} />
+          <StatTile label="Invested" value={formatMoney(invested)} />
+          <StatTile label="Profit/loss" value={formatMoney(profit)} color={profitColor} />
+          <StatTile label="Return" value={value === null ? 'N/A' : formatPercent(returnRate, 2)} color={profitColor} />
+        </div>
+      </Card>
+
+      <SimpleGrid cols={1} spacing="sm">
         <PerformanceChart contributions={contributions} values={values} />
       </SimpleGrid>
 
@@ -91,7 +94,7 @@ function InvestmentDetailPage() {
 
       <InvestmentModal investment={editing ? investment : null} onClose={() => setEditing(false)} />
       <ConfirmDelete
-        title="Delete Investment"
+        title="Delete investment"
         opened={deleting}
         details={{ Investment: investment.name }}
         onClose={() => setDeleting(false)}
@@ -113,7 +116,7 @@ function NotFound() {
         </Title>
         <Text c="dimmed">The investment you're looking for doesn't exist.</Text>
         <Button component={Link} to="/investments" leftSection={<ChevronLeft size={16} />}>
-          Back to Investments
+          Back to investments
         </Button>
       </Stack>
     </Center>

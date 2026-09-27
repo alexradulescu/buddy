@@ -459,6 +459,11 @@ button.grouped-list-row:active {
     overflow: visible;
   }
 
+  /* The document scrolls on phones; stick below the fixed toolbar (see app-shell.css) */
+  .tx-day-header {
+    top: calc(52px + env(safe-area-inset-top, 0px));
+  }
+
   .tx-row-title,
   .tx-row-amount {
     font-size: 17px;

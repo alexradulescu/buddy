@@ -34,7 +34,7 @@ export function InvestmentModal({ investment, onClose }: { investment: Investmen
     <Modal
       opened={!!investment}
       onClose={onClose}
-      title={investment?.id ? 'Edit Investment' : 'Add Investment'}
+      title={investment?.id ? 'Edit investment' : 'Add investment'}
       centered
     >
       {investment && <InvestmentForm investment={investment} onClose={onClose} />}
@@ -208,7 +208,9 @@ export function EntriesCard({ title, icon, amountLabel, emptyText, rows, onSave,
             <Table.Tbody>
               {newest.map((row) => (
                 <Table.Tr key={row.id}>
-                  <Table.Td className="data-table-muted">{dayjs(row.date).format('DD MMM YYYY')}</Table.Td>
+                  <Table.Td className="data-table-muted" style={{ whiteSpace: 'nowrap' }}>
+                    {dayjs(row.date).format('DD MMM YYYY')}
+                  </Table.Td>
                   <Table.Td ta="right">
                     <Money value={row.amount} />
                   </Table.Td>
