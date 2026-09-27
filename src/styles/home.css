@@ -223,7 +223,7 @@
 }
 
 /* Totals row */
-.home-data-table .mantine-Table-tfoot .mantine-Table-td {
+.data-table .mantine-Table-tfoot .mantine-Table-td {
   height: 44px;
   background: var(--color-surface-secondary);
   border-top: 1px solid var(--color-border);

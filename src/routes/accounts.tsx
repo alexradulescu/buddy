@@ -1,11 +1,24 @@
 import { useState } from 'react'
-import { Button, Card, Group, Modal, NumberInput, SimpleGrid, Stack, Text, TextInput } from '@mantine/core'
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Card,
+  Group,
+  Modal,
+  NumberInput,
+  SimpleGrid,
+  Stack,
+  Table,
+  Text,
+  TextInput
+} from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { createFileRoute } from '@tanstack/react-router'
-import { Calculator, Edit2, Trash2, Wallet } from 'lucide-react'
+import { Calculator, Edit2, Plus, Trash2, Wallet } from 'lucide-react'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
-import { CardTitle, colorBySign, MetricList } from '@/components/ui'
+import { CardTitle, colorBySign, MetricList, Money } from '@/components/ui'
 import { db, remove, save, type AccountBalance } from '@/db'
 import { useMonth } from '@/hooks/use-month'
 import { monthTotal, prevMonth, sum } from '@/lib/finance'
@@ -59,37 +72,72 @@ function AccountsPage() {
       </Card>
 
       <Card shadow="sm" padding="md">
-        <Group justify="space-between">
-          <CardTitle icon={<Wallet size={16} />} title="Account balances" />
-          <Button size="xs" onClick={() => setEditing({ title: '', amount: 0 })}>
-            Add
-          </Button>
-        </Group>
+        <CardTitle
+          icon={<Wallet size={16} />}
+          title="Account balances"
+          trailing={
+            <Button
+              size="xs"
+              variant="default"
+              leftSection={<Plus size={14} />}
+              onClick={() => setEditing({ title: '', amount: 0 })}
+            >
+              Add
+            </Button>
+          }
+        />
         {current.length === 0 ? (
           <Text ta="center" c="dimmed" py="md">
             No account balances for this month.
           </Text>
         ) : (
-          <Stack gap="xs" mt="sm">
-            {current.map((balance) => (
-              <Group key={balance.id} justify="space-between" wrap="nowrap">
-                <Text size="sm" fw={500}>
-                  {balance.title}
-                </Text>
-                <Group gap="xs" wrap="nowrap">
-                  <Text size="sm" fw={600} className="tabular-number">
-                    {formatMoney(balance.amount)}
-                  </Text>
-                  <Button size="compact-xs" variant="subtle" onClick={() => setEditing(balance)}>
-                    <Edit2 size={12} />
-                  </Button>
-                  <Button size="compact-xs" variant="subtle" color="red" onClick={() => setDeleting(balance)}>
-                    <Trash2 size={12} />
-                  </Button>
-                </Group>
-              </Group>
-            ))}
-          </Stack>
+          <Box className="table-frame">
+            <Table className="data-table">
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Account</Table.Th>
+                  <Table.Th ta="right">Balance</Table.Th>
+                  <Table.Th ta="right" w={72}>
+                    <span className="visually-hidden">Actions</span>
+                  </Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {current.map((balance) => (
+                  <Table.Tr key={balance.id}>
+                    <Table.Td className="data-table-primary">{balance.title}</Table.Td>
+                    <Table.Td ta="right">
+                      <Money value={balance.amount} />
+                    </Table.Td>
+                    <Table.Td ta="right">
+                      <Group gap={2} wrap="nowrap" justify="flex-end" className="row-actions">
+                        <ActionIcon size="sm" aria-label="Edit" onClick={() => setEditing(balance)}>
+                          <Edit2 size={14} />
+                        </ActionIcon>
+                        <ActionIcon
+                          size="sm"
+                          c="var(--color-negative)"
+                          aria-label="Delete"
+                          onClick={() => setDeleting(balance)}
+                        >
+                          <Trash2 size={14} />
+                        </ActionIcon>
+                      </Group>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+              <Table.Tfoot>
+                <Table.Tr>
+                  <Table.Td>Total</Table.Td>
+                  <Table.Td ta="right">
+                    <Money value={actual} />
+                  </Table.Td>
+                  <Table.Td />
+                </Table.Tr>
+              </Table.Tfoot>
+            </Table>
+          </Box>
         )}
       </Card>
 
