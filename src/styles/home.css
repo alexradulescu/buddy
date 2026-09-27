@@ -1,0 +1,377 @@
+/*
+ * Home dashboard: summary tiles, budget meters, category tables with grouped column headers.
+ * Colors come from tokens only, so light and dark follow base.css.
+ */
+
+/* Card headings */
+.card-title-text {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 20px;
+  color: var(--color-text);
+}
+
+.card-title-icon {
+  display: inline-flex;
+  color: var(--color-text-secondary);
+}
+
+.card-title-note {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Small stat (label over value) */
+.stat-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.stat-value {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.stat-value[data-size='md'] {
+  font-size: 20px;
+}
+
+/* Label/value rows */
+.metric-list-label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.metric-list-sign {
+  display: inline-block;
+  width: 1em;
+  color: var(--color-text-muted);
+}
+
+.metric-list-value {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.metric-list-row[data-total] {
+  border-top: 1px solid var(--color-border);
+}
+
+.metric-list-row[data-total] .metric-list-label,
+.metric-list-row[data-total] .metric-list-value {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Hero: the one headline number, what's left of this month's budget */
+.hero-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hero-label {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.hero-value {
+  font-size: 40px;
+  line-height: 46px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.hero-card .meter {
+  height: 6px;
+}
+
+.hero-footnote {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-secondary);
+}
+
+/* Secondary figures: two compact cards side by side */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stat-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.stat-tile-label {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-secondary);
+}
+
+.stat-tile-value {
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat-tile-footnote {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-tile-grid[data-compact] {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 14px 20px;
+}
+
+.stat-tile-grid[data-compact] .stat-tile-value {
+  font-size: 19px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.stat-tile .meter {
+  margin-top: 4px;
+}
+
+/* Meter: a thin capsule filled in tint, red once over */
+.meter {
+  height: 4px;
+  width: 100%;
+  border-radius: 999px;
+  background: var(--color-fill);
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-tint);
+  transition: width 0.3s ease;
+}
+
+.meter[data-over] .meter-fill {
+  background: var(--color-negative);
+}
+
+.budget-remaining {
+  font-weight: 500;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.budget-remaining.negative {
+  color: var(--color-negative);
+}
+
+/* Sections: card with heading and a full-bleed table */
+.home-section-header {
+  padding: 16px 16px 4px;
+}
+
+.home-section .home-table {
+  border-top: 1px solid var(--color-border-light);
+  margin-top: 8px;
+}
+
+.investments-stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 8px 16px 16px;
+}
+
+.home-data-table .mantine-Table-td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Two-level header: group names centred over their columns, divided by hairlines */
+.home-data-table .column-group-row .mantine-Table-th {
+  height: 30px;
+  border-bottom: none;
+}
+
+.home-data-table .column-group {
+  text-align: center;
+  color: var(--color-text);
+  font-weight: 600;
+  border-left: 1px solid var(--color-border-light);
+}
+
+.home-data-table .column-group-row .mantine-Table-th[rowspan] {
+  vertical-align: bottom;
+  padding-bottom: 9px;
+}
+
+.home-data-table .mantine-Table-th.group-start,
+.home-data-table .mantine-Table-td.group-start {
+  border-left: 1px solid var(--color-border-light);
+}
+
+.home-data-table .mantine-Table-thead .mantine-Table-tr:nth-child(2) .mantine-Table-th {
+  height: 28px;
+}
+
+.spent-cell {
+  /* Fixed width so wide screens give the spare room to the category column */
+  width: 120px;
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.spent-cell[data-over] {
+  color: var(--color-negative);
+}
+
+.budget-cell {
+  width: 200px;
+  min-width: 150px;
+}
+
+.budget-cell-text {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.budget-cell-of {
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* Totals row */
+.data-table .mantine-Table-tfoot .mantine-Table-td {
+  height: 44px;
+  background: var(--color-surface-secondary);
+  border-top: 1px solid var(--color-border);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Category names open the filtered list */
+.row-link {
+  color: var(--color-text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.row-link:hover {
+  color: var(--color-tint);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.grouped-list[data-mobile] {
+  display: none;
+}
+
+.grouped-list-row-detail {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (max-width: 74em) {
+  .summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .investments-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 47.99em) {
+  .stat-tile-value {
+    font-size: 20px;
+    line-height: 26px;
+  }
+
+  .stat-tile-grid {
+    gap: 16px;
+  }
+
+  .stat-tile-grid[data-compact] .stat-tile-value {
+    font-size: 17px;
+    line-height: 22px;
+  }
+
+  .hero-value {
+    font-size: 30px;
+    line-height: 36px;
+  }
+
+  /* Section card dissolves into an iOS grouped list with its title as the header */
+  .home-section {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible;
+  }
+
+  .home-section-header {
+    padding: 0 4px 8px;
+  }
+
+  .home-section-header .card-title-text {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .home-section .home-table {
+    display: none;
+  }
+
+  .grouped-list[data-mobile] {
+    display: block;
+  }
+
+  .investments-stats {
+    padding: 16px;
+    margin-bottom: 16px;
+    background: var(--color-surface);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+  }
+}
+
+/* A single row of four headline tiles (investments) */
+.stat-tile-strip {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 47.99em) {
+  .stat-tile-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Card, SimpleGrid } from '@mantine/core'
+import { Card } from '@mantine/core'
 import { createFileRoute } from '@tanstack/react-router'
 
+import { AddEntry } from '@/components/add-entry'
 import { DraftEntry, newDraft, TransactionList, type Draft } from '@/components/transactions'
 import { db } from '@/db'
 import { useMonth } from '@/hooks/use-month'
@@ -14,6 +15,7 @@ function IncomesPage() {
   const { year, month } = useMonth()
   const { data } = db.useQuery({ incomes: {}, incomeCategories: {} })
   const [drafts, setDrafts] = useState<Draft[]>(() => [newDraft(year, month)])
+  const [adding, setAdding] = useState(false)
   useUnsavedChangesWarning(drafts.some((d) => d.amount || d.description))
 
   const categories = data?.incomeCategories ?? []
@@ -22,8 +24,8 @@ function IncomesPage() {
   const monthIncomes = (data?.incomes ?? []).filter((i) => inMonth(i, year, month))
 
   return (
-    <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
-      <Card>
+    <>
+      <AddEntry label="Add income" opened={adding} setOpened={setAdding}>
         <DraftEntry
           entity="incomes"
           categories={activeOptions}
@@ -31,11 +33,15 @@ function IncomesPage() {
           setDrafts={setDrafts}
           year={year}
           month={month}
+          onSaved={() => {
+            setDrafts([newDraft(year, month)])
+            setAdding(false)
+          }}
         />
-      </Card>
-      <Card>
+      </AddEntry>
+      <Card className="tx-card">
         <TransactionList entity="incomes" rows={monthIncomes} categories={allOptions} />
       </Card>
-    </SimpleGrid>
+    </>
   )
 }

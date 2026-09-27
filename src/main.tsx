@@ -12,10 +12,11 @@ import '@mantine/notifications/styles.css'
 import './styles/base.css'
 import './styles/mantine-overrides.css'
 import './styles/app-shell.css'
+import './styles/home.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <MantineProvider theme={theme} defaultColorScheme="light">
+    <MantineProvider theme={theme} defaultColorScheme="auto">
       <Notifications />
       <RouterProvider router={router} />
     </MantineProvider>

@@ -12,17 +12,26 @@ type Props = {
   categories: Option[]
   onSave: (entry: Entry) => void
   onClose: () => void
+  onDelete?: (entry: Entry) => void
 }
 
-export function EntryModal({ title, entry, categories, onSave, onClose }: Props) {
+export function EntryModal({ title, entry, categories, onSave, onClose, onDelete }: Props) {
   return (
     <Modal opened={!!entry} onClose={onClose} title={title} centered>
-      {entry && <EntryForm entry={entry} categories={categories} onSave={onSave} onClose={onClose} />}
+      {entry && (
+        <EntryForm entry={entry} categories={categories} onSave={onSave} onClose={onClose} onDelete={onDelete} />
+      )}
     </Modal>
   )
 }
 
-function EntryForm({ entry, categories, onSave, onClose }: Omit<Props, 'title' | 'entry'> & { entry: Entry }) {
+function EntryForm({
+  entry,
+  categories,
+  onSave,
+  onClose,
+  onDelete
+}: Omit<Props, 'title' | 'entry'> & { entry: Entry }) {
   const [values, setValues] = useState(entry)
   const set = (patch: Partial<Entry>) => setValues({ ...values, ...patch })
 
@@ -62,11 +71,20 @@ function EntryForm({ entry, categories, onSave, onClose }: Omit<Props, 'title' |
           value={values.categoryId}
           onChange={(v) => set({ categoryId: v ?? '' })}
         />
-        <Group justify="flex-end" gap="xs" mt="md">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit">Save</Button>
+        <Group justify="space-between" gap="xs" mt="md" wrap="nowrap">
+          {onDelete && entry.id ? (
+            <Button variant="subtle" color="red" onClick={() => onDelete(entry)}>
+              Delete
+            </Button>
+          ) : (
+            <span />
+          )}
+          <Group gap="xs" wrap="nowrap">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">Save</Button>
+          </Group>
         </Group>
       </Stack>
     </form>
