@@ -39,7 +39,7 @@ export function AddEntry({
           aria-label={label}
           onClick={() => setOpened(true)}
         >
-          <Plus size={26} strokeWidth={2.2} />
+          <Plus size={26} strokeWidth={2.2} color="#fff" />
         </ActionIcon>,
         document.body
       )}
