@@ -339,35 +339,6 @@ button.grouped-list-row:active {
   }
 }
 
-/* Home sections: card with accordion on desktop; on phones the card chrome goes and the
-   accordion title becomes the grouped-list section header */
-@media (max-width: 48em) {
-  .home-section {
-    background: transparent !important;
-    box-shadow: none !important;
-    overflow: visible;
-  }
-
-  .home-section .mantine-Accordion-item,
-  .home-section .mantine-Accordion-content {
-    background: transparent;
-  }
-
-  .home-section .mantine-Accordion-control,
-  .home-section .mantine-Accordion-control:hover {
-    background: transparent;
-    padding: 0 4px;
-    height: 40px;
-  }
-
-  .home-section .mantine-Accordion-label {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    padding: 0;
-  }
-}
-
 /* Transaction rows sit inside a card on phones: flatten to the card's edges */
 .transaction-list {
   box-shadow: none;
