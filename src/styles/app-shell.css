@@ -436,7 +436,9 @@
     height: 64px;
     padding: 4px;
     border-radius: 32px;
-    background-color: var(--material-bar-solid);
+    background-color: var(--material-tab-bar);
+    -webkit-backdrop-filter: blur(7px) opacity(1);
+    backdrop-filter: blur(7px) opacity(1);
     box-shadow: var(--shadow-floating);
   }
 
