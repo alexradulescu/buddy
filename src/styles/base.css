@@ -61,15 +61,13 @@
   --radius-inner: 12px;
   --radius-capsule: 999px;
 
-  /* Paper: hairline, a lit top edge, a soft lift above and a longer shadow below */
-  --shadow-card:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 1px rgba(0, 0, 0, 0.065), 0 -1px 3px rgba(0, 0, 0, 0.04),
-    0 1px 2px rgba(0, 0, 0, 0.07), 0 6px 14px -4px rgba(0, 0, 0, 0.09), 0 20px 40px -16px rgba(0, 0, 0, 0.18);
+  /* Light paper: a hairline and the faintest contact shadow; dark mode carries the deeper lift */
+  --shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.055), 0 1px 2px rgba(0, 0, 0, 0.035);
   /* Faint tint wash from the top plus a barely-there dot grid behind content */
   --page-texture:
     radial-gradient(120% 55% at 50% -12%, rgba(0, 122, 255, 0.05), transparent 65%),
     radial-gradient(circle, rgba(0, 0, 0, 0.05) 0.7px, transparent 1px) 0 0 / 16px 16px;
-  --shadow-control: 0 0 0 1px rgba(0, 0, 0, 0.09), 0 1px 2px rgba(0, 0, 0, 0.08), 0 2px 6px -2px rgba(0, 0, 0, 0.08);
+  --shadow-control: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 1px 1px rgba(0, 0, 0, 0.04);
   --shadow-canvas: 0 0 0 1px rgba(255, 255, 255, 0.04);
   --shadow-popover: 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 10px 30px rgba(0, 0, 0, 0.12);
   --shadow-floating: 0 0 0 0.5px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04);

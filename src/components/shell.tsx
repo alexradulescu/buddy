@@ -67,7 +67,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <div className="sidebar-header">
           <div className="sidebar-brand">
             <span className="sidebar-logo" aria-hidden>
-              <Wallet size={15} strokeWidth={2.4} />
+              <Wallet size={14} strokeWidth={2.1} />
             </span>
             <span className="sidebar-brand-name">Buddy</span>
           </div>

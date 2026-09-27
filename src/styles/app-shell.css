@@ -59,12 +59,15 @@
   width: 26px;
   height: 26px;
   flex-shrink: 0;
-  border-radius: 8px;
+  /* App-icon squircle: systemBlue lit softly from above, hairline rim, no heavy drop shadow */
+  border-radius: 7px;
   color: #fff;
-  background: linear-gradient(160deg, #3a9bff 0%, #0064e0 100%);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.28), transparent 60%),
+    linear-gradient(180deg, #2f95ff 0%, #007aff 55%, #006ae6 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 1px 2px rgba(0, 0, 0, 0.4);
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.22),
+    0 0.5px 1px rgba(0, 0, 0, 0.3);
 }
 
 .sidebar-brand-name {
@@ -213,7 +216,7 @@
   align-items: center;
   gap: 12px;
   height: 52px;
-  padding: 0 14px 0 16px;
+  padding: 0 28px;
 }
 
 .canvas-toolbar::before {
@@ -252,6 +255,11 @@
   color: var(--color-text-secondary);
   text-decoration: none;
   white-space: nowrap;
+}
+
+/* Root breadcrumb lines up with the large title below it */
+.breadcrumb:not(.breadcrumb-link) {
+  padding-left: 2px;
 }
 
 .breadcrumb-link {
