@@ -42,16 +42,21 @@ function moneyRenderer(
   td.textContent = isNumber
     ? n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : String(value ?? '')
-  td.style.color = isNumber && n < 0 ? 'var(--mantine-color-green-6)' : ''
+  td.style.color = isNumber && n < 0 ? 'var(--color-positive)' : ''
   td.style.fontWeight = isNumber && n < 0 ? '500' : ''
   return td
 }
 
+// lucide "trash-2", inlined because the renderer builds plain DOM
+const trashIcon =
+  '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>'
+
 function deleteRenderer(onDelete: (row: number) => void) {
   return (_hot: Handsontable, td: HTMLTableCellElement, row: number) => {
     const button = document.createElement('button')
-    button.textContent = '🗑️'
+    button.innerHTML = trashIcon
     button.className = 'spreadsheet-delete-button'
+    button.setAttribute('aria-label', 'Delete row')
     button.onclick = (e) => {
       e.stopPropagation()
       onDelete(row)
@@ -123,7 +128,7 @@ export function Sheet<T extends Row>({ rows, columns, onChange, onDelete, highli
   const hotColumns = [
     ...columns.map(toHotColumn),
     ...(onDelete
-      ? [{ data: 'id', title: '', width: 36, readOnly: true, renderer: deleteRenderer((i) => onDelete(rows[i])) }]
+      ? [{ data: 'id', title: '\u00a0', width: 40, readOnly: true, renderer: deleteRenderer((i) => onDelete(rows[i])) }]
       : [])
   ]
 
@@ -146,26 +151,28 @@ export function Sheet<T extends Row>({ rows, columns, onChange, onDelete, highli
     return String(v ?? '')
   }
 
+  // HotTable's className is applied to every cell, so the frame lives on a wrapper
   return (
-    <HotTable
-      data={data}
-      columns={hotColumns}
-      colHeaders
-      licenseKey="non-commercial-and-evaluation"
-      themeName="ht-theme-main"
-      className="spreadsheet"
-      height={height}
-      width="100%"
-      stretchH="all"
-      autoWrapRow
-      autoWrapCol
-      enterMoves={{ row: 1, col: 0 }}
-      tabMoves={{ row: 0, col: 1 }}
-      manualColumnResize
-      search
-      outsideClickDeselects={false}
-      afterChange={afterChange}
-      cells={(i) => (highlight && rows[i] && highlight(rows[i]) ? { className: 'spreadsheet-duplicate-row' } : {})}
-    />
+    <div className="spreadsheet">
+      <HotTable
+        data={data}
+        columns={hotColumns}
+        colHeaders
+        licenseKey="non-commercial-and-evaluation"
+        themeName="ht-theme-main-dark-auto"
+        height={height}
+        width="100%"
+        stretchH="all"
+        autoWrapRow
+        autoWrapCol
+        enterMoves={{ row: 1, col: 0 }}
+        tabMoves={{ row: 0, col: 1 }}
+        manualColumnResize
+        search
+        outsideClickDeselects={false}
+        afterChange={afterChange}
+        cells={(i) => (highlight && rows[i] && highlight(rows[i]) ? { className: 'spreadsheet-duplicate-row' } : {})}
+      />
+    </div>
   )
 }

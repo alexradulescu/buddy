@@ -255,3 +255,132 @@
   background-color: var(--color-fill);
   color: var(--color-text-secondary);
 }
+
+/*
+ * Data tables after Shopify admin: soft grey header row, roomy rows, hairlines between rows only,
+ * row actions revealed on hover (always shown on touch screens).
+ */
+.table-frame {
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--color-border-light);
+  overflow: hidden;
+}
+
+.data-table {
+  --table-border-color: var(--color-border-light);
+  font-size: 13px;
+}
+
+.data-table .mantine-Table-th {
+  height: 36px;
+  padding-block: 0;
+  background-color: var(--color-surface-secondary);
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.data-table .mantine-Table-td {
+  height: 44px;
+  padding-block: 6px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.data-table .mantine-Table-th:first-child,
+.data-table .mantine-Table-td:first-child {
+  padding-left: 14px;
+}
+
+.data-table .mantine-Table-th:last-child,
+.data-table .mantine-Table-td:last-child {
+  padding-right: 10px;
+}
+
+.data-table .mantine-Table-tbody .mantine-Table-tr:last-child .mantine-Table-td {
+  border-bottom: none;
+}
+
+.data-table .mantine-Table-tbody .mantine-Table-tr {
+  transition: background-color 0.12s ease;
+}
+
+.data-table .mantine-Table-tbody .mantine-Table-tr:hover {
+  background-color: var(--color-fill-secondary);
+}
+
+.data-table-muted {
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table-primary {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.data-table-amount {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Grey chip for categories and variants, like Shopify's "10.5 US" */
+.chip {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background-color: var(--color-fill);
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.sort-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.sort-label[data-active] {
+  color: var(--color-text);
+}
+
+.sort-icon {
+  color: var(--color-text-muted);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.sort-icon[data-active],
+.mantine-Table-th:hover .sort-icon {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .row-actions {
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+
+  .mantine-Table-tr:hover .row-actions,
+  .row-actions:focus-within {
+    opacity: 1;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

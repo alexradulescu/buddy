@@ -44,7 +44,6 @@ export function Shell({ children }: { children: ReactNode }) {
   const { year, month } = useMonth()
   const [actionsSlot, setActionsSlot] = useState<HTMLElement | null>(null)
   const [collapsed, setCollapsed] = useLocalStorage({ key: 'buddy.sidebar-collapsed', defaultValue: false })
-  const [tabBarMinimized, setTabBarMinimized] = useState(false)
 
   // This month's expense count, shown as a badge like Shopify's order count
   const { data } = db.useQuery({ expenses: {} })
@@ -57,18 +56,13 @@ export function Shell({ children }: { children: ReactNode }) {
   const isRoot = nav.some((n) => n.href === pathname)
 
   // Desktop scrolls inside the canvas, phones scroll the document; a capturing listener hears both.
-  // Past the large title the inline title takes over; scrolling down minimizes the tab bar.
+  // Past the large title the inline title takes over.
   useEffect(() => {
-    let last = 0
     const onScroll = (e: Event) => {
       const el = e.target instanceof HTMLElement ? e.target : document.scrollingElement
       if (!el || !(el === document.scrollingElement || el.classList.contains('canvas'))) return
       const top = el.scrollTop
       document.documentElement.toggleAttribute('data-scrolled', top > TITLE_COLLAPSE_AT)
-      if (Math.abs(top - last) > 8) {
-        setTabBarMinimized(top > last && top > 120)
-        last = top
-      }
     }
     document.addEventListener('scroll', onScroll, { capture: true, passive: true })
     return () => document.removeEventListener('scroll', onScroll, { capture: true })
@@ -149,12 +143,7 @@ export function Shell({ children }: { children: ReactNode }) {
         </div>
       </main>
 
-      <TabBar
-        minimized={tabBarMinimized}
-        onExpand={() => setTabBarMinimized(false)}
-        isActive={isActive}
-        badges={badges}
-      />
+      <TabBar isActive={isActive} badges={badges} />
     </div>
   )
 }
@@ -178,18 +167,8 @@ function SidebarLink({ item, active, badge, rail }: { item: NavItem; active: boo
   )
 }
 
-// iOS 27 floating tab bar. Every item is at least 64px wide, so extra tabs scroll sideways.
-function TabBar({
-  minimized,
-  onExpand,
-  isActive,
-  badges
-}: {
-  minimized: boolean
-  onExpand: () => void
-  isActive: (href: string) => boolean
-  badges: Record<string, number>
-}) {
+// iOS 27 floating tab bar, always expanded. Every item is at least 64px wide, so extra tabs scroll sideways.
+function TabBar({ isActive, badges }: { isActive: (href: string) => boolean; badges: Record<string, number> }) {
   const { year, month } = useMonth()
   const scroller = useRef<HTMLDivElement>(null)
 
@@ -202,7 +181,7 @@ function TabBar({
   }, [activeIndex])
 
   return (
-    <Box component="nav" className="tab-bar" data-minimized={minimized || undefined} onClick={onExpand}>
+    <Box component="nav" className="tab-bar">
       <div className="tab-bar-scroller" ref={scroller}>
         {nav.map((item) => {
           const active = isActive(item.href)
@@ -213,8 +192,6 @@ function TabBar({
               search={{ year, month } as never}
               className="tab-bar-item"
               data-active={active || undefined}
-              tabIndex={minimized && !active ? -1 : undefined}
-              onClick={(e) => minimized && e.preventDefault()}
             >
               <span className="tab-bar-icon">
                 <item.icon size={22} strokeWidth={active ? 2.3 : 1.9} />

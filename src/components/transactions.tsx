@@ -127,12 +127,12 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
   const header = (key: SortKey, label: string) => {
     const Icon = sort.key !== key ? ArrowUpDown : sort.asc ? ArrowUp : ArrowDown
     return (
-      <UnstyledButton onClick={() => setSort({ key, asc: sort.key === key ? !sort.asc : true })}>
+      <UnstyledButton w="100%" onClick={() => setSort({ key, asc: sort.key === key ? !sort.asc : true })}>
         <Group gap={4} wrap="nowrap" justify={key === 'amount' ? 'flex-end' : 'flex-start'}>
-          <Text fw={500} size="xs" c="dimmed">
+          <span className="sort-label" data-active={sort.key === key || undefined}>
             {label}
-          </Text>
-          <Icon size={14} opacity={sort.key === key ? 1 : 0.4} />
+          </span>
+          <Icon size={12} strokeWidth={2.2} className="sort-icon" data-active={sort.key === key || undefined} />
         </Group>
       </UnstyledButton>
     )
@@ -185,28 +185,38 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
               </Box>
             ))}
           </Box>
-          <ScrollArea mah={500} visibleFrom="sm">
-            <Table miw={450} stickyHeader>
+          <ScrollArea mah={560} visibleFrom="sm" className="table-frame">
+            <Table miw={450} stickyHeader className="data-table">
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th w={110}>{header('date', 'Date')}</Table.Th>
                   <Table.Th>{header('description', 'Description')}</Table.Th>
                   <Table.Th>{header('category', 'Category')}</Table.Th>
-                  <Table.Th w={70}>{header('amount', 'Amount')}</Table.Th>
-                  <Table.Th w={60}>Actions</Table.Th>
+                  <Table.Th w={110} ta="right">
+                    {header('amount', 'Amount')}
+                  </Table.Th>
+                  <Table.Th w={72}>
+                    <span className="visually-hidden">Actions</span>
+                  </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {visible.map((row) => (
                   <Table.Tr key={row.id}>
-                    <Table.Td style={{ whiteSpace: 'nowrap' }}>{dayjs(row.date).format('DD MMM YYYY')}</Table.Td>
-                    <Table.Td>{row.description}</Table.Td>
-                    <Table.Td c="dimmed">{row.category}</Table.Td>
-                    <Table.Td ta="right" c={row.amount < 0 ? 'var(--color-positive)' : undefined}>
+                    <Table.Td className="data-table-muted" style={{ whiteSpace: 'nowrap' }}>
+                      {dayjs(row.date).format('DD MMM YYYY')}
+                    </Table.Td>
+                    <Table.Td className="data-table-primary">{row.description}</Table.Td>
+                    <Table.Td>{row.category && <span className="chip">{row.category}</span>}</Table.Td>
+                    <Table.Td
+                      ta="right"
+                      className="data-table-amount"
+                      c={row.amount < 0 ? 'var(--color-positive)' : undefined}
+                    >
                       <Money value={row.amount} />
                     </Table.Td>
                     <Table.Td>
-                      <Group gap={4} wrap="nowrap">
+                      <Group gap={2} wrap="nowrap" justify="flex-end" className="row-actions">
                         <ActionIcon size="sm" aria-label="Edit" onClick={() => setEditing(row)}>
                           <Edit size={14} />
                         </ActionIcon>

@@ -1,7 +1,7 @@
 /*
  * App frame after Shopify admin v2 (itself after macOS 27): a dark frame holds the sidebar and a
  * rounded content canvas that scrolls on its own. Phones drop the frame and follow iOS 27: large
- * titles, a scroll-edge toolbar and a floating tab bar that scrolls sideways and minimizes.
+ * titles, a scroll-edge toolbar and a floating tab bar that scrolls sideways.
  */
 
 .app-frame {
@@ -466,10 +466,6 @@
     border-radius: 32px;
     background-color: var(--material-bar-solid);
     box-shadow: var(--shadow-floating);
-    transition:
-      right 0.45s var(--ease-spring),
-      height 0.45s var(--ease-spring),
-      border-radius 0.45s var(--ease-spring);
   }
 
   .tab-bar-scroller {
@@ -499,9 +495,6 @@
     color: var(--color-text);
     text-decoration: none;
     transition:
-      flex 0.45s var(--ease-spring),
-      min-width 0.45s var(--ease-spring),
-      opacity 0.2s ease,
       background-color 0.2s ease,
       transform 0.3s var(--ease-spring);
   }
@@ -544,31 +537,5 @@
 
   .tab-bar-item:active {
     transform: scale(0.9);
-  }
-
-  /* Minimized: only the current tab, as a compact capsule at the leading edge */
-  .tab-bar[data-minimized] {
-    right: calc(100% - 12px - 56px);
-    height: 50px;
-    border-radius: 25px;
-    cursor: pointer;
-  }
-
-  .tab-bar[data-minimized] .tab-bar-item:not([data-active]) {
-    flex: 0 0 0;
-    min-width: 0;
-    padding: 0;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .tab-bar[data-minimized] .tab-bar-item[data-active] {
-    min-width: 42px;
-    background-color: transparent;
-  }
-
-  .tab-bar[data-minimized] .tab-bar-label,
-  .tab-bar[data-minimized] .tab-bar-badge {
-    display: none;
   }
 }

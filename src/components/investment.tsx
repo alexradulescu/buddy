@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import {
+  ActionIcon,
+  Box,
   Button,
   Card,
   Center,
@@ -191,39 +193,46 @@ export function EntriesCard({ title, icon, amountLabel, emptyText, rows, onSave,
           </Text>
         </Center>
       ) : (
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Date</Table.Th>
-              <Table.Th ta="right">{amountLabel}</Table.Th>
-              <Table.Th>Description</Table.Th>
-              <Table.Th ta="right" w={60}>
-                Actions
-              </Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {newest.map((row) => (
-              <Table.Tr key={row.id}>
-                <Table.Td>{dayjs(row.date).format('M/D/YYYY')}</Table.Td>
-                <Table.Td ta="right">
-                  <Money value={row.amount} />
-                </Table.Td>
-                <Table.Td c="dimmed">{row.description || '-'}</Table.Td>
-                <Table.Td ta="right">
-                  <Group gap={4} wrap="nowrap" justify="flex-end">
-                    <Button variant="subtle" size="compact-xs" color="gray" onClick={() => setEditing(row)}>
-                      <Edit size={12} />
-                    </Button>
-                    <Button variant="subtle" size="compact-xs" color="red" onClick={() => setDeleting(row)}>
-                      <Trash2 size={12} />
-                    </Button>
-                  </Group>
-                </Table.Td>
+        <Box className="table-frame">
+          <Table className="data-table">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Date</Table.Th>
+                <Table.Th ta="right">{amountLabel}</Table.Th>
+                <Table.Th>Description</Table.Th>
+                <Table.Th ta="right" w={72}>
+                  Actions
+                </Table.Th>
               </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
+            </Table.Thead>
+            <Table.Tbody>
+              {newest.map((row) => (
+                <Table.Tr key={row.id}>
+                  <Table.Td className="data-table-muted">{dayjs(row.date).format('DD MMM YYYY')}</Table.Td>
+                  <Table.Td ta="right">
+                    <Money value={row.amount} />
+                  </Table.Td>
+                  <Table.Td c="dimmed">{row.description || '-'}</Table.Td>
+                  <Table.Td ta="right">
+                    <Group gap={2} wrap="nowrap" justify="flex-end" className="row-actions">
+                      <ActionIcon size="sm" aria-label="Edit" onClick={() => setEditing(row)}>
+                        <Edit size={14} />
+                      </ActionIcon>
+                      <ActionIcon
+                        size="sm"
+                        c="var(--color-negative)"
+                        aria-label="Delete"
+                        onClick={() => setDeleting(row)}
+                      >
+                        <Trash2 size={14} />
+                      </ActionIcon>
+                    </Group>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Box>
       )}
 
       <Modal

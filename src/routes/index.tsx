@@ -145,7 +145,7 @@ function HomePage() {
           ))}
         </GroupedList>
         <ScrollArea visibleFrom="sm">
-          <Table miw={800}>
+          <Table miw={800} className="data-table">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th pl="md">Category</Table.Th>
@@ -200,7 +200,7 @@ function HomePage() {
           ))}
         </GroupedList>
         <ScrollArea visibleFrom="sm">
-          <Table miw={600}>
+          <Table miw={600} className="data-table">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th pl="md">Category</Table.Th>
@@ -261,7 +261,7 @@ function HomePage() {
             ))}
           </GroupedList>
           <ScrollArea mt="sm" visibleFrom="sm">
-            <Table miw={500}>
+            <Table miw={500} className="data-table">
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th pl="md">Name</Table.Th>
