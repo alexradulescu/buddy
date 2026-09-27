@@ -63,8 +63,32 @@
 
   /* Light paper: a hairline and the faintest contact shadow; dark mode carries the deeper lift */
   --shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.055), 0 1px 2px rgba(0, 0, 0, 0.035);
-  /* Faint tint wash from the top */
-  --page-texture: radial-gradient(120% 55% at 50% -12%, rgba(0, 122, 255, 0.05), transparent 65%);
+  /* Calm Milky Way behind content; cards are opaque so it never sits under text */
+  --page-texture:
+    /* Star field: tiles of co-prime-ish sizes so the dots never read as a grid */
+    radial-gradient(circle at 23px 41px, rgba(40, 50, 90, 0.1) 0 0.7px, transparent 1.2px) 0 0 / 97px 97px,
+    radial-gradient(circle at 88px 17px, rgba(40, 50, 90, 0.12) 0 0.9px, transparent 1.4px) 0 0 / 139px 139px,
+    radial-gradient(circle at 150px 122px, rgba(60, 80, 140, 0.1) 0 1.2px, transparent 1.8px) 0 0 / 211px 211px,
+    radial-gradient(circle at 41px 133px, rgba(40, 50, 90, 0.08) 0 0.6px, transparent 1.1px) 0 0 / 173px 173px,
+    radial-gradient(circle at 260px 64px, rgba(40, 50, 90, 0.12) 0 0.8px, transparent 1.3px) 0 0 / 293px 293px,
+    /* Milky Way: a soft diagonal band with a warm core and cool arms */ radial-gradient(
+        ellipse 34% 16% at 54% 46%,
+        rgba(255, 180, 130, 0.06),
+        transparent 70%
+      )
+      no-repeat,
+    radial-gradient(ellipse 30% 20% at 26% 64%, rgba(80, 140, 255, 0.055), transparent 70%) no-repeat,
+    radial-gradient(ellipse 30% 18% at 82% 28%, rgba(110, 120, 230, 0.045), transparent 70%) no-repeat,
+    linear-gradient(
+        -25deg,
+        transparent 32%,
+        rgba(110, 120, 230, 0.045) 44%,
+        rgba(80, 140, 255, 0.055) 50%,
+        rgba(110, 120, 230, 0.045) 56%,
+        transparent 68%
+      )
+      no-repeat,
+    radial-gradient(120% 55% at 50% -12%, rgba(0, 122, 255, 0.05), transparent 65%) no-repeat;
   --shadow-control: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 1px 1px rgba(0, 0, 0, 0.04);
   --shadow-canvas: 0 0 0 1px rgba(255, 255, 255, 0.04);
   --shadow-popover: 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 10px 30px rgba(0, 0, 0, 0.12);
@@ -118,7 +142,31 @@
     --shadow-card:
       inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 0 0 1px rgba(255, 255, 255, 0.08), 0 -1px 4px rgba(0, 0, 0, 0.35),
       0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 40px -14px rgba(0, 0, 0, 0.75);
-    --page-texture: radial-gradient(120% 55% at 50% -12%, rgba(10, 132, 255, 0.09), transparent 65%);
+    --page-texture:
+      /* Star field: tiles of co-prime-ish sizes so the dots never read as a grid */
+      radial-gradient(circle at 23px 41px, rgba(255, 255, 255, 0.3) 0 0.7px, transparent 1.2px) 0 0 / 97px 97px,
+      radial-gradient(circle at 88px 17px, rgba(255, 255, 255, 0.4) 0 0.9px, transparent 1.4px) 0 0 / 139px 139px,
+      radial-gradient(circle at 150px 122px, rgba(200, 220, 255, 0.45) 0 1.2px, transparent 1.8px) 0 0 / 211px 211px,
+      radial-gradient(circle at 41px 133px, rgba(255, 255, 255, 0.25) 0 0.6px, transparent 1.1px) 0 0 / 173px 173px,
+      radial-gradient(circle at 260px 64px, rgba(255, 255, 255, 0.4) 0 0.8px, transparent 1.3px) 0 0 / 293px 293px,
+      /* Milky Way: a soft diagonal band with a warm core and cool arms */ radial-gradient(
+          ellipse 34% 16% at 54% 46%,
+          rgba(255, 190, 140, 0.1),
+          transparent 70%
+        )
+        no-repeat,
+      radial-gradient(ellipse 30% 20% at 26% 64%, rgba(90, 150, 255, 0.1), transparent 70%) no-repeat,
+      radial-gradient(ellipse 30% 18% at 82% 28%, rgba(130, 120, 255, 0.08), transparent 70%) no-repeat,
+      linear-gradient(
+          -25deg,
+          transparent 32%,
+          rgba(130, 120, 255, 0.08) 44%,
+          rgba(90, 150, 255, 0.1) 50%,
+          rgba(130, 120, 255, 0.08) 56%,
+          transparent 68%
+        )
+        no-repeat,
+      radial-gradient(120% 55% at 50% -12%, rgba(10, 132, 255, 0.09), transparent 65%) no-repeat;
     --shadow-control:
       inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.12), 0 2px 6px rgba(0, 0, 0, 0.4);
     --shadow-canvas: 0 0 0 1px rgba(255, 255, 255, 0.07);
