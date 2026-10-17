@@ -98,7 +98,7 @@ export const theme = createTheme({
       }
     },
     Modal: {
-      defaultProps: { radius: 34, centered: true },
+      defaultProps: { centered: true },
       styles: {
         content: { backgroundColor: 'var(--color-surface)' },
         header: { backgroundColor: 'var(--color-surface)' },

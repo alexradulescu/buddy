@@ -93,9 +93,23 @@ export function StatTile({
 }
 
 // Thin progress bar: tint while within the limit, red once over it
+// Overspend under this many dollars reads as a warning (yellow) rather than an alarm (red)
+const SLIGHT_OVER_LIMIT = 100
+
+// 'slight' for small overspend, 'over' beyond it, undefined within budget
+export function overspend(left: number): 'slight' | 'over' | undefined {
+  if (left >= 0) return undefined
+  return -left < SLIGHT_OVER_LIMIT ? 'slight' : 'over'
+}
+
+export function overspendColor(left: number) {
+  const state = overspend(left)
+  return state === 'slight' ? 'var(--color-warning)' : state === 'over' ? 'var(--color-negative)' : undefined
+}
+
 export function Meter({ used, limit }: { used: number; limit: number }) {
   const ratio = limit > 0 ? used / limit : used > 0 ? 1 : 0
-  const over = used > limit
+  const over = overspend(limit - used)
   return (
     <div
       className="meter"
@@ -103,7 +117,7 @@ export function Meter({ used, limit }: { used: number; limit: number }) {
       aria-valuemin={0}
       aria-valuemax={limit}
       aria-valuenow={used}
-      data-over={over || undefined}
+      data-over={over}
     >
       <div className="meter-fill" style={{ width: `${Math.min(ratio, 1) * 100}%` }} />
     </div>
@@ -113,8 +127,10 @@ export function Meter({ used, limit }: { used: number; limit: number }) {
 // "$40.12 left" / "$100.43 over" for a budget, coloured only when over
 export function BudgetRemaining({ spent, budget }: { spent: number; budget: number }) {
   const left = budget - spent
+  const state = overspend(left)
+  const tone = state === 'slight' ? ' warning' : state === 'over' ? ' negative' : ''
   return (
-    <span className={left < 0 ? 'budget-remaining negative' : 'budget-remaining'}>
+    <span className={`budget-remaining${tone}`}>
       {formatMoney(Math.abs(left))} {left < 0 ? 'over' : 'left'}
     </span>
   )

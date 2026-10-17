@@ -136,7 +136,6 @@
   .mantine-Modal-content {
     flex: 1 1 100% !important;
     max-height: 90dvh !important;
-    border-radius: 38px !important;
     animation: sheet-up 0.5s var(--ease-spring);
   }
 
