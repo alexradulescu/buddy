@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import {
+  ActionIcon,
+  Box,
   Button,
   Card,
   Center,
@@ -32,7 +34,7 @@ export function InvestmentModal({ investment, onClose }: { investment: Investmen
     <Modal
       opened={!!investment}
       onClose={onClose}
-      title={investment?.id ? 'Edit Investment' : 'Add Investment'}
+      title={investment?.id ? 'Edit investment' : 'Add investment'}
       centered
     >
       {investment && <InvestmentForm investment={investment} onClose={onClose} />}
@@ -103,22 +105,50 @@ export function PerformanceChart({
           </Text>
         </Stack>
       ) : (
-        <ResponsiveContainer width="100%" height={144}>
-          <LineChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" />
-            <XAxis dataKey="month" tick={{ fontSize: 10 }} stroke="var(--mantine-color-gray-5)" />
-            <YAxis tick={{ fontSize: 10 }} width={50} stroke="var(--mantine-color-gray-5)" />
-            <Tooltip formatter={(v) => formatMoney(Number(v))} />
-            <Legend wrapperStyle={{ fontSize: '11px' }} />
+        <ResponsiveContainer width="100%" height={160}>
+          <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+            <CartesianGrid vertical={false} stroke="rgba(142, 142, 147, 0.2)" />
+            <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#8e8e93' }} axisLine={false} tickLine={false} />
+            <YAxis
+              tick={{ fontSize: 11, fill: '#8e8e93' }}
+              width={52}
+              axisLine={false}
+              tickLine={false}
+              orientation="right"
+            />
+            <Tooltip
+              formatter={(v) => formatMoney(Number(v))}
+              contentStyle={{
+                background: 'var(--material-bar)',
+                backdropFilter: 'var(--material-blur)',
+                border: 'none',
+                borderRadius: 10,
+                boxShadow: 'var(--shadow-popover)',
+                fontSize: 12
+              }}
+              labelStyle={{ color: 'var(--color-text-secondary)' }}
+            />
+            <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px' }} />
             <Line
               type="monotone"
               dataKey="contributions"
               name="Contributions"
-              stroke="#8884d8"
+              stroke="#8e8e93"
               strokeWidth={1.5}
-              dot={{ r: 2 }}
+              strokeDasharray="4 3"
+              dot={false}
+              connectNulls
             />
-            <Line type="monotone" dataKey="value" name="Value" stroke="#82ca9d" strokeWidth={1.5} dot={{ r: 2 }} />
+            <Line
+              type="monotone"
+              dataKey="value"
+              name="Value"
+              stroke="#007aff"
+              strokeWidth={2}
+              dot={false}
+              connectNulls
+              activeDot={{ r: 4 }}
+            />
           </LineChart>
         </ResponsiveContainer>
       )}
@@ -163,39 +193,48 @@ export function EntriesCard({ title, icon, amountLabel, emptyText, rows, onSave,
           </Text>
         </Center>
       ) : (
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Date</Table.Th>
-              <Table.Th ta="right">{amountLabel}</Table.Th>
-              <Table.Th>Description</Table.Th>
-              <Table.Th ta="right" w={60}>
-                Actions
-              </Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {newest.map((row) => (
-              <Table.Tr key={row.id}>
-                <Table.Td>{dayjs(row.date).format('M/D/YYYY')}</Table.Td>
-                <Table.Td ta="right">
-                  <Money value={row.amount} />
-                </Table.Td>
-                <Table.Td c="dimmed">{row.description || '-'}</Table.Td>
-                <Table.Td ta="right">
-                  <Group gap={4} wrap="nowrap" justify="flex-end">
-                    <Button variant="subtle" size="compact-xs" color="gray" onClick={() => setEditing(row)}>
-                      <Edit size={12} />
-                    </Button>
-                    <Button variant="subtle" size="compact-xs" color="red" onClick={() => setDeleting(row)}>
-                      <Trash2 size={12} />
-                    </Button>
-                  </Group>
-                </Table.Td>
+        <Box className="table-frame">
+          <Table className="data-table">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Date</Table.Th>
+                <Table.Th ta="right">{amountLabel}</Table.Th>
+                <Table.Th>Description</Table.Th>
+                <Table.Th ta="right" w={72}>
+                  Actions
+                </Table.Th>
               </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
+            </Table.Thead>
+            <Table.Tbody>
+              {newest.map((row) => (
+                <Table.Tr key={row.id}>
+                  <Table.Td className="data-table-muted" style={{ whiteSpace: 'nowrap' }}>
+                    {dayjs(row.date).format('DD MMM YYYY')}
+                  </Table.Td>
+                  <Table.Td ta="right">
+                    <Money value={row.amount} />
+                  </Table.Td>
+                  <Table.Td c="dimmed">{row.description || '-'}</Table.Td>
+                  <Table.Td ta="right">
+                    <Group gap={2} wrap="nowrap" justify="flex-end" className="row-actions">
+                      <ActionIcon size="sm" aria-label="Edit" onClick={() => setEditing(row)}>
+                        <Edit size={14} />
+                      </ActionIcon>
+                      <ActionIcon
+                        size="sm"
+                        c="var(--color-negative)"
+                        aria-label="Delete"
+                        onClick={() => setDeleting(row)}
+                      >
+                        <Trash2 size={14} />
+                      </ActionIcon>
+                    </Group>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Box>
       )}
 
       <Modal

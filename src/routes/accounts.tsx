@@ -1,11 +1,24 @@
 import { useState } from 'react'
-import { Button, Card, Group, Modal, NumberInput, SimpleGrid, Stack, Text, TextInput } from '@mantine/core'
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Card,
+  Group,
+  Modal,
+  NumberInput,
+  SimpleGrid,
+  Stack,
+  Table,
+  Text,
+  TextInput
+} from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { createFileRoute } from '@tanstack/react-router'
-import { Calculator, Edit2, Trash2, Wallet } from 'lucide-react'
+import { Calculator, Edit2, Plus, Trash2, Wallet } from 'lucide-react'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
-import { CardTitle, colorBySign, MetricList } from '@/components/ui'
+import { CardTitle, MetricList, Money } from '@/components/ui'
 import { db, remove, save, type AccountBalance } from '@/db'
 import { useMonth } from '@/hooks/use-month'
 import { monthTotal, prevMonth, sum } from '@/lib/finance'
@@ -27,67 +40,111 @@ function AccountsPage() {
   const previous = balances.filter((b) => b.year === prev.year && b.month === prev.month)
 
   // Last month's balances plus this month's cash flow should equal this month's balances
-  const real = sum(current)
+  const opening = sum(previous)
+  const actual = sum(current)
   const expenses = monthTotal(data?.expenses ?? [], year, month)
   const income = monthTotal(data?.incomes ?? [], year, month)
-  const expected = sum(previous) + income - expenses
-  const discrepancy = real - expected
+  const expected = opening + income - expenses
+  const difference = actual - expected
 
   return (
     <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
       <Card shadow="sm" padding="md">
-        <CardTitle icon={<Calculator size={16} />} title="Summary" />
+        <CardTitle icon={<Calculator size={16} />} title="Reconciliation" />
         <MetricList
           metrics={[
-            { label: 'Total Account Balances', value: formatMoney(real) },
-            { label: 'Total Expenses', value: formatMoney(expenses) },
-            { label: 'Total Income', value: formatMoney(income) },
-            { label: 'Expected Accounts Total', value: formatMoney(expected) },
-            { label: 'Real Accounts Total', value: formatMoney(real) },
-            { label: 'Discrepancy', value: formatMoney(discrepancy), color: colorBySign(discrepancy) }
+            { label: 'Opening balance', value: formatMoney(opening) },
+            { sign: '+', label: 'Income', value: formatMoney(income) },
+            { sign: '−', label: 'Expenses', value: formatMoney(expenses) },
+            { sign: '=', label: 'Expected balance', value: formatMoney(expected), total: true },
+            { label: 'Actual balance', value: formatMoney(actual) },
+            {
+              label: 'Difference',
+              value: formatMoney(difference),
+              color: difference < 0 ? 'var(--color-negative)' : undefined,
+              total: true
+            }
           ]}
         />
+        <Text size="xs" c="dimmed" mt="xs">
+          Opening balance is last month&apos;s account total. A non-zero difference means untracked income or spending.
+        </Text>
       </Card>
 
       <Card shadow="sm" padding="md">
-        <Group justify="space-between">
-          <CardTitle icon={<Wallet size={16} />} title="Account Balances" />
-          <Button size="xs" onClick={() => setEditing({ title: '', amount: 0 })}>
-            Add
-          </Button>
-        </Group>
+        <CardTitle
+          icon={<Wallet size={16} />}
+          title="Account balances"
+          trailing={
+            <Button
+              size="xs"
+              variant="default"
+              leftSection={<Plus size={14} />}
+              onClick={() => setEditing({ title: '', amount: 0 })}
+            >
+              Add
+            </Button>
+          }
+        />
         {current.length === 0 ? (
           <Text ta="center" c="dimmed" py="md">
             No account balances for this month.
           </Text>
         ) : (
-          <Stack gap="xs" mt="sm">
-            {current.map((balance) => (
-              <Group key={balance.id} justify="space-between" wrap="nowrap">
-                <Text size="sm" fw={500}>
-                  {balance.title}
-                </Text>
-                <Group gap="xs" wrap="nowrap">
-                  <Text size="sm" fw={600} className="tabular-number">
-                    {formatMoney(balance.amount)}
-                  </Text>
-                  <Button size="compact-xs" variant="subtle" onClick={() => setEditing(balance)}>
-                    <Edit2 size={12} />
-                  </Button>
-                  <Button size="compact-xs" variant="subtle" color="red" onClick={() => setDeleting(balance)}>
-                    <Trash2 size={12} />
-                  </Button>
-                </Group>
-              </Group>
-            ))}
-          </Stack>
+          <Box className="table-frame">
+            <Table className="data-table">
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Account</Table.Th>
+                  <Table.Th ta="right">Balance</Table.Th>
+                  <Table.Th ta="right" w={72}>
+                    <span className="visually-hidden">Actions</span>
+                  </Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {current.map((balance) => (
+                  <Table.Tr key={balance.id}>
+                    <Table.Td className="data-table-primary">{balance.title}</Table.Td>
+                    <Table.Td ta="right">
+                      <Money value={balance.amount} />
+                    </Table.Td>
+                    <Table.Td ta="right">
+                      <Group gap={2} wrap="nowrap" justify="flex-end" className="row-actions">
+                        <ActionIcon size="sm" aria-label="Edit" onClick={() => setEditing(balance)}>
+                          <Edit2 size={14} />
+                        </ActionIcon>
+                        <ActionIcon
+                          size="sm"
+                          c="var(--color-negative)"
+                          aria-label="Delete"
+                          onClick={() => setDeleting(balance)}
+                        >
+                          <Trash2 size={14} />
+                        </ActionIcon>
+                      </Group>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+              <Table.Tfoot>
+                <Table.Tr>
+                  <Table.Td>Total</Table.Td>
+                  <Table.Td ta="right">
+                    <Money value={actual} />
+                  </Table.Td>
+                  <Table.Td />
+                </Table.Tr>
+              </Table.Tfoot>
+            </Table>
+          </Box>
         )}
       </Card>
 
       <Modal
         opened={!!editing}
         onClose={() => setEditing(null)}
-        title={editing?.id ? 'Edit Account Balance' : 'Add New Account Balance'}
+        title={editing?.id ? 'Edit account balance' : 'Add account balance'}
         centered
       >
         {editing && (
@@ -103,7 +160,7 @@ function AccountsPage() {
       </Modal>
 
       <ConfirmDelete
-        title="Delete Account Balance"
+        title="Delete account balance"
         opened={!!deleting}
         details={deleting ? { Account: deleting.title, Amount: formatMoney(deleting.amount) } : undefined}
         onClose={() => setDeleting(null)}
@@ -125,18 +182,20 @@ function AccountForm({ draft, onSave }: { draft: Draft; onSave: (draft: Draft) =
     >
       <Stack gap="md">
         <TextInput
-          placeholder="Account Title"
+          label="Account"
+          placeholder="e.g. Checking"
           required
           value={values.title}
           onChange={(e) => setValues({ ...values, title: e.target.value })}
         />
         <NumberInput
-          placeholder="Balance Amount"
+          label="Balance"
+          placeholder="0.00"
           decimalScale={2}
           value={values.amount}
           onChange={(v) => setValues({ ...values, amount: Number(v) || 0 })}
         />
-        <Button type="submit">{draft.id ? 'Update Balance' : 'Add Balance'}</Button>
+        <Button type="submit">{draft.id ? 'Update balance' : 'Add balance'}</Button>
       </Stack>
     </form>
   )

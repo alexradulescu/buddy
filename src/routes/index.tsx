@@ -1,35 +1,21 @@
 import type { ReactNode } from 'react'
-import {
-  Accordion,
-  ActionIcon,
-  Anchor,
-  Badge,
-  Box,
-  Button,
-  Card,
-  Menu,
-  ScrollArea,
-  SimpleGrid,
-  Stack,
-  Table,
-  Text
-} from '@mantine/core'
+import { Box, Button, Card, Menu, ScrollArea, Stack, Table, Text } from '@mantine/core'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import dayjs from 'dayjs'
-import { Calendar, ChevronDown, Download } from 'lucide-react'
+import { ChevronDown, ChevronRight, Download } from 'lucide-react'
 
 import { PageHeader } from '@/components/shell'
-import { CardTitle, colorBySign, MetricList, Money, Stat } from '@/components/ui'
+import { BudgetRemaining, CardTitle, colorBySign, Meter, Money, StatTile } from '@/components/ui'
 import { db } from '@/db'
 import { useMonth } from '@/hooks/use-month'
 import { downloadCSV, fullCSV, overviewCSV, type ExportData } from '@/lib/csv'
 import { expenseCategoryRows, incomeCategoryRows, monthTotal, portfolio, ytdSummary } from '@/lib/finance'
-import { formatMoney, formatPercent, monthLabel } from '@/lib/format'
+import { formatMoney, formatPercent } from '@/lib/format'
 
 export const Route = createFileRoute('/')({ component: HomePage })
 
-const positive = '#2D6A4F'
-const negative = '#D64550'
+// Figures that are only noteworthy when they go wrong
+const negativeOnly = (amount: number) => (amount < 0 ? 'var(--color-negative)' : undefined)
 
 function HomePage() {
   const { year, month } = useMonth()
@@ -58,32 +44,49 @@ function HomePage() {
   const monthSpent = monthTotal(d.expenses, year, month)
   const net = income - monthSpent
 
+  const expenseRows = expenseCategoryRows(d.expenses, d.expenseCategories, year, month)
+  const incomeRows = incomeCategoryRows(d.incomes, d.incomeCategories, year, month)
+  const holdings = [...investments.rows].sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+
+  const totals = expenseRows.reduce(
+    (t, r) => ({
+      spentMonth: t.spentMonth + r.spent.month,
+      spentYtd: t.spentYtd + r.spent.ytd,
+      budgetMonth: t.budgetMonth + r.budget.month,
+      budgetYtd: t.budgetYtd + r.budget.ytd,
+      budgetAnnual: t.budgetAnnual + r.budget.annual,
+      spentAnnual: t.spentAnnual + (r.budget.annual - r.delta.annual)
+    }),
+    { spentMonth: 0, spentYtd: 0, budgetMonth: 0, budgetYtd: 0, budgetAnnual: 0, spentAnnual: 0 }
+  )
+  const incomeTotals = incomeRows.reduce(
+    (t, r) => ({ month: t.month + r.month, ytd: t.ytd + r.ytd, annual: t.annual + r.annual }),
+    { month: 0, ytd: 0, annual: 0 }
+  )
+
+  const monthName = dayjs(new Date(year, month)).format('MMMM')
+  const monthShort = dayjs(new Date(year, month)).format('MMM')
+  const monthLeft = totals.budgetMonth - monthSpent
+  const today = dayjs()
+  const daysLeft = today.year() === year && today.month() === month ? today.daysInMonth() - today.date() : null
+
   const exportCSV = (kind: 'Overview' | 'Full') => {
     const csv = kind === 'Overview' ? overviewCSV(d, year, month) : fullCSV(d, year, month)
     downloadCSV(csv, `Dashboard-${kind}-${dayjs(new Date(year, month)).format('MMM-YYYY')}.csv`)
   }
 
   return (
-    <Stack gap="md">
+    <Stack gap="lg">
       <PageHeader
         actions={
-          <Menu shadow="md" width={180}>
+          <Menu shadow="md" width={200} position="bottom-end">
             <Menu.Target>
-              <Box>
-                <Button
-                  visibleFrom="sm"
-                  variant="light"
-                  leftSection={<Download size={16} />}
-                  rightSection={<ChevronDown size={14} />}
-                >
-                  Export CSV
-                </Button>
-                <ActionIcon hiddenFrom="sm" variant="light" size="lg" aria-label="Export CSV">
-                  <Download size={18} />
-                </ActionIcon>
-              </Box>
+              <Button variant="default" leftSection={<Download size={16} />} rightSection={<ChevronDown size={14} />}>
+                Export
+              </Button>
             </Menu.Target>
             <Menu.Dropdown>
+              <Menu.Label>Export as CSV</Menu.Label>
               <Menu.Item onClick={() => exportCSV('Overview')}>Overview</Menu.Item>
               <Menu.Item onClick={() => exportCSV('Full')}>Full</Menu.Item>
             </Menu.Dropdown>
@@ -91,145 +94,249 @@ function HomePage() {
         }
       />
 
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
-        <Card>
-          <CardTitle icon={<Calendar size={16} />} title={`Year to Date (${year})`} />
-          <MetricList
-            metrics={[
-              { label: 'YTD Budget', value: formatMoney(ytd.budget) },
-              { label: 'YTD Spent', value: formatMoney(ytd.spent) },
-              { label: 'YTD Income', value: formatMoney(ytd.income) },
-              { label: 'Total Invested', value: formatMoney(ytd.totalInvested) },
-              { label: 'Investment Value', value: formatMoney(ytd.investmentValue) },
-              { label: 'YTD Savings', value: formatMoney(ytd.savings) },
-              { label: 'Savings Rate', value: formatPercent(ytd.savingsRate) }
-            ]}
-          />
-        </Card>
-        <Card>
-          <CardTitle icon={<Calendar size={16} color="#52B788" />} title={monthLabel(year, month)} />
-          <MetricList
-            metrics={[
-              { label: 'Total Income', value: formatMoney(income), color: positive },
-              { label: 'Total Expenses', value: formatMoney(monthSpent), color: negative },
-              { label: 'Net Income', value: formatMoney(net) },
-              { label: 'Investments', value: formatMoney(investments.value) },
-              { label: 'Saving Rate', value: income > 0 ? formatPercent(net / income) : 'N/A' }
-            ]}
-          />
-        </Card>
-      </SimpleGrid>
+      <Card className="hero-card">
+        <Text className="hero-label">{`${monthName} ${year}`}</Text>
+        <Text className="hero-value tabular-number" c={monthLeft < 0 ? 'var(--color-negative)' : undefined}>
+          {formatMoney(Math.abs(monthLeft))} {monthLeft < 0 ? 'over budget' : 'left this month'}
+        </Text>
+        <Meter used={monthSpent} limit={totals.budgetMonth} />
+        <Text className="hero-footnote tabular-number">
+          Spent {formatMoney(monthSpent)} of {formatMoney(totals.budgetMonth)}
+          {daysLeft !== null && ` · ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'} left`}
+        </Text>
+      </Card>
 
-      <Section title="Expense Categories">
-        <ScrollArea>
-          <Table striped miw={800}>
+      <div className="summary-grid">
+        <Card className="summary-card">
+          <CardTitle title="This month" trailing={<Text className="card-title-note">{monthShort}</Text>} />
+          <div className="stat-tile-grid" data-compact>
+            <StatTile label="Income" value={formatMoney(income)} />
+            <StatTile label="Net income" value={formatMoney(net)} color={negativeOnly(net)} />
+            <StatTile label="Saving rate" value={income > 0 ? formatPercent(net / income) : 'N/A'} />
+          </div>
+        </Card>
+        <Card className="summary-card">
+          <CardTitle
+            title={`${year} so far`}
+            trailing={<Text className="card-title-note">{month === 0 ? 'Jan' : `Jan – ${monthShort}`}</Text>}
+          />
+          <div className="stat-tile-grid" data-compact>
+            <StatTile label="Income" value={formatMoney(ytd.income)} />
+            <StatTile
+              label="Spent"
+              value={formatMoney(ytd.spent)}
+              meter={{ used: ytd.spent, limit: ytd.budget }}
+              footnote={
+                <>
+                  <BudgetRemaining spent={ytd.spent} budget={ytd.budget} /> of {formatMoney(ytd.budget)}
+                </>
+              }
+            />
+            <StatTile label="Savings" value={formatMoney(ytd.savings)} color={negativeOnly(ytd.savings)} />
+            <StatTile
+              label="Savings rate"
+              value={formatPercent(ytd.savingsRate)}
+              footnote="Investments not counted as spent"
+            />
+          </div>
+        </Card>
+      </div>
+
+      <Section title="Expenses by category">
+        <div className="grouped-list" data-mobile>
+          {expenseRows.map(({ category, spent, budget }) => (
+            <GroupedRow
+              key={category.id}
+              to="/expenses"
+              search={{ year, month, categoryExpense: category.id }}
+              title={category.name}
+              subtitle={`YTD ${formatMoney(spent.ytd)} / ${formatMoney(budget.ytd)}`}
+              value={formatMoney(spent.month)}
+              detail={<BudgetRemaining spent={spent.month} budget={budget.month} />}
+              meter={<Meter used={spent.month} limit={budget.month} />}
+            />
+          ))}
+        </div>
+        <ScrollArea className="home-table" type="auto">
+          <Table miw={860} className="data-table home-data-table">
             <Table.Thead>
-              <Table.Tr>
-                <Table.Th pl="md">Category</Table.Th>
-                <Table.Th ta="right">Current</Table.Th>
-                <Table.Th ta="right">Monthly Budget</Table.Th>
-                <Table.Th ta="right">Year-to-Date</Table.Th>
-                <Table.Th ta="right">YTD Budget</Table.Th>
-                <Table.Th ta="right" pr="md">
-                  Annual Budget
+              <Table.Tr className="column-group-row">
+                <Table.Th rowSpan={2}>Category</Table.Th>
+                <Table.Th colSpan={2} className="column-group">
+                  {monthName}
                 </Table.Th>
+                <Table.Th colSpan={2} className="column-group">
+                  {year} to date
+                </Table.Th>
+                <Table.Th className="column-group">Full year</Table.Th>
+              </Table.Tr>
+              <Table.Tr>
+                <Table.Th ta="right" className="group-start">
+                  Spent
+                </Table.Th>
+                <Table.Th>Budget</Table.Th>
+                <Table.Th ta="right" className="group-start">
+                  Spent
+                </Table.Th>
+                <Table.Th>Budget</Table.Th>
+                <Table.Th className="group-start">Budget</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {expenseCategoryRows(d.expenses, d.expenseCategories, year, month).map(
-                ({ category, spent, budget, delta }) => (
-                  <Table.Tr key={category.id}>
-                    <Table.Td pl="md">
-                      <CategoryLink to="/expenses" search={{ year, month, categoryExpense: category.id }}>
-                        {category.name}
-                      </CategoryLink>
-                    </Table.Td>
-                    <Table.Td ta="right" c={spent.month > budget.month ? negative : undefined}>
-                      <Money value={spent.month} />
-                    </Table.Td>
-                    <BudgetCell budget={budget.month} delta={delta.month} />
-                    <Table.Td ta="right">
-                      <Money value={spent.ytd} />
-                    </Table.Td>
-                    <BudgetCell budget={budget.ytd} delta={delta.ytd} />
-                    <BudgetCell budget={budget.annual} delta={delta.annual} pr="md" />
-                  </Table.Tr>
-                )
-              )}
+              {expenseRows.map(({ category, spent, budget, delta }) => (
+                <Table.Tr key={category.id}>
+                  <Table.Td>
+                    <Link
+                      to="/expenses"
+                      search={{ year, month, categoryExpense: category.id } as never}
+                      className="row-link"
+                    >
+                      {category.name}
+                    </Link>
+                  </Table.Td>
+                  <SpentCell value={spent.month} over={spent.month > budget.month} />
+                  <BudgetCell spent={spent.month} budget={budget.month} />
+                  <SpentCell value={spent.ytd} over={spent.ytd > budget.ytd} />
+                  <BudgetCell spent={spent.ytd} budget={budget.ytd} />
+                  <BudgetCell spent={budget.annual - delta.annual} budget={budget.annual} groupStart />
+                </Table.Tr>
+              ))}
             </Table.Tbody>
+            <Table.Tfoot>
+              <Table.Tr data-total>
+                <Table.Td>Total</Table.Td>
+                <SpentCell value={totals.spentMonth} over={totals.spentMonth > totals.budgetMonth} />
+                <BudgetCell spent={totals.spentMonth} budget={totals.budgetMonth} />
+                <SpentCell value={totals.spentYtd} over={totals.spentYtd > totals.budgetYtd} />
+                <BudgetCell spent={totals.spentYtd} budget={totals.budgetYtd} />
+                <BudgetCell spent={totals.spentAnnual} budget={totals.budgetAnnual} groupStart />
+              </Table.Tr>
+            </Table.Tfoot>
           </Table>
         </ScrollArea>
       </Section>
 
-      <Section title="Income Categories">
-        <ScrollArea>
-          <Table striped miw={600}>
+      <Section title="Income by category">
+        <div className="grouped-list" data-mobile>
+          {incomeRows.map((row) => (
+            <GroupedRow
+              key={row.category.id}
+              to="/incomes"
+              search={{ year, month, categoryIncome: row.category.id }}
+              title={row.category.title}
+              subtitle={`YTD ${formatMoney(row.ytd)} · Year ${formatMoney(row.annual)}`}
+              value={formatMoney(row.month)}
+            />
+          ))}
+        </div>
+        <ScrollArea className="home-table" type="auto">
+          <Table miw={600} className="data-table home-data-table">
             <Table.Thead>
               <Table.Tr>
-                <Table.Th pl="md">Category</Table.Th>
-                <Table.Th ta="right">Current</Table.Th>
-                <Table.Th ta="right">Year-to-Date</Table.Th>
-                <Table.Th ta="right" pr="md">
-                  Annual
-                </Table.Th>
+                <Table.Th>Category</Table.Th>
+                <Table.Th ta="right">{monthName}</Table.Th>
+                <Table.Th ta="right">{year} to date</Table.Th>
+                <Table.Th ta="right">Full year</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {incomeCategoryRows(d.incomes, d.incomeCategories, year, month).map((row) => (
+              {incomeRows.map((row) => (
                 <Table.Tr key={row.category.id}>
-                  <Table.Td pl="md">
-                    <CategoryLink to="/incomes" search={{ year, month, categoryIncome: row.category.id }}>
+                  <Table.Td>
+                    <Link
+                      to="/incomes"
+                      search={{ year, month, categoryIncome: row.category.id } as never}
+                      className="row-link"
+                    >
                       {row.category.title}
-                    </CategoryLink>
+                    </Link>
                   </Table.Td>
                   {[row.month, row.ytd, row.annual].map((amount, i) => (
-                    <Table.Td key={i} ta="right" pr={i === 2 ? 'md' : undefined} c={amount > 0 ? positive : undefined}>
+                    <Table.Td key={i} ta="right" c={amount > 0 ? undefined : 'var(--color-text-muted)'}>
                       <Money value={amount} />
                     </Table.Td>
                   ))}
                 </Table.Tr>
               ))}
             </Table.Tbody>
+            <Table.Tfoot>
+              <Table.Tr data-total>
+                <Table.Td>Total</Table.Td>
+                {[incomeTotals.month, incomeTotals.ytd, incomeTotals.annual].map((amount, i) => (
+                  <Table.Td key={i} ta="right">
+                    <Money value={amount} />
+                  </Table.Td>
+                ))}
+              </Table.Tr>
+            </Table.Tfoot>
           </Table>
         </ScrollArea>
       </Section>
 
       {investments.rows.length > 0 && (
         <Section title="Investments">
-          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm" px="md" pt="sm">
-            <Stat size="md" label="Total Value" value={formatMoney(investments.value)} />
-            <Stat size="md" label="Total Invested" value={formatMoney(investments.invested)} />
-            <Stat
-              size="md"
-              label="Total P&L"
-              value={`${formatMoney(investments.profit)} (${formatPercent(investments.returnRate, 2)})`}
+          <div className="stat-tile-grid investments-stats">
+            <StatTile label="Value" value={formatMoney(investments.value)} />
+            <StatTile label="Invested" value={formatMoney(investments.invested)} />
+            <StatTile
+              label="Profit/loss"
+              value={formatMoney(investments.profit)}
               color={colorBySign(investments.profit)}
+              footnote={`${formatPercent(investments.returnRate, 2)} return`}
             />
-          </SimpleGrid>
-          <ScrollArea mt="sm">
-            <Table miw={500}>
+            <StatTile
+              label="All contributions"
+              value={formatMoney(ytd.totalInvested)}
+              footnote="Including closed holdings"
+            />
+          </div>
+          <div className="grouped-list" data-mobile>
+            {holdings.map((r) => (
+              <GroupedRow
+                key={r.investment.id}
+                to="/investments/$id"
+                params={{ id: r.investment.id }}
+                title={r.investment.name}
+                subtitle={`Invested ${formatMoney(r.invested)}`}
+                value={formatMoney(r.value)}
+                detail={
+                  <span className={r.profit >= 0 ? 'positive' : 'negative'}>
+                    {formatMoney(r.profit)} · {formatPercent(r.returnRate, 2)}
+                  </span>
+                }
+              />
+            ))}
+          </div>
+          <ScrollArea className="home-table" type="auto">
+            <Table miw={560} className="data-table home-data-table">
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th pl="md">Name</Table.Th>
-                  <Table.Th ta="right">Current Value</Table.Th>
-                  <Table.Th ta="right">Total Invested</Table.Th>
-                  <Table.Th ta="right" pr="md">
-                    P&L
-                  </Table.Th>
+                  <Table.Th>Holding</Table.Th>
+                  <Table.Th ta="right">Value</Table.Th>
+                  <Table.Th ta="right">Invested</Table.Th>
+                  <Table.Th ta="right">Profit/loss</Table.Th>
+                  <Table.Th ta="right">Return</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {investments.rows.map((r) => (
+                {holdings.map((r) => (
                   <Table.Tr key={r.investment.id}>
-                    <Table.Td pl="md">{r.investment.name}</Table.Td>
-                    <Table.Td ta="right">
+                    <Table.Td>
+                      <Link to="/investments/$id" params={{ id: r.investment.id }} className="row-link">
+                        {r.investment.name}
+                      </Link>
+                    </Table.Td>
+                    <Table.Td ta="right" fw={600}>
                       <Money value={r.value} />
                     </Table.Td>
                     <Table.Td ta="right">
                       <Money value={r.invested} />
                     </Table.Td>
-                    <Table.Td ta="right" pr="md" className="tabular-number" c={colorBySign(r.profit)}>
-                      {formatMoney(r.profit)} ({formatPercent(r.returnRate, 2)})
+                    <Table.Td ta="right" c={colorBySign(r.profit)}>
+                      <Money value={r.profit} />
+                    </Table.Td>
+                    <Table.Td ta="right" className="tabular-number" c={colorBySign(r.profit)}>
+                      {formatPercent(r.returnRate, 2)}
                     </Table.Td>
                   </Table.Tr>
                 ))}
@@ -242,40 +349,75 @@ function HomePage() {
   )
 }
 
-// A card holding one open-by-default accordion
+// A card with a title on desktop; on phones the card chrome goes and the title heads a grouped list
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Card padding={0}>
-      <Accordion defaultValue={title}>
-        <Accordion.Item value={title}>
-          <Accordion.Control styles={{ control: { paddingTop: 0, paddingBottom: 0 } }}>{title}</Accordion.Control>
-          <Accordion.Panel styles={{ content: { padding: 0 } }}>{children}</Accordion.Panel>
-        </Accordion.Item>
-      </Accordion>
+    <Card padding={0} className="home-section">
+      <Box className="home-section-header">
+        <CardTitle title={title} />
+      </Box>
+      {children}
     </Card>
   )
 }
 
-function CategoryLink({ to, search, children }: { to: string; search: object; children: ReactNode }) {
+// One tappable phone row: title and secondary line on the left, value and detail on the right
+function GroupedRow({
+  to,
+  search,
+  params,
+  title,
+  subtitle,
+  value,
+  valueColor,
+  detail,
+  meter
+}: {
+  to: string
+  search?: object
+  params?: object
+  title: string
+  subtitle: string
+  value: string
+  valueColor?: string
+  detail?: ReactNode
+  meter?: ReactNode
+}) {
   return (
-    <Anchor component={Link} to={to} search={search as never} underline="hover" fz="sm" fw={500} c="forest.7">
-      {children}
-    </Anchor>
+    <Link to={to} search={search as never} params={params as never} className="grouped-list-row">
+      <Box className="grouped-list-row-main">
+        <Text className="grouped-list-row-title">{title}</Text>
+        <Text className="grouped-list-row-subtitle">{subtitle}</Text>
+        {meter && <Box mt={6}>{meter}</Box>}
+      </Box>
+      <Stack gap={2} align="flex-end">
+        <Text className="grouped-list-row-value" c={valueColor}>
+          {value}
+        </Text>
+        {detail && <Text className="grouped-list-row-detail">{detail}</Text>}
+      </Stack>
+      <ChevronRight size={16} strokeWidth={2.5} className="grouped-list-chevron" />
+    </Link>
   )
 }
 
-// Budget amount with a +/- badge: green when under budget
-function BudgetCell({ budget, delta, pr }: { budget: number; delta: number; pr?: string }) {
-  const color = delta >= 0 ? positive : negative
+function SpentCell({ value, over }: { value: number; over: boolean }) {
   return (
-    <Table.Td ta="right" pr={pr} className="tabular-number">
-      <Stack gap={0} align="flex-end">
-        <Text fz="sm">{formatMoney(budget)}</Text>
-        <Badge size="xs" styles={{ root: { color, backgroundColor: `${color}1A` } }}>
-          {delta >= 0 ? '+' : '-'}
-          {formatMoney(Math.abs(delta))}
-        </Badge>
-      </Stack>
+    <Table.Td ta="right" className="group-start spent-cell" data-over={over || undefined}>
+      <Money value={value} />
+    </Table.Td>
+  )
+}
+
+// "$40 left" over "of $600" and a meter
+function BudgetCell({ spent, budget, groupStart }: { spent: number; budget: number; groupStart?: boolean }) {
+  return (
+    <Table.Td className={groupStart ? 'budget-cell group-start' : 'budget-cell'}>
+      <div className="budget-cell-text">
+        <BudgetRemaining spent={spent} budget={budget} />
+        <span className="budget-cell-of">of {formatMoney(budget)}</span>
+      </div>
+      <Meter used={spent} limit={budget} />
     </Table.Td>
   )
 }

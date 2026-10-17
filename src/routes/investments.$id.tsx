@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Button, Card, Center, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, BarChart3, DollarSign, Edit, PiggyBank, Trash2 } from 'lucide-react'
+import { ChevronLeft, BarChart3, Edit, PiggyBank, Trash2 } from 'lucide-react'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
 import { EntriesCard, InvestmentModal, PerformanceChart } from '@/components/investment'
-import { CardTitle, colorBySign, MetricList } from '@/components/ui'
+import { colorBySign, StatTile } from '@/components/ui'
 import { db, remove, save } from '@/db'
 import { investmentStats } from '@/lib/finance'
 import { formatMoney, formatPercent } from '@/lib/format'
@@ -34,39 +34,40 @@ function InvestmentDetailPage() {
 
   return (
     <Stack gap="md">
-      <Group justify="space-between">
-        <Button variant="subtle" color="gray" component={Link} to="/investments" leftSection={<ArrowLeft size={14} />}>
-          Back to Investments
-        </Button>
-        <Group gap="xs">
+      <Group justify="space-between" align="flex-start" wrap="nowrap" className="large-title-row">
+        <Stack gap={2}>
+          <Title order={1} className="large-title">
+            {investment.name}
+          </Title>
+          <Text c="dimmed" size="sm">
+            {investment.description || 'No description provided'}
+          </Text>
+        </Stack>
+        <Group gap="xs" wrap="nowrap">
           <Button variant="default" onClick={() => setEditing(true)} leftSection={<Edit size={14} />}>
             Edit
           </Button>
-          <Button color="red" onClick={() => setDeleting(true)} leftSection={<Trash2 size={14} />}>
+          <Button
+            variant="default"
+            c="var(--color-negative)"
+            onClick={() => setDeleting(true)}
+            leftSection={<Trash2 size={14} />}
+          >
             Delete
           </Button>
         </Group>
       </Group>
 
-      <Stack gap={2}>
-        <Title order={3}>{investment.name}</Title>
-        <Text c="dimmed" size="sm">
-          {investment.description || 'No description provided'}
-        </Text>
-      </Stack>
+      <Card>
+        <div className="stat-tile-grid stat-tile-strip">
+          <StatTile label="Current value" value={value === null ? 'N/A' : formatMoney(value)} />
+          <StatTile label="Invested" value={formatMoney(invested)} />
+          <StatTile label="Profit/loss" value={formatMoney(profit)} color={profitColor} />
+          <StatTile label="Return" value={value === null ? 'N/A' : formatPercent(returnRate, 2)} color={profitColor} />
+        </div>
+      </Card>
 
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
-        <Card>
-          <CardTitle icon={<DollarSign size={16} />} title="Overview" />
-          <MetricList
-            metrics={[
-              { label: 'Total Contributions', value: formatMoney(invested) },
-              { label: 'Current Value', value: formatMoney(value) },
-              { label: 'Profit/Loss', value: formatMoney(profit), color: profitColor },
-              { label: 'Return', value: value === null ? 'N/A' : formatPercent(returnRate, 2), color: profitColor }
-            ]}
-          />
-        </Card>
+      <SimpleGrid cols={1} spacing="sm">
         <PerformanceChart contributions={contributions} values={values} />
       </SimpleGrid>
 
@@ -93,7 +94,7 @@ function InvestmentDetailPage() {
 
       <InvestmentModal investment={editing ? investment : null} onClose={() => setEditing(false)} />
       <ConfirmDelete
-        title="Delete Investment"
+        title="Delete investment"
         opened={deleting}
         details={{ Investment: investment.name }}
         onClose={() => setDeleting(false)}
@@ -114,8 +115,8 @@ function NotFound() {
           Investment not found
         </Title>
         <Text c="dimmed">The investment you're looking for doesn't exist.</Text>
-        <Button component={Link} to="/investments" leftSection={<ArrowLeft size={14} />}>
-          Back to Investments
+        <Button component={Link} to="/investments" leftSection={<ChevronLeft size={16} />}>
+          Back to investments
         </Button>
       </Stack>
     </Center>

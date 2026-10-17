@@ -1,135 +1,129 @@
 /*
- * Handsontable overrides. The !important flags are required: Handsontable's
- * theme sets these properties with higher-specificity or inline rules.
+ * Handsontable, themed through its own CSS variables so light and dark follow our tokens.
+ * The theme class ("ht-theme-main-dark-auto") sits on the table root and on dropdowns rendered
+ * outside it; the doubled attribute selector outranks the theme's single-class rules.
  */
 
+[class*='ht-theme-main'][class*='ht-theme-main'] {
+  --ht-font-family: var(--font-body);
+  --ht-font-size: 13px;
+  --ht-font-size-small: 12px;
+  --ht-line-height: 20px;
+  --ht-font-weight: 400;
+  --ht-letter-spacing: -0.005em;
+
+  --ht-accent-color: var(--color-tint);
+  --ht-foreground-color: var(--color-text);
+  --ht-foreground-secondary-color: var(--color-text-secondary);
+  --ht-background-color: var(--color-surface);
+  --ht-background-secondary-color: var(--color-surface-secondary);
+  --ht-placeholder-color: var(--color-text-muted);
+  --ht-read-only-color: var(--color-text-muted);
+  --ht-disabled-color: var(--color-text-muted);
+
+  --ht-border-color: var(--color-border-light);
+  --ht-border-radius: 10px;
+  --ht-cell-horizontal-border-color: var(--color-border-light);
+  --ht-cell-vertical-border-color: var(--color-border-light);
+  --ht-cell-horizontal-padding: 10px;
+  --ht-cell-vertical-padding: 6px;
+
+  --ht-row-cell-odd-background-color: var(--color-surface);
+  --ht-row-cell-even-background-color: var(--color-surface);
+  --ht-cell-read-only-background-color: var(--color-surface);
+
+  --ht-header-background-color: var(--color-surface-secondary);
+  --ht-header-foreground-color: var(--color-text-secondary);
+  --ht-header-font-weight: 500;
+  --ht-header-active-background-color: var(--color-tint-fill-strong);
+  --ht-header-active-foreground-color: var(--color-tint);
+  --ht-header-active-border-color: var(--color-tint);
+  --ht-header-highlighted-background-color: var(--color-fill);
+  --ht-header-highlighted-foreground-color: var(--color-text);
+  --ht-header-row-background-color: var(--color-surface-secondary);
+  --ht-header-row-foreground-color: var(--color-text-muted);
+  --ht-header-row-active-background-color: var(--color-tint-fill-strong);
+  --ht-header-row-active-foreground-color: var(--color-tint);
+  --ht-header-row-highlighted-background-color: var(--color-fill);
+  --ht-header-row-highlighted-foreground-color: var(--color-text);
+
+  --ht-cell-selection-background-color: var(--color-tint);
+  --ht-cell-selection-border-color: var(--color-tint);
+  --ht-cell-selection-handle-background-color: var(--color-tint);
+  --ht-cell-selection-handle-border-color: var(--color-surface);
+
+  --ht-cell-editor-background-color: var(--color-surface);
+  --ht-cell-editor-foreground-color: var(--color-text);
+  --ht-cell-editor-border-color: var(--color-tint);
+  --ht-cell-editor-shadow-color: var(--color-tint);
+
+  --ht-cell-error-background-color: var(--color-negative-background);
+  --ht-cell-success-background-color: var(--color-positive-background);
+
+  --ht-checkbox-border-color: var(--color-border);
+  --ht-checkbox-background-color: var(--color-surface);
+  --ht-checkbox-checked-background-color: var(--color-tint);
+  --ht-checkbox-checked-border-color: var(--color-tint);
+  --ht-checkbox-checked-icon-color: #fff;
+  --ht-checkbox-focus-ring-color: var(--color-tint-fill-strong);
+
+  --ht-resize-indicator-color: var(--color-tint);
+  --ht-move-indicator-color: var(--color-tint);
+  --ht-scrollbar-thumb-color: var(--color-border);
+}
+
 .spreadsheet {
-  font-family: var(--font-body);
-  font-size: 13px;
   width: 100%;
   min-width: 100%;
-  line-height: 1.4;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--color-border-light);
 }
 
-.spreadsheet .ht_master .wtHolder {
-  background: var(--color-surface);
+/* Numeric cells line up */
+.spreadsheet td.htRight {
+  font-variant-numeric: tabular-nums;
 }
 
-.spreadsheet td {
-  border-color: var(--color-border-light) !important;
-  padding: 0 4px !important;
-  color: var(--color-text);
-}
-
+/* Header labels read like Shopify's column headings: small, muted, not shouting */
 .spreadsheet th {
-  background: var(--color-page-background) !important;
-  border-color: var(--color-border) !important;
-  color: var(--color-text-secondary);
-  font-family: var(--font-body);
-  font-weight: 600;
-  padding: 0 4px !important;
-  height: 24px !important;
-  line-height: 24px !important;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  vertical-align: middle;
+  font-size: 12px;
   text-align: inherit;
 }
 
-.spreadsheet .ht_clone_top th {
-  height: 24px !important;
-  line-height: 24px !important;
-}
-
-.spreadsheet .ht_clone_top_inline_start_corner th {
-  height: 24px !important;
-}
-
-/* Selection */
-.spreadsheet .ht__highlight {
-  background: var(--color-accent-background) !important;
-}
-
-.spreadsheet .area {
-  background: var(--color-accent-background-strong) !important;
-}
-
-.spreadsheet .current.area {
-  border: 2px solid var(--color-accent) !important;
-}
-
-/* Right-aligned (numeric) cells */
-.spreadsheet td.htRight {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-}
-
-.spreadsheet .ht__row_header {
-  background: var(--color-page-background) !important;
-  color: var(--color-text-muted);
-  font-size: 11px;
-}
-
-.spreadsheet .htAutocompleteArrow {
-  color: var(--color-text-muted);
-}
-
-/* Cell editor */
-.spreadsheet .handsontableInput {
-  font-family: var(--font-body);
-  font-size: 13px;
-  padding: 4px 6px;
-  border: 2px solid var(--color-accent) !important;
-  border-radius: 4px;
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-
-.spreadsheet input[type='text'] {
-  font-family: var(--font-body);
-}
-
-/* Select-column autocomplete dropdown (rendered outside .spreadsheet) */
-.handsontable.listbox {
-  font-family: var(--font-body);
-  font-size: 13px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-popover);
-  border-radius: 8px;
-}
-
-.handsontable.listbox .ht_master table {
-  border: none;
-}
-
-.handsontable.listbox td.current {
-  background: var(--color-accent-background) !important;
-  color: var(--color-text);
-}
-
 .spreadsheet .spreadsheet-duplicate-row {
-  background-color: var(--color-negative-background) !important;
+  background-color: var(--color-negative-background);
 }
 
-/* Read-only cells */
+/* Read-only cells: muted, not italic */
 .spreadsheet .htDimmed {
-  color: var(--color-text-muted);
-  font-style: italic;
+  font-style: normal;
 }
 
 .spreadsheet-delete-button {
+  display: grid;
+  place-items: center;
   width: 100%;
   height: 100%;
-  border: none;
-  background: transparent;
+  min-height: 30px;
+  padding: 0;
+  border: none !important;
+  border-radius: 0;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: var(--color-text-muted);
   cursor: pointer;
-  font-size: 14px;
-  padding: 2px;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .spreadsheet-delete-button:hover {
-  background: #fee;
+  color: var(--color-negative);
+  background: var(--color-negative-background) !important;
+}
+
+/* Dates never wrap, even in narrow sheets */
+[class*='ht-theme-main'] td.ht-nowrap {
+  white-space: nowrap;
 }

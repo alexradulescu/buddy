@@ -5,9 +5,9 @@ import { Plus } from 'lucide-react'
 
 import { InvestmentModal } from '@/components/investment'
 import { PageHeader } from '@/components/shell'
-import { colorBySign, Stat } from '@/components/ui'
+import { colorBySign, Stat, StatTile } from '@/components/ui'
 import { db } from '@/db'
-import { investmentStats } from '@/lib/finance'
+import { investmentStats, portfolio } from '@/lib/finance'
 import { formatMoney, formatPercent } from '@/lib/format'
 
 export const Route = createFileRoute('/investments/')({ component: InvestmentsPage })
@@ -19,9 +19,10 @@ function InvestmentsPage() {
   const [adding, setAdding] = useState(false)
 
   const investments = data?.investments ?? []
-  const stats = investments.map((i) =>
-    investmentStats(i, data?.investmentContributions ?? [], data?.investmentValues ?? [])
-  )
+  const contributions = data?.investmentContributions ?? []
+  const values = data?.investmentValues ?? []
+  const stats = investments.map((i) => investmentStats(i, contributions, values))
+  const total = portfolio(investments, contributions, values)
 
   return (
     <Stack gap="md">
@@ -29,14 +30,14 @@ function InvestmentsPage() {
         actions={
           <>
             <Button onClick={() => setAdding(true)} leftSection={<Plus size={16} />} visibleFrom="sm">
-              Add Investment
+              Add investment
             </Button>
             <ActionIcon
               onClick={() => setAdding(true)}
-              variant="filled"
+              variant="light"
               hiddenFrom="sm"
               size="lg"
-              aria-label="Add Investment"
+              aria-label="Add investment"
             >
               <Plus size={18} />
             </ActionIcon>
@@ -53,17 +54,32 @@ function InvestmentsPage() {
                 Get started by adding your first investment
               </Text>
               <Button onClick={() => setAdding(true)} leftSection={<Plus size={16} />}>
-                Add Investment
+                Add investment
               </Button>
             </Stack>
           </Center>
         </Card>
       ) : (
-        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="sm">
-          {stats.map((s) => (
-            <InvestmentCard key={s.investment.id} {...s} />
-          ))}
-        </SimpleGrid>
+        <>
+          <Card>
+            <div className="stat-tile-grid stat-tile-strip">
+              <StatTile label="Total value" value={formatMoney(total.value)} footnote="Active investments" />
+              <StatTile label="Invested" value={formatMoney(total.invested)} />
+              <StatTile
+                label="Profit/loss"
+                value={formatMoney(total.profit)}
+                color={colorBySign(total.profit)}
+                footnote={`${formatPercent(total.returnRate, 2)} return`}
+              />
+              <StatTile label="Active" value={`${total.rows.length} of ${investments.length}`} />
+            </div>
+          </Card>
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="sm">
+            {stats.map((s) => (
+              <InvestmentCard key={s.investment.id} {...s} />
+            ))}
+          </SimpleGrid>
+        </>
       )}
 
       <InvestmentModal investment={adding ? blank : null} onClose={() => setAdding(false)} />
@@ -88,8 +104,8 @@ function InvestmentCard({ investment, invested, value, profit, returnRate }: Ret
         )}
         <SimpleGrid cols={2} spacing={4}>
           <Stat label="Contributions" value={formatMoney(invested)} />
-          <Stat label="Current Value" value={formatMoney(value)} />
-          <Stat label="Profit/Loss" value={formatMoney(profit)} color={profitColor} />
+          <Stat label="Current value" value={formatMoney(value)} />
+          <Stat label="Profit/loss" value={formatMoney(profit)} color={profitColor} />
           <Stat label="Return" value={value === null ? 'N/A' : formatPercent(returnRate, 2)} color={profitColor} />
         </SimpleGrid>
       </Card>

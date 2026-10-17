@@ -1,25 +1,14 @@
-import { useState } from 'react'
-import {
-  Button,
-  Group,
-  NumberInput,
-  ScrollArea,
-  Select,
-  Stack,
-  Table,
-  Text,
-  TextInput,
-  UnstyledButton
-} from '@mantine/core'
+import { useState, type CSSProperties } from 'react'
+import { ActionIcon, Button, Group, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core'
+import { useElementSize } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import dayjs from 'dayjs'
-import { ArrowDown, ArrowUp, ArrowUpDown, Edit, Search, Trash } from 'lucide-react'
+import { Edit, Search, Trash } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 
 import { ConfirmDelete } from '@/components/confirm-delete'
 import { EntryModal, type Entry, type Option } from '@/components/entry-modal'
 import { Sheet, type SheetColumn } from '@/components/sheet'
-import { Money } from '@/components/ui'
 import { remove, save } from '@/db'
 import { inMonth } from '@/lib/finance'
 import { formatMoney } from '@/lib/format'
@@ -65,7 +54,8 @@ export function DraftEntry({
   drafts,
   setDrafts,
   year,
-  month
+  month,
+  onSaved
 }: {
   entity: Entity
   categories: Option[]
@@ -73,6 +63,7 @@ export function DraftEntry({
   setDrafts: (drafts: Draft[]) => void
   year: number
   month: number
+  onSaved?: () => void
 }) {
   const [count, setCount] = useState(1)
 
@@ -90,117 +81,173 @@ export function DraftEntry({
       <Group gap="xs">
         <NumberInput value={count} onChange={(v) => setCount(Number(v) || 1)} min={1} w={60} />
         <Button onClick={() => setDrafts([...drafts, ...Array.from({ length: count }, () => newDraft(year, month))])}>
-          Add Rows
+          Add rows
         </Button>
       </Group>
-      <Button fullWidth onClick={() => saveDrafts(entity, drafts, year, month) && setDrafts([])}>
-        Save {entity === 'expenses' ? 'Expenses' : 'Incomes'}
+      <Button
+        fullWidth
+        onClick={() => {
+          if (!saveDrafts(entity, drafts, year, month)) return
+          setDrafts([])
+          onSaved?.()
+        }}
+      >
+        Save {entity}
       </Button>
     </Stack>
   )
 }
 
-type SortKey = 'date' | 'description' | 'category' | 'amount'
+type Sort = 'newest' | 'oldest' | 'highest' | 'lowest'
+
+const sortOptions: { value: Sort; label: string }[] = [
+  { value: 'newest', label: 'Newest first' },
+  { value: 'oldest', label: 'Oldest first' },
+  { value: 'highest', label: 'Highest amount' },
+  { value: 'lowest', label: 'Lowest amount' }
+]
+
+type Row = Entry & { category: string }
+
+// Wallet-style sections: one per day when sorted by date, a single unlabelled one when sorted by amount
+function groupRows(rows: Row[], byDay: boolean) {
+  if (!byDay) return [{ key: 'all', label: null, total: 0, rows }]
+  const groups: { key: string; label: string | null; total: number; rows: Row[] }[] = []
+  for (const row of rows) {
+    const last = groups.at(-1)
+    if (last?.key === row.date) {
+      last.rows.push(row)
+      last.total += row.amount
+    } else {
+      groups.push({ key: row.date, label: dayjs(row.date).format('ddd D MMM'), total: row.amount, rows: [row] })
+    }
+  }
+  return groups
+}
 
 // Saved entries of the month: search, category filter (in URL), sort, edit, delete
 export function TransactionList({ entity, rows, categories }: { entity: Entity; rows: Entry[]; categories: Option[] }) {
   const noun = entity === 'expenses' ? 'expense' : 'income'
+  const Noun = entity === 'expenses' ? 'Expense' : 'Income'
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useQueryState(noun === 'expense' ? 'categoryExpense' : 'categoryIncome')
-  const [sort, setSort] = useState<{ key: SortKey; asc: boolean }>({ key: 'date', asc: true })
+  const [sort, setSort] = useState<Sort>('newest')
   const [editing, setEditing] = useState<Entry | null>(null)
   const [deleting, setDeleting] = useState<Entry | null>(null)
 
   const categoryName = (id: string) => categories.find((c) => c.value === id)?.label ?? ''
   const term = search.toLowerCase()
-  const visible = rows
+  const visible: Row[] = rows
     .map((r) => ({ ...r, category: categoryName(r.categoryId) }))
     .filter((r) => !categoryFilter || r.categoryId === categoryFilter)
     .filter((r) => `${r.description} ${r.category} ${r.amount}`.toLowerCase().includes(term))
     .sort((a, b) => {
-      const cmp = sort.key === 'amount' ? a.amount - b.amount : String(a[sort.key]).localeCompare(String(b[sort.key]))
-      return sort.asc ? cmp : -cmp
+      if (sort === 'highest') return b.amount - a.amount
+      if (sort === 'lowest') return a.amount - b.amount
+      const cmp = a.date.localeCompare(b.date)
+      return sort === 'oldest' ? cmp : -cmp
     })
-
-  const header = (key: SortKey, label: string) => {
-    const Icon = sort.key !== key ? ArrowUpDown : sort.asc ? ArrowUp : ArrowDown
-    return (
-      <UnstyledButton onClick={() => setSort({ key, asc: sort.key === key ? !sort.asc : true })}>
-        <Group gap={4} wrap="nowrap" justify={key === 'amount' ? 'flex-end' : 'flex-start'}>
-          <Text fw={700} size="sm">
-            {label}
-          </Text>
-          <Icon size={14} opacity={sort.key === key ? 1 : 0.4} />
-        </Group>
-      </UnstyledButton>
-    )
-  }
+  const total = visible.reduce((sum, r) => sum + r.amount, 0)
+  const byDay = sort === 'newest' || sort === 'oldest'
+  const groups = groupRows(visible, byDay)
+  // Day headers stick just below the sticky filter bar, whose height changes as it wraps
+  const { ref: toolbarRef, height: toolbarHeight } = useElementSize()
 
   return (
-    <Stack gap="sm">
-      <TextInput
-        placeholder={`Search ${entity}...`}
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        leftSection={<Search size={14} />}
-      />
-      <Group gap="xs">
-        <Text size="xs" c="dimmed">
-          Filter:
-        </Text>
-        <Select
-          flex={1}
-          value={categoryFilter ?? 'all'}
-          onChange={(v) => setCategoryFilter(v === 'all' ? null : v)}
-          data={[{ value: 'all', label: 'All categories' }, ...categories]}
-        />
-      </Group>
+    <Stack gap={0} style={{ '--tx-toolbar-height': `${toolbarHeight}px` } as CSSProperties}>
+      <Stack gap="sm" className="tx-toolbar" ref={toolbarRef}>
+        <Group justify="space-between" align="baseline" gap="xs">
+          <Text fw={600} size="lg">
+            {visible.length} {visible.length === 1 ? noun : entity}
+          </Text>
+          <Text fw={600} size="lg" className="tabular">
+            {formatMoney(total)}
+          </Text>
+        </Group>
+        <Group gap="xs" wrap="wrap">
+          <TextInput
+            flex="2 1 180px"
+            placeholder={`Search ${entity}`}
+            aria-label={`Search ${entity}`}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            leftSection={<Search size={14} />}
+          />
+          <Select
+            flex="1 1 150px"
+            aria-label="Category"
+            value={categoryFilter ?? 'all'}
+            onChange={(v) => setCategoryFilter(v === 'all' ? null : v)}
+            data={[{ value: 'all', label: 'All categories' }, ...categories]}
+          />
+          <Select
+            flex="1 1 140px"
+            aria-label="Sort"
+            value={sort}
+            onChange={(v) => v && setSort(v as Sort)}
+            data={sortOptions}
+            allowDeselect={false}
+          />
+        </Group>
+      </Stack>
 
       {visible.length === 0 ? (
-        <Text ta="center" c="dimmed" py="md" size="sm">
+        <Text ta="center" c="dimmed" pt="lg" pb="xs" size="sm">
           No {entity} found for this period.
         </Text>
       ) : (
-        <>
-          <Text size="xs" c="dimmed">
-            {visible.length} {visible.length === 1 ? 'item' : 'items'}
-          </Text>
-          <ScrollArea mah={500}>
-            <Table miw={450} stickyHeader>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th w={80}>{header('date', 'Date')}</Table.Th>
-                  <Table.Th>{header('description', 'Description')}</Table.Th>
-                  <Table.Th>{header('category', 'Category')}</Table.Th>
-                  <Table.Th w={70}>{header('amount', 'Amount')}</Table.Th>
-                  <Table.Th w={60}>Actions</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {visible.map((row) => (
-                  <Table.Tr key={row.id}>
-                    <Table.Td>{dayjs(row.date).format('DD MMM YYYY')}</Table.Td>
-                    <Table.Td>{row.description}</Table.Td>
-                    <Table.Td c="dimmed">{row.category}</Table.Td>
-                    <Table.Td ta="right" c={row.amount < 0 ? 'green.6' : undefined}>
-                      <Money value={row.amount} />
-                    </Table.Td>
-                    <Table.Td>
-                      <Group gap={4} wrap="nowrap">
-                        <Button size="compact-xs" variant="subtle" color="gray" onClick={() => setEditing(row)}>
-                          <Edit size={12} />
-                        </Button>
-                        <Button size="compact-xs" variant="subtle" color="red" onClick={() => setDeleting(row)}>
-                          <Trash size={12} />
-                        </Button>
-                      </Group>
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-          </ScrollArea>
-        </>
+        <div className="tx-list">
+          {groups.map((group) => (
+            <section key={group.key} className="tx-day">
+              {group.label && (
+                <header className="tx-day-header">
+                  <span>{group.label}</span>
+                  <span className="tabular">{formatMoney(group.total)}</span>
+                </header>
+              )}
+              {group.rows.map((row) => (
+                <div
+                  key={row.id}
+                  className="tx-row"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setEditing(row)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setEditing(row)
+                    }
+                  }}
+                >
+                  <div className="tx-row-main">
+                    <div className="tx-row-title">{row.description || 'Untitled'}</div>
+                    <div className="tx-row-subtitle">
+                      {!byDay && `${dayjs(row.date).format('D MMM')} · `}
+                      {row.category || 'Uncategorized'}
+                    </div>
+                  </div>
+                  <div className="tx-row-amount" data-positive={row.amount < 0 || undefined}>
+                    {formatMoney(row.amount)}
+                  </div>
+                  <Group gap={2} wrap="nowrap" className="row-actions" onClick={(e) => e.stopPropagation()}>
+                    <ActionIcon size="sm" aria-label="Edit" className="tx-row-edit" onClick={() => setEditing(row)}>
+                      <Edit size={14} />
+                    </ActionIcon>
+                    <ActionIcon
+                      size="sm"
+                      c="var(--color-negative)"
+                      className="tx-row-delete"
+                      aria-label="Delete"
+                      onClick={() => setDeleting(row)}
+                    >
+                      <Trash size={14} />
+                    </ActionIcon>
+                  </Group>
+                </div>
+              ))}
+            </section>
+          ))}
+        </div>
       )}
 
       <EntryModal
@@ -208,10 +255,14 @@ export function TransactionList({ entity, rows, categories }: { entity: Entity; 
         entry={editing}
         categories={categories}
         onClose={() => setEditing(null)}
+        onDelete={(entry) => {
+          setEditing(null)
+          setDeleting(entry)
+        }}
         onSave={(entry) => {
           save(entity, entry)
           setEditing(null)
-          notifications.show({ title: `${noun} updated`, message: entry.description, color: 'green' })
+          notifications.show({ title: `${Noun} updated`, message: entry.description, color: 'green' })
         }}
       />
       <ConfirmDelete
