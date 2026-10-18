@@ -5,7 +5,7 @@ import dayjs from 'dayjs'
 import { ChevronDown, ChevronRight, Download } from 'lucide-react'
 
 import { PageHeader } from '@/components/shell'
-import { BudgetRemaining, CardTitle, colorBySign, Meter, Money, StatTile } from '@/components/ui'
+import { BudgetRemaining, CardTitle, colorBySign, Meter, overspendColor, Money, StatTile } from '@/components/ui'
 import { db } from '@/db'
 import { useMonth } from '@/hooks/use-month'
 import { downloadCSV, fullCSV, overviewCSV, type ExportData } from '@/lib/csv'
@@ -96,7 +96,7 @@ function HomePage() {
 
       <Card className="hero-card">
         <Text className="hero-label">{`${monthName} ${year}`}</Text>
-        <Text className="hero-value tabular-number" c={monthLeft < 0 ? 'var(--color-negative)' : undefined}>
+        <Text className="hero-value tabular-number" c={overspendColor(monthLeft)}>
           {formatMoney(Math.abs(monthLeft))} {monthLeft < 0 ? 'over budget' : 'left this month'}
         </Text>
         <Meter used={monthSpent} limit={totals.budgetMonth} />

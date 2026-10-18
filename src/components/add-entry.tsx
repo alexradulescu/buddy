@@ -43,7 +43,7 @@ export function AddEntry({
         </ActionIcon>,
         document.body
       )}
-      <Modal opened={opened} onClose={() => setOpened(false)} title={label} size="lg" keepMounted>
+      <Modal opened={opened} onClose={() => setOpened(false)} title={label} size="min(1200px, 94vw)" keepMounted>
         {children}
       </Modal>
     </>

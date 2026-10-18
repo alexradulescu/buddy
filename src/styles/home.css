@@ -177,6 +177,10 @@
   background: var(--color-negative);
 }
 
+.meter[data-over='slight'] .meter-fill {
+  background: var(--color-warning);
+}
+
 .budget-remaining {
   font-weight: 500;
   color: var(--color-text);
